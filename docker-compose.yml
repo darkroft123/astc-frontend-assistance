@@ -1,0 +1,27 @@
+name: astc-frontend-assistance
+
+version: "3.9"
+
+services:
+  frontend-assistance:
+    build: ./services/frontend-assistance
+    container_name: astc-frontend-assistance
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/frontend-assistance:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_GRAPHQL_URL: http://localhost:8082/graphql
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    command: npm run dev
+    networks:
+      - astc-network
+    restart: unless-stopped
+
+networks:
+  astc-network:
+    driver: bridge
