@@ -64,23 +64,23 @@ export function MobileSidebar({
       {/* Panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 z-[70] h-full w-72 bg-card shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col",
+          "fixed top-0 right-0 z-[70] h-full w-80 bg-[#10121d] border-l border-white/[0.06] shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col p-4",
           open ? "translate-x-0" : "translate-x-full",
           className
         )}
       >
         {/* Close button */}
-        <div className="flex justify-end p-4">
+        <div className="flex justify-end pb-2">
           <button
             onClick={() => setOpen(false)}
-            className="p-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors"
+            className="p-2 rounded-xl hover:bg-white/[0.06] text-slate-400 hover:text-white transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar">
           {children}
         </div>
       </div>
@@ -93,7 +93,8 @@ export function HamburgerButton() {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="md:hidden p-2 rounded-xl hover:bg-zinc-100 text-zinc-600 transition-colors"
+      className="md:hidden p-2 rounded-xl bg-white/[0.04] border border-white/[0.06] text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors"
+      aria-label="Abrir menú"
     >
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
