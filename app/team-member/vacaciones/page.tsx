@@ -163,16 +163,7 @@ export default function VacationsPage() {
   };
 
   const statusBadge = (status: string) => {
-    switch (status) {
-      case "APPROVED": 
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 shadow-sm"><CheckCircle2 className="w-3.5 h-3.5" /> Aprobado</span>;
-      case "REJECTED": 
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 shadow-sm"><Ban className="w-3.5 h-3.5" /> Rechazado</span>;
-      case "CANCELLED": 
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-muted text-zinc-600 shadow-sm"><XCircle className="w-3.5 h-3.5" /> Cancelado</span>;
-      default: 
-        return <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 shadow-sm"><Clock className="w-3.5 h-3.5" /> Pendiente</span>;
-    }
+    return <StatusBadge status={status as any} />;
   };
 
   const columns: Column<any>[] = [
@@ -224,30 +215,31 @@ export default function VacationsPage() {
             onClick={() => { fetchData(); setDialogOpen(true); }}
             disabled={balance?.availableDays === 0}
             title={balance?.availableDays === 0 ? "No tienes días de vacaciones disponibles" : ""}
-            className="bg-primary hover:bg-primary/90 rounded-xl h-11 px-5 text-sm font-bold shadow-md shrink-0 mt-1 disabled:opacity-50 disabled:hover:bg-primary"
+            variant="gradient"
+            className="h-11 px-5 text-sm font-bold shrink-0 mt-1 disabled:opacity-50"
           >
             <Plus className="w-4 h-4 mr-1.5" />
-            Nueva Solicitud
+            Nueva solicitud
           </Button>
         </div>
 
         {/* ELIGIBILITY BANNER */}
         {eligibility && !eligibility.isEligible && (
-          <Card className="border-0 shadow-sm ring-1 ring-amber-200/50 bg-gradient-to-b from-white to-amber-50/30 rounded-2xl mb-6">
-            <CardContent className="p-5">
+          <Card className="border border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-950/20 rounded-2xl mb-6 shadow-sm">
+            <CardContent className="p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                  <Hourglass className="w-5 h-5 text-amber-600" />
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                  <Hourglass className="w-5 h-5 text-amber-500" />
                 </div>
                 <div className="space-y-1">
-                  <p className="font-bold text-amber-800 text-sm">Aún no puedes solicitar vacaciones</p>
-                  <p className="text-xs text-amber-700 leading-relaxed">
+                  <p className="font-bold text-amber-600 dark:text-amber-400 text-sm">Aún no puedes solicitar vacaciones</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Debes completar al menos <strong>{eligibility.requiredDays === 1 ? `${eligibility.requiredDays} día` : `${eligibility.requiredDays} días`}</strong> en el proyecto para poder solicitar vacaciones.
                     Has completado <strong>{Math.max(0, eligibility.daysElapsed) === 1 ? `${Math.max(0, eligibility.daysElapsed)} día` : `${Math.max(0, eligibility.daysElapsed)} días`}</strong>.
                     Te faltan <strong>{eligibility.daysRemaining === 1 ? `${eligibility.daysRemaining} día` : `${eligibility.daysRemaining} días`}</strong>.
                   </p>
                   {eligibility.joinDate && (
-                    <p className="text-[11px] text-amber-600/80 pt-1">Fecha de ingreso: {format(new Date(eligibility.joinDate), "dd MMM yyyy", { locale: es })}</p>
+                    <p className="text-[11px] text-amber-500/80 pt-1 font-mono">Fecha de ingreso: {format(new Date(eligibility.joinDate), "dd MMM yyyy", { locale: es })}</p>
                   )}
                 </div>
               </div>
@@ -256,11 +248,11 @@ export default function VacationsPage() {
         )}
 
         {eligibility && eligibility.isEligible && balance?.availableDays === 0 && (
-          <Card className="border-0 shadow-sm ring-1 ring-amber-200/50 bg-gradient-to-b from-white to-amber-50/30 rounded-2xl mb-6">
+          <Card className="border border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-950/20 rounded-2xl mb-6 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-amber-700">
-                <ShieldAlert className="w-4 h-4" />
-                <p className="font-bold text-sm">
+              <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400">
+                <ShieldAlert className="w-4 h-4 shrink-0" />
+                <p className="font-semibold text-sm">
                   Has utilizado todos tus días de vacaciones. Debes esperar al próximo ciclo para conseguir más días.
                 </p>
               </div>
@@ -269,11 +261,11 @@ export default function VacationsPage() {
         )}
 
         {eligibility && eligibility.isEligible && balance?.availableDays !== 0 && (
-          <Card className="border-0 shadow-sm ring-1 ring-emerald-200/50 bg-gradient-to-b from-white to-emerald-50/30 rounded-2xl mb-6">
+          <Card className="border border-emerald-500/20 bg-emerald-500/[0.05] dark:bg-emerald-950/20 rounded-2xl mb-6 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-emerald-700">
-                <CheckCircle2 className="w-4 h-4" />
-                <p className="font-bold text-sm">
+              <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <p className="font-semibold text-sm">
                   Cumples con los {eligibility.requiredDays} días requeridos. ¡Puedes solicitar vacaciones!
                 </p>
               </div>
@@ -290,8 +282,8 @@ export default function VacationsPage() {
         </div>
 
         {/* History Table */}
-        <Card className="border-0 shadow-sm ring-1 ring-zinc-200/50 bg-card rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-zinc-100 bg-zinc-50/50 px-6 py-4">
+        <Card className="border border-border shadow-sm bg-card rounded-2xl overflow-hidden">
+          <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                 Historial de Solicitudes
@@ -299,7 +291,7 @@ export default function VacationsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-                className="text-xs border border-border rounded-lg px-2 py-1.5 text-zinc-600 bg-white"
+                className="text-xs border border-border rounded-xl px-3 py-1.5 text-foreground bg-background cursor-pointer"
               >
                 <option value="ALL">Todas</option>
                 <option value="PENDING">Pendientes</option>

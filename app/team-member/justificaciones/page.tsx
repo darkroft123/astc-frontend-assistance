@@ -122,7 +122,7 @@ export default function JustificationsPage() {
           onPeriodChange={(r) => { setDateRange(r); setPeriod(r.period); setPage(1); }}
         />
 
-        <Card className="flex-1 border-0 shadow-sm ring-1 ring-zinc-200/50 bg-card rounded-2xl overflow-hidden flex flex-col">
+        <Card className="flex-1 border border-border shadow-sm bg-card rounded-2xl overflow-hidden flex flex-col">
           <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
 
             <div className="flex flex-col gap-4 mb-6">

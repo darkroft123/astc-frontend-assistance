@@ -303,7 +303,7 @@ export default function AttendanceHistoryPage() {
         />
 
         {/* MAIN CARD */}
-        <Card className="flex-1 border-0 shadow-sm ring-1 ring-zinc-200/50 bg-card rounded-2xl overflow-hidden flex flex-col">
+        <Card className="flex-1 border border-border shadow-sm bg-card rounded-2xl overflow-hidden flex flex-col">
           <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
 
             {/* TOOLBAR: Metrics + Filters */}

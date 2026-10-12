@@ -240,46 +240,42 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-12 gap-4 sm:gap-6 my-6">
-              {UserProfileCard}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 my-6">
+              <MetricCard
+                icon={<User className="w-5 h-5" />}
+                value={metrics.totalAttendances}
+                title="Días presentes"
+                subtitle="Jornadas completadas"
+                badge="+5% vs mes ant."
+                color="emerald"
+              />
 
-              <div className="col-span-12 lg:col-span-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <MetricCard
-                  icon={<User />}
-                  value={metrics.totalAttendances}
-                  title="Asistencias"
-                  subtitle="Días presentes"
-                  trend="Último período"
-                  color="emerald"
-                />
+              <MetricCard
+                icon={<Clock className="w-5 h-5" />}
+                value={metrics.pendingJustifications}
+                title="Requiere acción"
+                subtitle="Por justificar"
+                badge="Pendiente"
+                color="amber"
+              />
 
-                <MetricCard
-                  icon={<Clock />}
-                  value={metrics.pendingJustifications}
-                  title="Pendientes"
-                  subtitle="Por justificar"
-                  trend="Revisión requerida"
-                  color="amber"
-                />
+              <MetricCard
+                icon={<XCircle className="w-5 h-5" />}
+                value={metrics.totalAbsences}
+                title="Faltas registradas"
+                subtitle="Ausencias en período"
+                badge="0 justif."
+                color="rose"
+              />
 
-                <MetricCard
-                  icon={<XCircle />}
-                  value={metrics.totalAbsences}
-                  title="Faltas"
-                  subtitle="Días ausentes"
-                  trend="Histórico"
-                  color="rose"
-                />
-
-                <MetricCard
-                  icon={<TrendingUp />}
-                  value={`${attendanceRate}%`}
-                  title="Cumplimiento"
-                  subtitle="Tasa general"
-                  trend="Promedio actual"
-                  color="blue"
-                />
-              </div>
+              <MetricCard
+                icon={<TrendingUp className="w-5 h-5" />}
+                value={`${attendanceRate}%`}
+                title="Tasa de cumplimiento"
+                subtitle="Meta mensual: 95%"
+                badge="Meta 95%"
+                color="sky"
+              />
             </div>
 
             <div className="grid grid-cols-12 gap-4 sm:gap-6 mt-4">

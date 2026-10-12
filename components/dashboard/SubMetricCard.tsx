@@ -1,34 +1,75 @@
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type MetricCardProps = {
   label: string;
   value: string | number;
   icon?: ReactNode;
   color?: "green" | "red" | "amber" | "blue" | "zinc";
+  className?: string;
 };
 
-export function SubMetricCard({ label, value, icon, color = "zinc" }: MetricCardProps) {
-  const style =
-    color === "green"
-      ? "bg-emerald-50 border-emerald-300 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400"
-      : color === "red"
-      ? "bg-red-50 border-red-300 text-red-700 dark:bg-red-950/40 dark:border-red-800 dark:text-red-400"
-      : color === "amber"
-      ? "bg-amber-50 border-amber-300 text-amber-700 dark:bg-amber-950/40 dark:border-amber-800 dark:text-amber-400"
-      : color === "blue"
-      ? "bg-blue-50 border-blue-300 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-400"
-      : "bg-muted/50 border-border text-foreground dark:bg-zinc-900/60 dark:border-zinc-800 dark:text-zinc-300";
+export function SubMetricCard({ label, value, icon, color = "zinc", className }: MetricCardProps) {
+  const colorStyles = {
+    green: {
+      card: "border-emerald-500/20 bg-emerald-500/[0.04] dark:bg-emerald-950/20",
+      iconBox: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+      value: "text-foreground",
+      label: "text-emerald-600 dark:text-emerald-400 font-semibold",
+    },
+    red: {
+      card: "border-rose-500/20 bg-rose-500/[0.04] dark:bg-rose-950/20",
+      iconBox: "text-rose-500 bg-rose-500/10 border-rose-500/20",
+      value: "text-foreground",
+      label: "text-rose-600 dark:text-rose-400 font-semibold",
+    },
+    amber: {
+      card: "border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-950/20",
+      iconBox: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+      value: "text-foreground",
+      label: "text-amber-600 dark:text-amber-400 font-semibold",
+    },
+    blue: {
+      card: "border-blue-500/20 bg-blue-500/[0.04] dark:bg-blue-950/20",
+      iconBox: "text-blue-500 bg-blue-500/10 border-blue-500/20",
+      value: "text-foreground",
+      label: "text-blue-600 dark:text-blue-400 font-semibold",
+    },
+    zinc: {
+      card: "border-border bg-card",
+      iconBox: "text-muted-foreground bg-muted border-border",
+      value: "text-foreground",
+      label: "text-muted-foreground font-medium",
+    },
+  };
+
+  const current = colorStyles[color] || colorStyles.zinc;
 
   return (
     <div
-      className={`border rounded-lg px-3 py-1.5 text-center ${style} shadow-sm min-w-[88px] flex flex-col items-center justify-center transition-colors`}
+      className={cn(
+        "rounded-2xl border p-4 shadow-sm flex flex-col justify-between transition-all",
+        current.card,
+        className
+      )}
     >
-      <p className="text-[9px] text-muted-foreground font-medium tracking-tight">
-        {label}
-      </p>
-      <div className="flex items-center gap-1.5 mt-0.5">
-        {icon && <div className="w-3.5 h-3.5 opacity-80">{icon}</div>}
-        <p className="text-base font-bold">{value}</p>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <div
+          className={cn(
+            "w-8 h-8 rounded-xl border flex items-center justify-center shrink-0",
+            current.iconBox
+          )}
+        >
+          {icon}
+        </div>
+        <span className={cn("text-[11px] font-mono uppercase tracking-wider", current.label)}>
+          {label}
+        </span>
+      </div>
+      <div className="mt-1">
+        <p className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-sans">
+          {value}
+        </p>
       </div>
     </div>
   );

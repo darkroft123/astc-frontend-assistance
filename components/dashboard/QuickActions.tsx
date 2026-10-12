@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Clock, XCircle, LogOut, BarChart3 } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, LogOut, BarChart3, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/jwt/auth/auth.provider";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
@@ -19,64 +19,80 @@ export function QuickActions() {
 
   useEffect(() => {
     if (!token || !project) return;
-    getTodayAttendance(token, project.id).then(att => {
+    getTodayAttendance(token, project.id).then((att) => {
       if (att?.checkIn && !att?.checkOut) setIsEntryDone(true);
     });
   }, [token, project]);
 
   return (
     <>
-    <Card className="w-full h-full border border-border rounded-3xl shadow-sm bg-card">
-      <CardContent className="p-5 flex flex-col justify-between h-full">
-        <div>
-          <h3 className="font-bold text-lg text-foreground">
-            Acciones Rápidas
-          </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Gestión de asistencia personal
-          </p>
-        </div>
+      <Card className="w-full h-full border border-border rounded-3xl shadow-sm bg-card">
+        <CardContent className="p-5 flex flex-col justify-between h-full">
+          <div>
+            <h3 className="font-sans font-bold text-lg text-foreground tracking-tight">
+              Acciones Rápidas
+            </h3>
+            <p className="font-sans text-xs text-muted-foreground mt-0.5">
+              Gestión de asistencia personal y solicitudes
+            </p>
+          </div>
 
-        <div className="grid grid-cols-2 gap-3.5 mt-4 flex-1 items-center">
-          <Button
-            onClick={() => router.push("/team-member/registrar")}
-            className={`h-24 sm:h-28 w-full justify-center text-sm font-bold rounded-2xl flex-col gap-2 shadow-sm text-white transition-all ${
-              isEntryDone
-                ? "bg-emerald-600 hover:bg-emerald-700"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            {isEntryDone ? <LogOut className="w-6 h-6" /> : <CheckCircle className="w-6 h-6" />}
-            <span className="text-sm font-bold">{isEntryDone ? "Marcar Salida" : "Registrar"}</span>
-          </Button>
+          <div className="grid grid-cols-2 gap-3.5 mt-4 flex-1 items-stretch">
+            {/* Primary Action Button (Registrar / Marcar Entrada o Salida) */}
+            <button
+              onClick={() => router.push("/team-member/registrar")}
+              className={`h-24 sm:h-28 w-full justify-center text-sm font-semibold rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98] ${
+                isEntryDone
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 hover:opacity-95 text-white shadow-[0_4px_20px_rgba(16,185,129,0.35)] border border-emerald-400/20"
+                  : "bg-gradient-to-r from-[#3B82F6] via-[#6366F1] to-[#8B5CF6] hover:opacity-95 text-white shadow-[0_4px_25px_rgba(99,102,241,0.45)] border border-white/10"
+              }`}
+            >
+              {isEntryDone ? (
+                <LogOut className="w-6 h-6 shrink-0" />
+              ) : (
+                <CheckCircle2 className="w-6 h-6 shrink-0" />
+              )}
+              <span className="font-sans font-bold text-sm tracking-tight">
+                {isEntryDone ? "Marcar Salida" : "Marcar Entrada"}
+              </span>
+            </button>
 
-          <Button
-            onClick={() => setShowJustificar(true)}
-            className="h-24 sm:h-28 w-full justify-center text-sm font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-2xl flex-col gap-2 shadow-sm transition-all"
-          >
-            <Clock className="w-6 h-6" />
-            <span className="text-sm font-bold">Justificar</span>
-          </Button>
+            {/* Justificar */}
+            <button
+              onClick={() => setShowJustificar(true)}
+              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/25 text-amber-600 dark:text-amber-400 rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
+            >
+              <Clock className="w-6 h-6 shrink-0" />
+              <span className="font-sans font-bold text-sm tracking-tight">
+                Justificar
+              </span>
+            </button>
 
-          <Button
-            onClick={() => router.push("/team-member/faltas")}
-            className="h-24 sm:h-28 w-full justify-center text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-2xl flex-col gap-2 shadow-sm transition-all"
-          >
-            <XCircle className="w-6 h-6" />
-            <span className="text-sm font-bold">Ver Faltas</span>
-          </Button>
+            {/* Ver Faltas */}
+            <button
+              onClick={() => router.push("/team-member/faltas")}
+              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-rose-500/10 hover:bg-rose-500/15 border border-rose-500/25 text-rose-600 dark:text-rose-400 rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
+            >
+              <XCircle className="w-6 h-6 shrink-0" />
+              <span className="font-sans font-bold text-sm tracking-tight">
+                Ver Faltas
+              </span>
+            </button>
 
-          <Button
-            onClick={() => router.push("/team-member/asistencias")}
-            className="h-24 sm:h-28 w-full justify-center text-sm font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl flex-col gap-2 shadow-sm transition-all"
-          >
-            <BarChart3 className="w-6 h-6" />
-            <span className="text-sm font-bold">Ver Asistencias</span>
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-    <JustificarModal open={showJustificar} onOpenChange={setShowJustificar} />
+            {/* Ver Asistencias */}
+            <button
+              onClick={() => router.push("/team-member/asistencias")}
+              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-indigo-500/10 hover:bg-indigo-500/15 border border-indigo-500/25 text-indigo-600 dark:text-indigo-400 rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
+            >
+              <BarChart3 className="w-6 h-6 shrink-0" />
+              <span className="font-sans font-bold text-sm tracking-tight">
+                Historial
+              </span>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+      <JustificarModal open={showJustificar} onOpenChange={setShowJustificar} />
     </>
   );
 }

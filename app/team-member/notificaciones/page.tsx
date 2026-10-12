@@ -232,15 +232,15 @@ export default function NotificationsPage() {
               key={key}
               onClick={() => setFilter(key)}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all",
                 filter === key
                   ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                  : "bg-card text-muted-foreground border-border hover:bg-accent"
+                  : "bg-muted/60 dark:bg-card text-muted-foreground border-border hover:text-foreground hover:bg-muted"
               )}
             >
               {label}
               {count != null && count > 0 && (
-                <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded-full", filter === key ? "bg-white/20" : "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300")}>
+                <span className={cn("text-[10px] font-bold px-1.5 py-0.2 rounded-full", filter === key ? "bg-white/20" : "bg-blue-500/10 text-blue-600 dark:text-blue-400")}>
                   {count}
                 </span>
               )}
@@ -271,15 +271,22 @@ export default function NotificationsPage() {
                     key={n.id}
                     onClick={() => handleClick(n)}
                     className={cn(
-                      "w-full text-left rounded-2xl border transition-all duration-200 hover:scale-[1.01] hover:shadow-md relative overflow-hidden group",
-                      n.read ? "bg-card border-border shadow-sm" : "bg-blue-50/40 dark:bg-blue-950/30 border-blue-200/50 dark:border-blue-800/50 shadow"
+                      "w-full text-left rounded-2xl border transition-all duration-200 hover:scale-[1.005] hover:shadow-md relative overflow-hidden group p-4 sm:p-5 flex items-start gap-4",
+                      n.read
+                        ? "bg-card border-border shadow-sm text-foreground"
+                        : "bg-card border-amber-500/30 dark:border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.06)]"
                     )}
                   >
-                    <div className={cn("absolute left-0 top-0 bottom-0 w-1.5 transition-colors", n.read ? colors.bg.replace('100', '300') : colors.bg.replace('100', '500'))} />
-                    <div className="p-5 pl-7 flex items-start gap-4">
-                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-105", colors.bg)}>
-                        <Icon className={cn("w-6 h-6", colors.text)} />
-                      </div>
+                    <div
+                      className={cn(
+                        "w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border",
+                        n.read
+                          ? "bg-muted border-border text-muted-foreground"
+                          : "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                      )}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
                       <div className="flex-1 min-w-0 pt-0.5">
                         <div className="flex items-start justify-between gap-3">
                           <p className={cn("text-base leading-snug", n.read ? "text-muted-foreground" : "text-foreground font-bold")}>{n.title}</p>

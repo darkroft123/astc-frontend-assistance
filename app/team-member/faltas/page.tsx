@@ -147,7 +147,9 @@ export default function AbsencesPage() {
         if (pendingAbsenceIds.has(row.id)) return <span className="text-zinc-400 text-xs italic">En revisión</span>;
         return (
           <Link href={`/team-member/justificar?absenceId=${row.id}&date=${row.date}`}>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 h-7 text-[11px] font-bold px-3">JUSTIFICAR</Button>
+            <Button size="sm" variant="gradient" className="h-7 text-[11px] font-bold px-3.5 rounded-full">
+              Justificar
+            </Button>
           </Link>
         );
       },
@@ -170,7 +172,7 @@ export default function AbsencesPage() {
           onPeriodChange={(r) => { setDateRange(r); setPeriod(r.period); setCurrentPage(1); }}
         />
 
-        <Card className="flex-1 border-0 shadow-sm ring-1 ring-zinc-200/50 bg-card rounded-2xl overflow-hidden flex flex-col">
+        <Card className="flex-1 border border-border shadow-sm bg-card rounded-2xl overflow-hidden flex flex-col">
           <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
             <div className="flex flex-col gap-4 mb-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
