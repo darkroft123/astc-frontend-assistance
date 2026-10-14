@@ -10,9 +10,9 @@ interface ActivityItemProps {
 
 export function ActivityItem({ initials, name, action, time, color }: ActivityItemProps) {
   const colorMap: Record<string, string> = {
-    blue: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-400",
-    emerald: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
-    amber: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400",
+    blue: "bg-primary/10 text-primary",
+    emerald: "bg-green/10 text-green-ink",
+    amber: "bg-amber/10 text-amber-ink",
   };
 
   return (

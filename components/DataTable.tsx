@@ -27,12 +27,12 @@ export function DataTable<T = any>({
   compact = false,
 }: DataTableProps<T>) {
   return (
-    <div className="w-full border border-border rounded-2xl bg-card shadow-sm overflow-x-auto">
+    <div className="w-full border border-border rounded-[14px] bg-card shadow-sm overflow-x-auto">
       <div className="overflow-y-auto" style={{ maxHeight }}>
 
         <table className="w-full text-sm min-w-[500px]">
 
-          <thead className="sticky top-0 bg-muted/80 dark:bg-[#181b2d] backdrop-blur text-muted-foreground dark:text-slate-300 z-10 border-b border-border">
+          <thead className="sticky top-0 bg-muted/80 backdrop-blur text-text-3 z-10 border-b border-border">
             <tr>
               {columns.map((col) => (
                 <th
@@ -52,10 +52,10 @@ export function DataTable<T = any>({
               <tr>
                 <td 
                   colSpan={columns.length} 
-                  className="text-center py-12 text-blue-500"
+                  className="text-center py-12 text-primary"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-6 h-6 border-2 border-blue-300 border-t-blue-700 rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     Cargando datos...
                   </div>
                 </td>
@@ -73,7 +73,7 @@ export function DataTable<T = any>({
               data.map((row, i) => (
                 <tr
                   key={(row as any)?.id ?? i}
-                  className="hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition-all duration-150 group"
+                  className="hover:bg-primary/5 transition-all duration-150 group"
                 >
                   {columns.map((col) => (
                     <td

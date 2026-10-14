@@ -150,8 +150,8 @@ export default function NotificationsPage() {
             </Button>
             <h1 className="text-xl font-bold text-foreground tracking-tight">Detalle de Notificación</h1>
           </div>
-          <Card className={cn("border-border shadow-md rounded-2xl overflow-hidden relative")}>
-            <div className={cn("absolute top-0 left-0 w-full h-1 bg-gradient-to-r", colors.gradient)} />
+          <Card className={cn("border-border shadow-md rounded-[16px] overflow-hidden relative")}>
+            <div className={cn("absolute top-0 left-0 w-full h-1", colors.gradient)} />
             <CardContent className="p-6">
               <div className="flex items-start gap-4 mb-6">
                 <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm", colors.bg)}>
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
                   Volver a la lista
                 </Button>
                 <Link href={link} className="flex-1">
-                  <Button className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all font-medium">
+                  <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all font-medium">
                     Ver más detalles
                   </Button>
                 </Link>
@@ -189,20 +189,20 @@ export default function NotificationsPage() {
         {/* HEADER */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-md">
-              <Bell className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-brand-gradient rounded-2xl flex items-center justify-center shadow-md">
+              <Bell className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground tracking-tight">Notificaciones</h1>
               {unreadCount > 0 ? (
-                <p className="text-sm text-blue-600 font-medium mt-0.5">{unreadCount} sin leer</p>
+                <p className="text-sm text-primary font-medium mt-0.5">{unreadCount} sin leer</p>
               ) : (
                 <p className="text-sm text-muted-foreground font-medium mt-0.5">Estás al día</p>
               )}
             </div>
           </div>
           {unreadCount > 0 && (
-            <Button variant="ghost" size="sm" onClick={markAllRead} className="text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950 font-medium">
+            <Button variant="ghost" size="sm" onClick={markAllRead} className="text-sm text-primary hover:text-primary hover:bg-primary/10 font-medium">
               Marcar todo como leído
             </Button>
           )}
@@ -234,13 +234,13 @@ export default function NotificationsPage() {
               className={cn(
                 "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all",
                 filter === key
-                  ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                  : "bg-muted/60 dark:bg-card text-muted-foreground border-border hover:text-foreground hover:bg-muted"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-muted/60 text-muted-foreground border-border hover:text-foreground hover:bg-muted"
               )}
             >
               {label}
               {count != null && count > 0 && (
-                <span className={cn("text-[10px] font-bold px-1.5 py-0.2 rounded-full", filter === key ? "bg-white/20" : "bg-blue-500/10 text-blue-600 dark:text-blue-400")}>
+                <span className={cn("text-[10px] font-bold px-1.5 py-0.2 rounded-full", filter === key ? "bg-primary-foreground/20" : "bg-primary/10 text-primary")}>
                   {count}
                 </span>
               )}
@@ -274,7 +274,7 @@ export default function NotificationsPage() {
                       "w-full text-left rounded-2xl border transition-all duration-200 hover:scale-[1.005] hover:shadow-md relative overflow-hidden group p-4 sm:p-5 flex items-start gap-4",
                       n.read
                         ? "bg-card border-border shadow-sm text-foreground"
-                        : "bg-card border-amber-500/30 dark:border-amber-400/30 shadow-[0_0_15px_rgba(245,158,11,0.06)]"
+                        : "bg-card border-amber/30 shadow-sm"
                     )}
                   >
                     <div
@@ -282,7 +282,7 @@ export default function NotificationsPage() {
                         "w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border",
                         n.read
                           ? "bg-muted border-border text-muted-foreground"
-                          : "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                          : "bg-amber/10 border-amber/20 text-amber"
                       )}
                     >
                       <Icon className="w-5 h-5" />
@@ -298,12 +298,12 @@ export default function NotificationsPage() {
                       </div>
                       {!n.read && (
                         <div className="shrink-0 flex items-center justify-center w-6 h-full absolute right-4 top-0 bottom-0">
-                          <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-sm" />
                         </div>
                       )}
                       <button
                         onClick={(e) => handleDelete(n, e)}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 text-muted-foreground hover:text-red-500 absolute right-4 bottom-4"
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-red/10 text-muted-foreground hover:text-red-ink absolute right-4 bottom-4"
                         title="Eliminar notificación"
                       >
                         <Trash2 className="w-4 h-4" />

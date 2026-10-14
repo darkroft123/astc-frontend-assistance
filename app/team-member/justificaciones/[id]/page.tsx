@@ -16,7 +16,7 @@ function fmtD(v?: string | null) {
   try { return new Date(v).toLocaleDateString("es-PE", { timeZone: "America/Lima" }); } catch { return v; }
 }
 
-const dotColor: Record<string, string> = { PENDING: "#3b82f6", SUBMITTED: "#3b82f6", OBSERVATION: "#f97316", APPROVED: "#10b981", REJECTED: "#ef4444" };
+const dotColor: Record<string, string> = { PENDING: "var(--blue)", SUBMITTED: "var(--blue)", OBSERVATION: "var(--amber)", APPROVED: "var(--green)", REJECTED: "var(--red)" };
 const historyIcon: Record<string, any> = { PENDING: FileText, SUBMITTED: Send, OBSERVATION: AlertCircle, APPROVED: CheckCircle, REJECTED: XCircle };
 function eventLabel(e: any) {
   if (!e.previousStatus && (e.newStatus === "PENDING")) return "Justificación creada";
@@ -54,8 +54,8 @@ export default function JustificationDetailPage() {
     finally { setSubmitting(false); }
   };
 
-  if (!hydrated || checkingAuth || loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
-  if (error || !detail) return <div className="min-h-screen flex flex-col items-center justify-center gap-3"><p className="text-slate-600">{error || "Justificación no encontrada"}</p><Button variant="outline" onClick={() => router.push("/team-member/justificaciones")}>Volver</Button></div>;
+  if (!hydrated || checkingAuth || loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (error || !detail) return <div className="min-h-screen flex flex-col items-center justify-center gap-3"><p className="text-text-2">{error || "Justificación no encontrada"}</p><Button variant="outline" onClick={() => router.push("/team-member/justificaciones")}>Volver</Button></div>;
 
   const st = detail.status;
 
@@ -72,26 +72,26 @@ export default function JustificationDetailPage() {
 
         {/* STATUS BANNER */}
         {st === "PENDING" && (
-          <div className="p-3 mb-4 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl flex items-center gap-2 shadow-sm"><Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" /><span className="text-sm text-blue-800 dark:text-blue-200 font-medium">Enviado, esperando revisión del Jefe de Proyecto</span></div>
+          <div className="p-3 mb-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-2 shadow-sm"><Clock className="w-4 h-4 text-primary" /><span className="text-sm text-primary font-medium">Enviado, esperando revisión del Jefe de Proyecto</span></div>
         )}
         {st === "OBSERVATION" && (
-          <div className="flex items-center justify-between p-3 mb-4 bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800 rounded-2xl shadow-sm">
-            <div className="flex items-center gap-2"><AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400" /><span className="text-sm text-orange-800 dark:text-orange-200 font-medium">El Jefe de Proyecto solicitó correcciones</span></div>
+          <div className="flex items-center justify-between p-3 mb-4 bg-amber/10 border border-amber/20 rounded-2xl shadow-sm">
+            <div className="flex items-center gap-2"><AlertCircle className="w-4 h-4 text-amber" /><span className="text-sm text-amber-ink font-medium">El Jefe de Proyecto solicitó correcciones</span></div>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="h-8 text-xs border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50" onClick={() => router.push(`/team-member/justificar?justificationId=${id}`)}><Pencil className="w-3 h-3 mr-1" />Editar</Button>
-              <Button size="sm" className="h-8 text-xs bg-blue-600 hover:bg-blue-700 text-white" onClick={handleSubmit} disabled={submitting}>{submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3 mr-1" />}Reenviar</Button>
+              <Button size="sm" variant="outline" className="h-8 text-xs border-amber/20 text-amber-ink hover:bg-amber/10" onClick={() => router.push(`/team-member/justificar?justificationId=${id}`)}><Pencil className="w-3 h-3 mr-1" />Editar</Button>
+              <Button size="sm" className="h-8 text-xs bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleSubmit} disabled={submitting}>{submitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3 mr-1" />}Reenviar</Button>
             </div>
           </div>
         )}
         {st === "SUBMITTED" && (
-          <div className="p-3 mb-4 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-2xl flex items-center gap-2 shadow-sm"><Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" /><span className="text-sm text-blue-800 dark:text-blue-200 font-medium">Enviado, esperando revisión</span></div>
+          <div className="p-3 mb-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-2 shadow-sm"><Clock className="w-4 h-4 text-primary" /><span className="text-sm text-primary font-medium">Enviado, esperando revisión</span></div>
         )}
         {st === "APPROVED" && (
-          <div className="p-3 mb-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center gap-2 shadow-sm"><CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /><span className="text-sm text-emerald-800 dark:text-emerald-200 font-medium">Aprobada, falta justificada</span></div>
+          <div className="p-3 mb-4 bg-green/10 border border-green/20 rounded-2xl flex items-center gap-2 shadow-sm"><CheckCircle className="w-4 h-4 text-green-ink" /><span className="text-sm text-green-ink font-medium">Aprobada, falta justificada</span></div>
         )}
         {st === "REJECTED" && (
-          <div className="p-3 mb-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-2xl shadow-sm"><div className="flex items-center gap-2 mb-1.5"><XCircle className="w-4 h-4 text-red-600 dark:text-red-400" /><span className="text-sm font-semibold text-red-800 dark:text-red-200">Rechazada</span></div>
-            {detail.comment && <p className="text-xs text-red-700 dark:text-red-300 ml-6">{detail.comment}</p>}
+          <div className="p-3 mb-4 bg-red/10 border border-red/20 rounded-2xl shadow-sm"><div className="flex items-center gap-2 mb-1.5"><XCircle className="w-4 h-4 text-red-ink" /><span className="text-sm font-semibold text-red-ink">Rechazada</span></div>
+            {detail.comment && <p className="text-xs text-red-ink ml-6">{detail.comment}</p>}
           </div>
         )}
 
@@ -115,17 +115,17 @@ export default function JustificationDetailPage() {
                         { id: "0", newStatus: detail.status, changedAt: detail.submittedAt || detail.reviewedAt, comment: detail.comment, changedBy: detail.userId }
                       ]).map((entry: any, idx: number, arr: any[]) => {
                         const HIcon = historyIcon[entry.newStatus] || FileText;
-                        const color = dotColor[entry.newStatus] || "#3b82f6";
+                        const color = dotColor[entry.newStatus] || "var(--blue)";
                         const isLast = idx === arr.length - 1;
                         return (
                           <div key={entry.id || idx} className={`relative pb-4 ${isLast ? "!pb-0" : ""}`}>
                             <div className="absolute -left-7 top-0.5 w-6 h-6 rounded-full flex items-center justify-center shadow-sm ring-2 ring-background" style={{ backgroundColor: color }}>
-                              <HIcon className="w-3 h-3 text-white" />
+                              <HIcon className="w-3 h-3 text-primary-foreground" />
                             </div>
                             <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-                              <div className="flex items-center justify-between px-3 py-2 border-b border-border" style={{ backgroundColor: color + "1A" }}>
+                              <div className="flex items-center justify-between px-3 py-2 border-b border-border" style={{ backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)` }}>
                                 <p className="text-xs font-bold text-foreground">{eventLabel(entry)}</p>
-                                <p className="text-[11px] font-semibold text-foreground dark:text-zinc-200 font-mono">{fmt(entry.changedAt)}</p>
+                                <p className="text-[11px] font-semibold text-foreground font-mono">{fmt(entry.changedAt)}</p>
                               </div>
                               {entry.comment && (
                                 <div className="px-3 py-2.5">
@@ -139,7 +139,7 @@ export default function JustificationDetailPage() {
                                 </div>
                               )}
                             </div>
-                            {!isLast && <div className="absolute left-[-10px] top-6 bottom-0 w-0.5 rounded-full" style={{ backgroundColor: color + "30" }} />}
+                            {!isLast && <div className="absolute left-[-10px] top-6 bottom-0 w-0.5 rounded-full" style={{ backgroundColor: `color-mix(in srgb, ${color} 19%, transparent)` }} />}
                           </div>
                         );
                       })}
@@ -180,7 +180,7 @@ export default function JustificationDetailPage() {
                 <div className="pt-1">
                   {detail.documentUrl ? (
                     <a href={detail.documentUrl} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm">
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm">
                       <FileUp className="w-4 h-4" /> Ver documento adjunto
                     </a>
                   ) : (
@@ -216,7 +216,7 @@ export default function JustificationDetailPage() {
                 Volver a Justificaciones
               </Button>
               {st === "OBSERVATION" && (
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => router.push(`/team-member/justificar?justificationId=${id}`)}>
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => router.push(`/team-member/justificar?justificationId=${id}`)}>
                   <Pencil className="w-3.5 h-3.5 mr-1.5" />Editar justificación
                 </Button>
               )}

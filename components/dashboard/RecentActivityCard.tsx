@@ -40,7 +40,7 @@ export function RecentActivityCard() {
 
         <Button
           variant="ghost"
-          className="w-full mt-auto text-violet-600 hover:bg-violet-50"
+          className="w-full mt-auto text-primary hover:bg-primary/10"
           onClick={() => router.push("/team-member/asistencias")}
         >
           Ver todo

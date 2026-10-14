@@ -127,7 +127,7 @@ export function JustificarModal({ open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-amber-500" />
+            <Clock className="w-5 h-5 text-amber" />
             {selected ? "Justificar ausencia" : "Faltas pendientes"}
           </DialogTitle>
           <DialogDescription>
@@ -140,8 +140,8 @@ export function JustificarModal({ open, onOpenChange }: Props) {
         <div className="flex-1 overflow-y-auto min-h-0">
           {done ? (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
-              <div className="rounded-full bg-emerald-100 p-3">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+              <div className="rounded-full bg-green/10 p-3">
+                <CheckCircle2 className="w-8 h-8 text-green-ink" />
               </div>
               <p className="text-sm font-semibold text-foreground">Enviada correctamente</p>
               <p className="text-xs text-muted-foreground text-center">
@@ -164,7 +164,7 @@ export function JustificarModal({ open, onOpenChange }: Props) {
               </Button>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Motivo</label>
+                <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Motivo</label>
                 <Textarea
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -174,7 +174,7 @@ export function JustificarModal({ open, onOpenChange }: Props) {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Documento (opcional)</label>
+                <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Documento (opcional)</label>
                 <input
                   type="file" hidden ref={fileInputRef}
                   accept=".pdf,.jpg,.jpeg,.png"
@@ -184,11 +184,11 @@ export function JustificarModal({ open, onOpenChange }: Props) {
                   onClick={() => fileInputRef.current?.click()}
                   className={`w-full border-dashed border-2 p-3 rounded-2xl flex items-center gap-3 transition-all ${
                     documentFile
-                      ? "border-emerald-200 bg-emerald-50/30"
-                      : "border-border bg-zinc-50/50 hover:border-blue-300 hover:bg-blue-50/30"
+                      ? "border-green/20 bg-green/10"
+                      : "border-border bg-inset hover:border-primary/30 hover:bg-primary/10"
                   }`}
                 >
-                  <div className={`p-2 rounded-xl ${documentFile ? "bg-emerald-100 text-emerald-600" : "bg-card text-muted-foreground"}`}>
+                  <div className={`p-2 rounded-xl ${documentFile ? "bg-green/10 text-green-ink" : "bg-card text-muted-foreground"}`}>
                     {documentFile ? <FileCheck className="w-5 h-5" /> : <Upload className="w-5 h-5" />}
                   </div>
                   <div className="text-left">
@@ -204,11 +204,11 @@ export function JustificarModal({ open, onOpenChange }: Props) {
             <div className="space-y-2 py-1">
               {loadingList ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               ) : absences.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 gap-2">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                  <CheckCircle2 className="w-8 h-8 text-green" />
                   <p className="text-sm text-muted-foreground">No tienes faltas pendientes</p>
                 </div>
               ) : (
@@ -216,16 +216,16 @@ export function JustificarModal({ open, onOpenChange }: Props) {
                   <button
                     key={a.id}
                     onClick={() => handlePick(a)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-amber-300 hover:bg-amber-50/40 transition-all text-left"
+                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-amber/30 hover:bg-amber/10 transition-all text-left"
                   >
-                    <div className="p-2 rounded-xl bg-amber-100 text-amber-600 shrink-0">
+                    <div className="p-2 rounded-xl bg-amber/10 text-amber-ink shrink-0">
                       <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">{a.date}</p>
                       <p className="text-xs text-muted-foreground">{typeLabel[a.type] || a.type}</p>
                     </div>
-                    <span className="text-xs font-bold text-amber-600 shrink-0">JUSTIFICAR</span>
+                    <span className="text-xs font-bold text-amber-ink shrink-0">JUSTIFICAR</span>
                   </button>
                 ))
               )}
@@ -236,7 +236,7 @@ export function JustificarModal({ open, onOpenChange }: Props) {
         <DialogFooter>
           {selected && !done && (
             <Button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl"
               onClick={handleSubmit}
               disabled={submitting || !reason.trim()}
             >

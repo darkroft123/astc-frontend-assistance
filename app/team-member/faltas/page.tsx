@@ -102,9 +102,9 @@ export default function AbsencesPage() {
   }, [absenceRecords, search]);
 
   const getStatusLabel = (row: AbsenceItem) => {
-    if (row.justified) return { label: "Justificada", cls: "bg-emerald-100 text-emerald-700 border-emerald-200" };
-    if (pendingAbsenceIds.has(row.id)) return { label: "Pendiente", cls: "bg-blue-100 text-blue-700 border-blue-200" };
-    return { label: "No justificada", cls: "bg-amber-100 text-amber-700 border-amber-200" };
+    if (row.justified) return { label: "Justificada", cls: "bg-green/10 text-green-ink border-green/20" };
+    if (pendingAbsenceIds.has(row.id)) return { label: "Pendiente", cls: "bg-primary/10 text-primary border-primary/20" };
+    return { label: "No justificada", cls: "bg-amber/10 text-amber-ink border-amber/20" };
   };
 
   const getTypeLabel = (type: string) => {
@@ -124,8 +124,8 @@ export default function AbsencesPage() {
       key: "type", header: "MOTIVO",
       render: (row) => (
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-          <span className="font-medium text-zinc-700 text-sm">{getTypeLabel(row.type)}</span>
+          <AlertTriangle className="w-3.5 h-3.5 text-amber" />
+          <span className="font-medium text-text-2 text-sm">{getTypeLabel(row.type)}</span>
         </div>
       ),
     },
@@ -143,8 +143,8 @@ export default function AbsencesPage() {
     {
       key: "actions", header: "ACCIONES",
       render: (row) => {
-        if (row.justified) return <span className="text-zinc-400 text-xs italic">Completado</span>;
-        if (pendingAbsenceIds.has(row.id)) return <span className="text-zinc-400 text-xs italic">En revisión</span>;
+        if (row.justified) return <span className="text-text-4 text-xs italic">Completado</span>;
+        if (pendingAbsenceIds.has(row.id)) return <span className="text-text-4 text-xs italic">En revisión</span>;
         return (
           <Link href={`/team-member/justificar?absenceId=${row.id}&date=${row.date}`}>
             <Button size="sm" variant="gradient" className="h-7 text-[11px] font-bold px-3.5 rounded-full">
@@ -157,7 +157,7 @@ export default function AbsencesPage() {
   ];
 
   if (!hydrated || checkingAuth) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   return (
@@ -172,7 +172,7 @@ export default function AbsencesPage() {
           onPeriodChange={(r) => { setDateRange(r); setPeriod(r.period); setCurrentPage(1); }}
         />
 
-        <Card className="flex-1 border border-border shadow-sm bg-card rounded-2xl overflow-hidden flex flex-col">
+        <Card className="flex-1 border border-border shadow-sm bg-card rounded-[16px] overflow-hidden flex flex-col">
           <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
             <div className="flex flex-col gap-4 mb-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -183,14 +183,14 @@ export default function AbsencesPage() {
               </div>
               <div className="flex flex-wrap items-end gap-3 lg:ml-auto">
                 <div className="flex flex-col w-full sm:w-auto sm:min-w-[180px]">
-                  <label className="text-[9px] font-bold text-zinc-500 mb-1 uppercase tracking-wider">Buscar Falta</label>
+                  <label className="text-[9px] font-bold text-text-4 mb-1 uppercase tracking-wider">Buscar Falta</label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
                     <Input value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} placeholder="Fecha o motivo..." className="pl-9 h-9 text-xs rounded-md border-border" />
                   </div>
                 </div>
                 <div className="flex flex-col w-full sm:w-auto sm:min-w-[140px]">
-                  <label className="text-[9px] font-bold text-zinc-500 mb-1 uppercase tracking-wider">Estado</label>
+                  <label className="text-[9px] font-bold text-text-4 mb-1 uppercase tracking-wider">Estado</label>
                   <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as any); setCurrentPage(1); }}>
                     <SelectTrigger className="h-9 text-xs rounded-md border-border"><SelectValue placeholder="Estado" /></SelectTrigger>
                     <SelectContent>
@@ -200,7 +200,7 @@ export default function AbsencesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => { loadData(); setCurrentPage(1); }} className="h-9 px-3 text-xs gap-2 border border-border bg-card text-zinc-700 hover:bg-background">
+                <Button variant="ghost" size="sm" onClick={() => { loadData(); setCurrentPage(1); }} className="h-9 px-3 text-xs gap-2 border border-border bg-card text-text-2 hover:bg-background">
                   <RefreshCw className="w-3.5 h-3.5" /> Actualizar
                 </Button>
               </div>
@@ -213,13 +213,13 @@ export default function AbsencesPage() {
         </Card>
 
         <div className="flex justify-center pb-2">
-          <div className="flex items-center gap-4 bg-card border border-border rounded-lg px-5 py-2 shadow-sm">
-            <p className="text-xs text-zinc-600 font-medium">Página <span className="font-bold text-foreground">{currentPage}</span> de {pagination.totalPages}</p>
+          <div className="flex items-center gap-4 bg-card border border-border rounded-[9px] px-5 py-2 shadow-sm">
+            <p className="text-xs text-text-2 font-medium">Página <span className="font-bold text-foreground">{currentPage}</span> de {pagination.totalPages}</p>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" className="h-8 w-8 p-0" disabled={currentPage === 1} onClick={() => setCurrentPage(p => Math.max(1, p - 1))}><ChevronLeft className="w-4 h-4" /></Button>
               <Button variant="outline" size="sm" className="h-8 w-8 p-0" disabled={currentPage >= pagination.totalPages} onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}><ChevronRight className="w-4 h-4" /></Button>
             </div>
-            <p className="text-xs text-zinc-400 italic">{pagination.total} registros totales</p>
+            <p className="text-xs text-text-4 italic">{pagination.total} registros totales</p>
           </div>
         </div>
       </div>

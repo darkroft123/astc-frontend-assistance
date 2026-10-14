@@ -171,13 +171,13 @@ export default function VacationsPage() {
     { key: "endDate", header: "FIN", render: (r) => <span className="font-medium text-muted-foreground">{format(new Date(r.endDate), "dd MMM yyyy", { locale: es })}</span> },
     { key: "businessDays", header: "DÍAS HÁBILES", render: (r) => <span className="font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">{r.businessDays === 1 ? `${r.businessDays} día` : `${r.businessDays} días`}</span> },
     { key: "status", header: "ESTADO", render: (r) => statusBadge(r.status) },
-    { key: "createdAt", header: "FECHA SOLICITUD", render: (r) => <span className="text-zinc-500 text-sm">{format(new Date(r.createdAt), "dd MMM yyyy", { locale: es })}</span> },
+    { key: "createdAt", header: "FECHA SOLICITUD", render: (r) => <span className="text-text-4 text-sm">{format(new Date(r.createdAt), "dd MMM yyyy", { locale: es })}</span> },
     {
       key: "actions",
       header: "",
       render: (r) =>
         r.status === "PENDING" ? (
-          <Button variant="ghost" size="sm" onClick={() => handleCancel(r.id)} className="text-red-500 hover:text-red-700 hover:bg-red-50 transition-all rounded-lg h-8 px-3">
+          <Button variant="ghost" size="sm" onClick={() => handleCancel(r.id)} className="text-red-ink hover:text-red-ink hover:bg-red/10 transition-all rounded-[9px] h-8 px-3">
             <XCircle className="w-4 h-4 mr-1.5" />
             Cancelar
           </Button>
@@ -187,18 +187,18 @@ export default function VacationsPage() {
 
   if (checkingAuth || !hydrated) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50/50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-muted/50">
         <div className="w-16 h-16 relative">
           <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
           <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
         </div>
-        <p className="mt-4 text-sm font-medium text-zinc-500 animate-pulse">Cargando perfil...</p>
+        <p className="mt-4 text-sm font-medium text-text-4 animate-pulse">Cargando perfil...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 py-8">
+    <div className="min-h-screen bg-muted/50 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
         {/* HEADER */}
@@ -225,21 +225,21 @@ export default function VacationsPage() {
 
         {/* ELIGIBILITY BANNER */}
         {eligibility && !eligibility.isEligible && (
-          <Card className="border border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-950/20 rounded-2xl mb-6 shadow-sm">
+          <Card className="border border-amber/20 bg-amber/5 rounded-2xl mb-6 shadow-sm">
             <CardContent className="p-4 sm:p-5">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
-                  <Hourglass className="w-5 h-5 text-amber-500" />
+                <div className="w-10 h-10 rounded-xl bg-amber/10 border border-amber/20 flex items-center justify-center shrink-0">
+                  <Hourglass className="w-5 h-5 text-amber" />
                 </div>
                 <div className="space-y-1">
-                  <p className="font-bold text-amber-600 dark:text-amber-400 text-sm">Aún no puedes solicitar vacaciones</p>
+                  <p className="font-bold text-amber-ink text-sm">Aún no puedes solicitar vacaciones</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Debes completar al menos <strong>{eligibility.requiredDays === 1 ? `${eligibility.requiredDays} día` : `${eligibility.requiredDays} días`}</strong> en el proyecto para poder solicitar vacaciones.
                     Has completado <strong>{Math.max(0, eligibility.daysElapsed) === 1 ? `${Math.max(0, eligibility.daysElapsed)} día` : `${Math.max(0, eligibility.daysElapsed)} días`}</strong>.
                     Te faltan <strong>{eligibility.daysRemaining === 1 ? `${eligibility.daysRemaining} día` : `${eligibility.daysRemaining} días`}</strong>.
                   </p>
                   {eligibility.joinDate && (
-                    <p className="text-[11px] text-amber-500/80 pt-1 font-mono">Fecha de ingreso: {format(new Date(eligibility.joinDate), "dd MMM yyyy", { locale: es })}</p>
+                    <p className="text-[11px] text-amber/80 pt-1 font-mono">Fecha de ingreso: {format(new Date(eligibility.joinDate), "dd MMM yyyy", { locale: es })}</p>
                   )}
                 </div>
               </div>
@@ -248,9 +248,9 @@ export default function VacationsPage() {
         )}
 
         {eligibility && eligibility.isEligible && balance?.availableDays === 0 && (
-          <Card className="border border-amber-500/20 bg-amber-500/[0.04] dark:bg-amber-950/20 rounded-2xl mb-6 shadow-sm">
+          <Card className="border border-amber/20 bg-amber/5 rounded-2xl mb-6 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2.5 text-amber-600 dark:text-amber-400">
+              <div className="flex items-center gap-2.5 text-amber-ink">
                 <ShieldAlert className="w-4 h-4 shrink-0" />
                 <p className="font-semibold text-sm">
                   Has utilizado todos tus días de vacaciones. Debes esperar al próximo ciclo para conseguir más días.
@@ -261,9 +261,9 @@ export default function VacationsPage() {
         )}
 
         {eligibility && eligibility.isEligible && balance?.availableDays !== 0 && (
-          <Card className="border border-emerald-500/20 bg-emerald-500/[0.05] dark:bg-emerald-950/20 rounded-2xl mb-6 shadow-sm">
+          <Card className="border border-green/20 bg-green/5 rounded-2xl mb-6 shadow-sm">
             <CardContent className="p-4">
-              <div className="flex items-center gap-2.5 text-emerald-600 dark:text-emerald-400">
+              <div className="flex items-center gap-2.5 text-green-ink">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <p className="font-semibold text-sm">
                   Cumples con los {eligibility.requiredDays} días requeridos. ¡Puedes solicitar vacaciones!
@@ -305,7 +305,7 @@ export default function VacationsPage() {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                <p className="text-sm text-zinc-400 font-medium">Cargando historial...</p>
+                <p className="text-sm text-text-4 font-medium">Cargando historial...</p>
               </div>
             ) : (() => {
               const filtered = statusFilter === "ALL" ? vacations : vacations.filter((v: any) => v.status === statusFilter);
@@ -313,11 +313,11 @@ export default function VacationsPage() {
               const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
               return filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-                  <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mb-4 ring-1 ring-zinc-200">
-                    <PlaneTakeoff className="w-8 h-8 text-zinc-300" />
+                  <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mb-4 ring-1 ring-border">
+                    <PlaneTakeoff className="w-8 h-8 text-text-3" />
                   </div>
-                  <h3 className="text-lg font-semibold text-zinc-700 mb-1">Aún no hay solicitudes</h3>
-                  <p className="text-sm text-zinc-500 max-w-sm">No has solicitado vacaciones todavía. Puedes crear una nueva solicitud en cualquier momento.</p>
+                  <h3 className="text-lg font-semibold text-text-2 mb-1">Aún no hay solicitudes</h3>
+                  <p className="text-sm text-text-4 max-w-sm">No has solicitado vacaciones todavía. Puedes crear una nueva solicitud en cualquier momento.</p>
                 </div>
               ) : (
                 <div>
@@ -325,7 +325,7 @@ export default function VacationsPage() {
                     <DataTable columns={columns} data={paginated} />
                   </div>
                   {totalPages > 1 && (
-                    <div className="flex items-center justify-center gap-3 py-3 border-t border-zinc-100">
+                    <div className="flex items-center justify-center gap-3 py-3 border-t border-border">
                       <span className="text-xs text-muted-foreground">Página {page} de {totalPages}</span>
                       <div className="flex gap-1">
                         <button disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="px-2 py-1 text-xs border rounded-md disabled:opacity-30 hover:bg-background">&larr;</button>
@@ -344,32 +344,32 @@ export default function VacationsPage() {
 
       {/* Modern Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-[24px] p-0 overflow-hidden border-0 shadow-2xl">
-          <div className="bg-gradient-to-r from-primary to-primary/70 p-6 text-white text-center">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-              <Sun className="w-6 h-6 text-yellow-300 drop-shadow-sm" />
+        <DialogContent className="sm:max-w-md rounded-[20px] p-0 overflow-hidden border-0 shadow-2xl">
+          <div className="bg-gradient-to-r from-primary to-primary/70 p-6 text-primary-foreground text-center">
+            <div className="w-12 h-12 bg-primary-foreground/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+              <Sun className="w-6 h-6 text-amber drop-shadow-sm" />
             </div>
-            <DialogTitle className="text-2xl font-extrabold text-white">
+            <DialogTitle className="text-2xl font-extrabold text-primary-foreground">
               Solicitar Vacaciones
             </DialogTitle>
-            <DialogDescription className="text-blue-100 text-sm mt-1">
+            <DialogDescription className="text-primary-foreground/80 text-sm mt-1">
               Selecciona los días que deseas tomar de descanso
             </DialogDescription>
           </div>
 
-          <div className="p-6 space-y-5 bg-card max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-100 [&::-webkit-scrollbar-thumb]:bg-zinc-300 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-400">
+          <div className="p-6 space-y-5 bg-card max-h-[60vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-muted [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-text-4">
             {eligibility && !eligibility.isEligible && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center space-y-1">
-                <Hourglass className="w-6 h-6 text-amber-500 mx-auto" />
-                <p className="font-bold text-amber-800 text-sm">Aún no cumples los días mínimos</p>
-                <p className="text-xs text-amber-700">
+              <div className="bg-amber/10 border border-amber/20 rounded-xl p-4 text-center space-y-1">
+                <Hourglass className="w-6 h-6 text-amber mx-auto" />
+                <p className="font-bold text-amber-ink text-sm">Aún no cumples los días mínimos</p>
+                <p className="text-xs text-amber-ink">
                   Te faltan <strong>{eligibility.daysRemaining === 1 ? `${eligibility.daysRemaining} día` : `${eligibility.daysRemaining} días`}</strong> de los {eligibility.requiredDays} requeridos
                 </p>
               </div>
             )}
             {eligibility && eligibility.isEligible && (
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center">
-                <p className="text-xs font-bold text-emerald-700">
+              <div className="bg-green/10 border border-green/20 rounded-xl p-3 text-center">
+                <p className="text-xs font-bold text-green-ink">
                   Días disponibles: <span className="text-lg">{balance?.availableDays ?? 0}</span>
                 </p>
               </div>
@@ -377,41 +377,41 @@ export default function VacationsPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Fecha Inicio</label>
+                <label className="text-[11px] font-bold text-text-4 uppercase tracking-wider">Fecha Inicio</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-sm rounded-xl h-11 border-border shadow-sm hover:bg-background", !startDate && "text-zinc-400 font-normal")}>
+                    <Button variant="outline" className={cn("w-full justify-start text-sm rounded-xl h-11 border-border shadow-sm hover:bg-background", !startDate && "text-text-4 font-normal")}>
                       <CalendarIcon className="w-4 h-4 mr-2" />
                       {startDate ? format(startDate, "dd/MM/yyyy") : "Seleccionar"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-zinc-100" align="start">
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-border" align="start">
                     <Calendar
                       mode="single" selected={startDate} onSelect={setStartDate}
                       locale={es} className="rounded-xl"
                       disabled={vacationDates}
                       modifiers={{ vacation: vacationDates }}
-                      modifiersStyles={{ vacation: { backgroundColor: "#fef9c3", borderRadius: "100%" } }}
+                      modifiersStyles={{ vacation: { backgroundColor: "color-mix(in srgb, var(--amber) 20%, transparent)", borderRadius: "100%" } }}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Fecha Fin</label>
+                <label className="text-[11px] font-bold text-text-4 uppercase tracking-wider">Fecha Fin</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-sm rounded-xl h-11 border-border shadow-sm hover:bg-background", !endDate && "text-zinc-400 font-normal")}>
+                    <Button variant="outline" className={cn("w-full justify-start text-sm rounded-xl h-11 border-border shadow-sm hover:bg-background", !endDate && "text-text-4 font-normal")}>
                       <CalendarIcon className="w-4 h-4 mr-2" />
                       {endDate ? format(endDate, "dd/MM/yyyy") : "Seleccionar"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-zinc-100" align="start">
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-border" align="start">
                     <Calendar
                       mode="single" selected={endDate} onSelect={setEndDate}
                       locale={es} className="rounded-xl"
                       disabled={vacationDates}
                       modifiers={{ vacation: vacationDates }}
-                      modifiersStyles={{ vacation: { backgroundColor: "#fef9c3", borderRadius: "100%" } }}
+                      modifiersStyles={{ vacation: { backgroundColor: "color-mix(in srgb, var(--amber) 20%, transparent)", borderRadius: "100%" } }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -419,21 +419,21 @@ export default function VacationsPage() {
             </div>
 
             {startDate && endDate && (
-              <div className="bg-blue-50/50 rounded-xl border border-blue-100/50 overflow-hidden">
+              <div className="bg-primary/5 rounded-xl border border-primary/10 overflow-hidden">
                 <div className="p-4 text-center">
-                  <p className="text-sm text-zinc-600 mb-1">Días a solicitar:</p>
+                  <p className="text-sm text-text-2 mb-1">Días a solicitar:</p>
                    <p className="text-4xl font-black text-primary tracking-tight">
                     {businessDaysBetween(startDate, endDate)}
                   </p>
                 </div>
                 {balance && businessDaysBetween(startDate, endDate) > (balance.availableDays ?? 0) && (
-                  <div className="mx-3 mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 bg-red-100/50 py-1.5 px-3 rounded-lg">
+                  <div className="mx-3 mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-red-ink bg-red/10 py-1.5 px-3 rounded-lg">
                     <ShieldAlert className="w-4 h-4" />
                     Supera tu saldo disponible de {balance.availableDays} días
                   </div>
                 )}
                 {selectedRangeOverlaps && (
-                  <div className="mx-3 mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-600 bg-amber-50 border border-amber-200 py-2 px-3 rounded-lg">
+                  <div className="mx-3 mb-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-ink bg-amber/10 border border-amber/20 py-2 px-3 rounded-lg">
                     <Ban className="w-4 h-4" />
                     Ya tienes una solicitud de vacaciones aprobada o pendiente en este rango
                   </div>
@@ -442,7 +442,7 @@ export default function VacationsPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Comentario (Opcional)</label>
+                <label className="text-[11px] font-bold text-text-4 uppercase tracking-wider">Comentario (Opcional)</label>
               <Input
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -452,15 +452,15 @@ export default function VacationsPage() {
             </div>
           </div>
 
-          <div className="bg-background p-4 px-6 border-t border-zinc-100 flex justify-end gap-3 rounded-b-[24px]">
-            <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl h-10 px-5 font-medium border-border text-zinc-600 hover:bg-zinc-100 hover:text-zinc-800">
+          <div className="bg-background p-4 px-6 border-t border-border flex justify-end gap-3 rounded-b-[20px]">
+            <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl h-10 px-5 font-medium border-border text-text-2 hover:bg-muted hover:text-foreground">
               Cancelar
             </Button>
             <Button
               onClick={handleRequest}
               disabled={!startDate || !endDate || submitting || (eligibility && !eligibility.isEligible) || (balance && businessDaysBetween(startDate, endDate) > (balance.availableDays ?? 999)) || selectedRangeOverlaps}
               title={eligibility && !eligibility.isEligible ? `Debes completar ${eligibility.requiredDays} días en el proyecto para solicitar` : ""}
-              className="bg-primary hover:bg-primary/90 text-white rounded-xl h-10 px-6 font-semibold shadow-md shadow-primary/20 transition-all disabled:opacity-50"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-10 px-6 font-semibold shadow-md shadow-primary/20 transition-all disabled:opacity-50"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <PlaneTakeoff className="w-4 h-4 mr-2" />}
               Enviar Solicitud

@@ -134,8 +134,8 @@ export default function DashboardPage() {
   if (!loadingProject && (!projects || projects.length === 0)) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center p-6 text-center">
-        <Card className="max-w-md w-full rounded-3xl border border-amber-200/50 bg-card text-card-foreground shadow-xl p-8">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-6 border border-amber-500/20">
+        <Card className="max-w-md w-full rounded-[16px] border border-amber/20 bg-card text-card-foreground shadow-xl p-8">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-amber/10 text-amber flex items-center justify-center mb-6 border border-amber/20">
             <AlertTriangle className="w-8 h-8" />
           </div>
           <h3 className="font-bold text-2xl mb-3 tracking-tight">Sin Proyecto Asignado</h3>
@@ -151,10 +151,10 @@ export default function DashboardPage() {
 
   const UserProfileCard = (
     <div className="col-span-12 lg:col-span-4">
-      <Card className="h-full rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-md border-0 overflow-hidden text-white flex flex-col justify-between">
+      <Card className="h-full rounded-2xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-md border-0 overflow-hidden text-primary-foreground flex flex-col justify-between">
         <CardContent className="p-4 sm:p-5 flex flex-col justify-between h-full space-y-3">
           <div className="flex items-center gap-3">
-            <Avatar className="w-12 h-12 rounded-full border-2 border-white/40 shadow-sm shrink-0">
+            <Avatar className="w-12 h-12 rounded-full border-2 border-primary-foreground/40 shadow-sm shrink-0">
               <AvatarImage src={avatarSrc} alt={displayName} className="object-cover" />
               <AvatarFallback className="bg-card text-primary text-lg font-bold">
                 {displayName.charAt(0).toUpperCase()}
@@ -162,29 +162,29 @@ export default function DashboardPage() {
             </Avatar>
 
             <div className="min-w-0">
-              <span className="bg-card/20 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+              <span className="bg-card/20 text-primary-foreground text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
                 {role === "TEAM_MEMBER" ? "Colaborador" : role === "PROJECT_MANAGER" ? "Jefe de Proyecto" : role === "ADMIN" ? "Administrador" : role || "Colaborador"}
               </span>
-              <h2 className="text-base font-bold text-white truncate mt-0.5">
+              <h2 className="text-base font-bold text-primary-foreground truncate mt-0.5">
                 {userFullName}
               </h2>
-              <p className="text-blue-100 text-xs truncate">
+              <p className="text-primary-foreground/80 text-xs truncate">
                 {user?.email ?? "—"}
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-left pt-2 border-t border-white/15">
+          <div className="grid grid-cols-2 gap-2 text-left pt-2 border-t border-primary-foreground/15">
             <div className="bg-card/10 rounded-xl p-2.5">
-              <p className="text-white/70 text-[9px] uppercase tracking-wider font-semibold">USUARIO</p>
-              <p className="text-white text-xs font-bold truncate mt-0.5">
+              <p className="text-primary-foreground/70 text-[9px] uppercase tracking-wider font-semibold">USUARIO</p>
+              <p className="text-primary-foreground text-xs font-bold truncate mt-0.5">
                 {user?.username ?? "—"}
               </p>
             </div>
 
             <div className="bg-card/10 rounded-xl p-2.5">
-              <p className="text-white/70 text-[9px] uppercase tracking-wider font-semibold">PROYECTO</p>
-              <p className="text-white text-xs font-bold truncate mt-0.5">
+              <p className="text-primary-foreground/70 text-[9px] uppercase tracking-wider font-semibold">PROYECTO</p>
+              <p className="text-primary-foreground text-xs font-bold truncate mt-0.5">
                 {project?.name || "Sin proyecto"}
               </p>
             </div>
@@ -209,14 +209,14 @@ export default function DashboardPage() {
         {projects.length > 1 && (
           <div className="mb-4 mt-4 flex flex-wrap items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-border shadow-sm">
             <div className="flex items-center gap-2">
-              <FolderKanban className="w-4 h-4 text-blue-600 shrink-0" />
+              <FolderKanban className="w-4 h-4 text-primary shrink-0" />
               <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Proyecto Activo:
               </span>
               <select
                 value={project?.id || ""}
                 onChange={(e) => selectProject(e.target.value)}
-                className="bg-background border border-border rounded-xl px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                className="bg-background border border-border rounded-xl px-3 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
               >
                 {projects.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -226,7 +226,7 @@ export default function DashboardPage() {
               </select>
             </div>
             {project && (
-              <div className="text-xs text-blue-700 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl border border-blue-200">
+              <div className="text-xs text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20">
                 <span className="font-semibold">Horario: </span>
                 <span>{project.workStartTime || "08:00"} - {project.workEndTime || "17:00"}</span>
               </div>

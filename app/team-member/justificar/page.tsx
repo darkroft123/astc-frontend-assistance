@@ -76,16 +76,16 @@ function JustifyAbsencePageContent() {
   }
 
   if (!hydrated || checkingAuth || initialLoading) {
-    return <div className="h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+    return <div className="h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
   if (blocked) {
     return (
       <div className="h-screen bg-muted/50 flex items-center justify-center p-6">
         <div className="max-w-md text-center">
           <div className="text-5xl mb-4">📋</div>
-          <h2 className="text-xl font-bold text-zinc-900 mb-2">No se puede editar</h2>
-          <p className="text-zinc-600 mb-6">Solo puedes editar justificaciones en estado de Observación.</p>
-          <Button onClick={() => router.push("/team-member/justificaciones")} className="bg-blue-600 hover:bg-blue-700 text-white">Volver</Button>
+          <h2 className="text-xl font-bold text-foreground mb-2">No se puede editar</h2>
+          <p className="text-text-2 mb-6">Solo puedes editar justificaciones en estado de Observación.</p>
+          <Button onClick={() => router.push("/team-member/justificaciones")} className="bg-primary hover:bg-primary/90 text-primary-foreground">Volver</Button>
         </div>
       </div>
     );
@@ -95,11 +95,11 @@ function JustifyAbsencePageContent() {
 
   return (
     <div className="min-h-screen bg-muted/50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl border-border shadow-lg rounded-3xl overflow-hidden">
+      <Card className="w-full max-w-xl border-border shadow-lg rounded-[16px] overflow-hidden">
         <CardContent className="p-5 sm:p-6 space-y-4">
 
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push(backHref)} className="text-zinc-400 hover:text-blue-600 transition-colors">
+            <button onClick={() => router.push(backHref)} className="text-text-4 hover:text-primary transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
@@ -109,21 +109,21 @@ function JustifyAbsencePageContent() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Motivo</label>
+            <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Motivo</label>
             <Textarea value={reason} onChange={(e) => setReason(e.target.value)}
               placeholder="Describa el motivo de su inasistencia..."
               className="min-h-[100px] rounded-xl border-border resize-none p-3 text-sm" />
-            <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+            <p className="text-[10px] text-text-4 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" /> Sea claro para facilitar la revisión.
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Documento (opcional)</label>
+            <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Documento (opcional)</label>
             <input type="file" hidden ref={fileInputRef} onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)} />
             <button onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-dashed border-2 p-4 rounded-2xl flex items-center gap-3 transition-all ${documentFile ? "border-emerald-200 bg-emerald-50/30" : "border-border bg-zinc-50/50 hover:border-blue-300 hover:bg-blue-50/30"}`}>
-              <div className={`p-2 rounded-xl ${documentFile ? "bg-emerald-100 text-emerald-600" : "bg-card text-muted-foreground"}`}>
+              className={`w-full border-dashed border-2 p-4 rounded-2xl flex items-center gap-3 transition-all ${documentFile ? "border-green/20 bg-green/10" : "border-border bg-inset hover:border-primary/30 hover:bg-primary/10"}`}>
+              <div className={`p-2 rounded-xl ${documentFile ? "bg-green/10 text-green-ink" : "bg-card text-muted-foreground"}`}>
                 {documentFile ? <FileCheck className="w-5 h-5" /> : <Upload className="w-5 h-5" />}
               </div>
               <div className="text-left">
@@ -135,7 +135,7 @@ function JustifyAbsencePageContent() {
 
           <div className="flex gap-3 pt-1">
             <Button variant="outline" className="flex-1 h-11 rounded-xl font-semibold" onClick={() => router.push(backHref)} disabled={isSubmitting}>Cancelar</Button>
-            <Button className="flex-1 h-11 rounded-xl font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md" onClick={handleSubmit} disabled={isSubmitting}>
+            <Button className="flex-1 h-11 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md" onClick={handleSubmit} disabled={isSubmitting}>
               {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin mr-1" /> Enviando...</> : isEditMode ? "Guardar cambios" : "Enviar justificación"}
             </Button>
           </div>
@@ -148,7 +148,7 @@ function JustifyAbsencePageContent() {
 
 export default function JustifyAbsencePage() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>}>
+    <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
       <JustifyAbsencePageContent />
     </Suspense>
   );

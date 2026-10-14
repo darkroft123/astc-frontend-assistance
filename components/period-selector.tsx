@@ -202,7 +202,7 @@ export default function PeriodSelector({
     return (
       <>
         <Select value={period === "custom" ? "custom" : period} onValueChange={handleMobileSelect}>
-          <SelectTrigger className="w-full bg-gradient-to-r from-[#3B82F6] via-[#6366F1] to-[#8B5CF6] text-white border-0 rounded-2xl h-11 px-4 text-xs font-semibold shadow-[0_4px_20px_rgba(99,102,241,0.35)] [&>svg]:text-white">
+          <SelectTrigger className="w-full bg-brand-gradient text-primary-foreground border-0 rounded-[9px] h-11 px-4 text-xs font-semibold [&>svg]:text-primary-foreground">
             <SelectValue placeholder="Seleccionar período" />
           </SelectTrigger>
           <SelectContent className="rounded-2xl border border-border bg-card shadow-2xl min-w-[180px]">
@@ -210,14 +210,14 @@ export default function PeriodSelector({
               <SelectItem
                 key={p.key}
                 value={p.key}
-                className="text-xs font-medium rounded-xl data-[state=checked]:bg-primary data-[state=checked]:text-white focus:bg-muted"
+                className="text-xs font-medium rounded-xl data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus:bg-muted"
               >
                 {p.label}
               </SelectItem>
             ))}
             <SelectItem
               value="custom"
-              className="text-xs font-medium rounded-xl data-[state=checked]:bg-primary data-[state=checked]:text-white focus:bg-muted"
+              className="text-xs font-medium rounded-xl data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground focus:bg-muted"
             >
               <div className="flex items-center gap-2">
                 <CalendarIcon className="h-3.5 w-3.5" />
@@ -228,7 +228,7 @@ export default function PeriodSelector({
         </Select>
 
         <Dialog open={customDialogOpen} onOpenChange={setCustomDialogOpen}>
-          <DialogContent className="sm:max-w-md rounded-3xl border border-border bg-card">
+          <DialogContent className="sm:max-w-md rounded-[20px] border border-border bg-card">
             <DialogHeader>
               <DialogTitle className="font-sans font-bold text-lg text-foreground">
                 Seleccionar rango personalizado
@@ -255,7 +255,7 @@ export default function PeriodSelector({
               <Button
                 onClick={applyCustomRange}
                 disabled={!customFrom || !customTo}
-                className="w-full bg-gradient-to-r from-[#3B82F6] via-[#6366F1] to-[#8B5CF6] hover:opacity-95 text-white rounded-2xl h-11 font-semibold text-xs shadow-md"
+                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[12px] h-11 font-semibold text-xs shadow-md"
               >
                 Aplicar rango
               </Button>
@@ -270,15 +270,15 @@ export default function PeriodSelector({
 
   return (
     <div className="flex items-center">
-      <div className="flex bg-[#10121d] dark:bg-[#10121d] bg-slate-100 border border-border p-1 rounded-2xl shadow-sm items-center gap-1">
+      <div className="flex bg-inset border border-border p-1 rounded-[9px] shadow-sm items-center gap-1">
         {periodOptions.map((p) => (
           <button
             key={p.key}
             onClick={() => selectPreset(p.key)}
-            className={`px-3.5 h-8 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+            className={`px-3.5 h-8 text-xs font-semibold rounded-[9px] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
               period === p.key
-                ? "bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-[0_2px_10px_rgba(99,102,241,0.35)]"
-                : "text-slate-400 hover:text-white dark:hover:text-white hover:text-slate-900 hover:bg-white/5"
+                ? "bg-brand-gradient text-primary-foreground"
+                : "text-text-4 hover:text-foreground hover:bg-raised"
             }`}
           >
             {p.label}
@@ -288,10 +288,10 @@ export default function PeriodSelector({
         <Popover>
           <PopoverTrigger asChild>
             <button
-              className={`px-3.5 h-8 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+              className={`px-3.5 h-8 text-xs font-semibold rounded-[9px] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
                 period === "custom"
-                  ? "bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-[0_2px_10px_rgba(99,102,241,0.35)]"
-                  : "text-slate-400 hover:text-white dark:hover:text-white hover:text-slate-900 hover:bg-white/5"
+                  ? "bg-brand-gradient text-primary-foreground"
+                  : "text-text-4 hover:text-foreground hover:bg-raised"
               }`}
             >
               <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
@@ -300,7 +300,7 @@ export default function PeriodSelector({
           </PopoverTrigger>
 
           <PopoverContent
-            className="w-auto p-4 border border-border bg-card rounded-3xl shadow-2xl"
+            className="w-auto p-4 border border-border bg-card rounded-[16px] shadow-2xl"
             align="end"
             sideOffset={8}
           >
@@ -318,7 +318,7 @@ export default function PeriodSelector({
               <Button
                 onClick={applyCustomRange}
                 disabled={!customFrom || !customTo}
-                className="w-full bg-gradient-to-r from-[#3B82F6] via-[#6366F1] to-[#8B5CF6] hover:opacity-95 text-white rounded-2xl h-11 font-semibold text-xs shadow-md"
+                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[12px] h-11 font-semibold text-xs shadow-md"
               >
                 Aplicar rango
               </Button>

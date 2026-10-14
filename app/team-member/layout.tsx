@@ -7,7 +7,7 @@ import { MobileSidebarProvider, MobileSidebar, HamburgerButton } from "@/compone
 export default function TeamMemberLayout({ children }: { children: React.ReactNode }) {
   const { hydrated, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   if (!hydrated || checkingAuth) {
-    return (<div className="min-h-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-2 border-violet-300 border-t-violet-600 rounded-full animate-spin" /></div>);
+    return (<div className="min-h-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>);
   }
   return (
     <div className="flex min-h-screen w-full">
@@ -16,7 +16,7 @@ export default function TeamMemberLayout({ children }: { children: React.ReactNo
         <MobileSidebar>
           <SidebarNav onNavigate={() => {}} />
         </MobileSidebar>
-        <main className="flex-1 min-w-0 md:ml-64 overflow-auto p-4 md:p-6 bg-background pb-6 md:pb-6 relative">
+        <main className="flex-1 min-w-0 md:ml-[268px] overflow-auto p-4 md:p-6 bg-background pb-6 md:pb-6 relative">
           <div className="absolute top-4 right-4 z-50"><NotificationBell /></div>
           <div className="md:hidden mb-4"><HamburgerButton /></div>
           {children}
