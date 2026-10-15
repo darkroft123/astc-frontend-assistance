@@ -110,7 +110,7 @@ export default function JustificationsPage() {
   }
 
   return (
-    <div className="min-h-screen sm:h-[calc(100vh-70px)] bg-muted/50 overflow-y-auto sm:overflow-hidden">
+    <div className="min-h-screen sm:h-[calc(100vh-70px)] bg-transparent overflow-y-auto sm:overflow-hidden">
       <div className="h-full max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4">
 
         <PageHeader

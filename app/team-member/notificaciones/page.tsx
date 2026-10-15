@@ -170,7 +170,7 @@ export default function NotificationsPage() {
 
   if (!hydrated || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-muted-foreground font-medium text-sm">
           Cargando notificaciones...
         </div>
@@ -185,7 +185,7 @@ export default function NotificationsPage() {
       selected.notificationCode?.startsWith("AST00010");
 
     return (
-      <div className="relative min-h-screen bg-background pb-12">
+      <div className="relative min-h-screen bg-transparent pb-12">
         <div className="max-w-3xl mx-auto px-4 py-8 relative z-10 animate-in slide-in-from-bottom-3 duration-200">
           <div className="flex items-center gap-3 mb-6">
             <button
@@ -243,7 +243,7 @@ export default function NotificationsPage() {
 
   /* ================= LIST VIEW (MATCHES OFFICIAL FIGMA) ================= */
   return (
-    <div className="relative min-h-screen bg-background pb-12">
+    <div className="relative min-h-screen bg-transparent pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 space-y-5 relative z-10">
         {/* 1. HEADER */}
         <div className="flex items-center justify-between">

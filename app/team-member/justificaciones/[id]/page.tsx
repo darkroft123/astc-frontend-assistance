@@ -60,7 +60,7 @@ export default function JustificationDetailPage() {
   const st = detail.status;
 
   return (
-    <div className="min-h-screen bg-muted/50 pb-10">
+    <div className="min-h-screen bg-transparent pb-10">
       <div className="max-w-6xl mx-auto px-4 py-5">
 
         {/* TOP BAR */}

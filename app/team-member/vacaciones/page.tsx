@@ -187,7 +187,7 @@ export default function VacationsPage() {
 
   if (checkingAuth || !hydrated) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-muted/50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-transparent">
         <div className="w-16 h-16 relative">
           <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
           <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
@@ -198,7 +198,7 @@ export default function VacationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/50 py-8">
+    <div className="min-h-screen bg-transparent py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
         {/* HEADER */}

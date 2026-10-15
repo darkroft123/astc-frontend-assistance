@@ -80,7 +80,7 @@ function JustifyAbsencePageContent() {
   }
   if (blocked) {
     return (
-      <div className="h-screen bg-muted/50 flex items-center justify-center p-6">
+      <div className="h-screen bg-transparent flex items-center justify-center p-6">
         <div className="max-w-md text-center">
           <div className="text-5xl mb-4">📋</div>
           <h2 className="text-xl font-bold text-foreground mb-2">No se puede editar</h2>
@@ -94,7 +94,7 @@ function JustifyAbsencePageContent() {
   const backHref = isEditMode ? "/team-member/justificaciones" : "/team-member/faltas";
 
   return (
-    <div className="min-h-screen bg-muted/50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
       <Card className="w-full max-w-xl border-border shadow-lg rounded-[16px] overflow-hidden">
         <CardContent className="p-5 sm:p-6 space-y-4">
 
