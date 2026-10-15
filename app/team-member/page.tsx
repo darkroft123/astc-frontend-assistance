@@ -134,7 +134,7 @@ export default function DashboardPage() {
   if (!loadingProject && (!projects || projects.length === 0)) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center p-6 text-center">
-        <Card className="max-w-md w-full rounded-[16px] border border-amber/20 bg-card text-card-foreground shadow-xl p-8">
+        <Card className="max-w-md w-full rounded-[var(--radius-card)] border border-amber/20 bg-card text-card-foreground shadow-xl p-8">
           <div className="mx-auto w-16 h-16 rounded-2xl bg-amber/10 text-amber flex items-center justify-center mb-6 border border-amber/20">
             <AlertTriangle className="w-8 h-8" />
           </div>

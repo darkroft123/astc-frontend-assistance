@@ -396,7 +396,7 @@ export default function AttendanceHistoryPage() {
             </div>
 
             {/* TABLE */}
-            <div className="flex-1 overflow-hidden border rounded-[14px]">
+            <div className="flex-1 overflow-hidden border rounded-[var(--radius-kpi)]">
               <DataTable
                 data={filteredRecords}
                 columns={columns}
@@ -410,7 +410,7 @@ export default function AttendanceHistoryPage() {
 
         {/* PAGINATION: Centered Status Bar */}
         <div className="flex justify-center pb-2">
-          <div className="flex items-center gap-4 bg-card border border-border rounded-[9px] px-5 py-2 shadow-sm">
+          <div className="flex items-center gap-4 bg-card border border-border rounded-[var(--radius-segment)] px-5 py-2 shadow-sm">
             <p className="text-xs text-text-2 font-medium">
               Página <span className="font-bold text-foreground">{currentPage}</span> de {pagination.totalPages}
             </p>

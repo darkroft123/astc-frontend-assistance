@@ -202,7 +202,7 @@ export default function PeriodSelector({
     return (
       <>
         <Select value={period === "custom" ? "custom" : period} onValueChange={handleMobileSelect}>
-          <SelectTrigger className="w-full bg-brand-gradient text-primary-foreground border-0 rounded-[9px] h-11 px-4 text-xs font-semibold [&>svg]:text-primary-foreground">
+          <SelectTrigger className="w-full bg-brand-gradient text-primary-foreground border-0 rounded-[var(--radius-segment)] h-11 px-4 text-xs font-semibold [&>svg]:text-primary-foreground">
             <SelectValue placeholder="Seleccionar período" />
           </SelectTrigger>
           <SelectContent className="rounded-2xl border border-border bg-card shadow-2xl min-w-[180px]">
@@ -228,7 +228,7 @@ export default function PeriodSelector({
         </Select>
 
         <Dialog open={customDialogOpen} onOpenChange={setCustomDialogOpen}>
-          <DialogContent className="sm:max-w-md rounded-[20px] border border-border bg-card">
+          <DialogContent className="sm:max-w-md rounded-[var(--radius-modal)] border border-border bg-card">
             <DialogHeader>
               <DialogTitle className="font-sans font-bold text-lg text-foreground">
                 Seleccionar rango personalizado
@@ -255,7 +255,7 @@ export default function PeriodSelector({
               <Button
                 onClick={applyCustomRange}
                 disabled={!customFrom || !customTo}
-                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[12px] h-11 font-semibold text-xs shadow-md"
+                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[var(--radius-control)] h-11 font-semibold text-xs shadow-md"
               >
                 Aplicar rango
               </Button>
@@ -270,12 +270,12 @@ export default function PeriodSelector({
 
   return (
     <div className="flex items-center">
-      <div className="flex bg-inset border border-border p-1 rounded-[9px] shadow-sm items-center gap-1">
+      <div className="flex bg-inset border border-border p-1 rounded-[var(--radius-segment)] shadow-sm items-center gap-1">
         {periodOptions.map((p) => (
           <button
             key={p.key}
             onClick={() => selectPreset(p.key)}
-            className={`px-3.5 h-8 text-xs font-semibold rounded-[9px] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+            className={`px-3.5 h-8 text-xs font-semibold rounded-[var(--radius-segment)] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
               period === p.key
                 ? "bg-brand-gradient text-primary-foreground"
                 : "text-text-4 hover:text-foreground hover:bg-raised"
@@ -288,7 +288,7 @@ export default function PeriodSelector({
         <Popover>
           <PopoverTrigger asChild>
             <button
-              className={`px-3.5 h-8 text-xs font-semibold rounded-[9px] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+              className={`px-3.5 h-8 text-xs font-semibold rounded-[var(--radius-segment)] transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
                 period === "custom"
                   ? "bg-brand-gradient text-primary-foreground"
                   : "text-text-4 hover:text-foreground hover:bg-raised"
@@ -300,7 +300,7 @@ export default function PeriodSelector({
           </PopoverTrigger>
 
           <PopoverContent
-            className="w-auto p-4 border border-border bg-card rounded-[16px] shadow-2xl"
+            className="w-auto p-4 border border-border bg-card rounded-[var(--radius-card)] shadow-2xl"
             align="end"
             sideOffset={8}
           >
@@ -318,7 +318,7 @@ export default function PeriodSelector({
               <Button
                 onClick={applyCustomRange}
                 disabled={!customFrom || !customTo}
-                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[12px] h-11 font-semibold text-xs shadow-md"
+                className="w-full bg-brand-gradient hover:opacity-95 text-primary-foreground rounded-[var(--radius-control)] h-11 font-semibold text-xs shadow-md"
               >
                 Aplicar rango
               </Button>

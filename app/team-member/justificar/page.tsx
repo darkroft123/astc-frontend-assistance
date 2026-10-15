@@ -95,7 +95,7 @@ function JustifyAbsencePageContent() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl border-border shadow-lg rounded-[16px] overflow-hidden">
+      <Card className="w-full max-w-xl border-border shadow-lg rounded-[var(--radius-card)] overflow-hidden">
         <CardContent className="p-5 sm:p-6 space-y-4">
 
           <div className="flex items-center gap-3">

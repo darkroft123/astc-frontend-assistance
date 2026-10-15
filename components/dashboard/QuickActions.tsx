@@ -26,7 +26,7 @@ export function QuickActions() {
 
   return (
     <>
-      <Card className="w-full h-full border border-border rounded-[16px] shadow-sm bg-card">
+      <Card className="w-full h-full border border-border rounded-[var(--radius-card)] shadow-sm bg-card">
         <CardContent className="p-5 flex flex-col justify-between h-full">
           <div>
             <h3 className="font-sans font-bold text-lg text-foreground tracking-tight">

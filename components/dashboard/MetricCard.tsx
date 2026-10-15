@@ -64,7 +64,7 @@ export function MetricCard({
   const displayBadge = badge || trend;
 
   return (
-    <div className="bg-card border border-border rounded-[14px] p-4 sm:p-5 flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all group">
+    <div className="bg-card border border-border rounded-[var(--radius-kpi)] p-4 sm:p-5 flex flex-col justify-between h-full shadow-sm hover:shadow-md transition-all group">
       <div className="flex items-center justify-between gap-2">
         <div
           className={`p-2.5 rounded-xl border shrink-0 transition-transform group-hover:scale-105 ${styles.iconBg}`}

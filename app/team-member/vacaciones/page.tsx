@@ -177,7 +177,7 @@ export default function VacationsPage() {
       header: "",
       render: (r) =>
         r.status === "PENDING" ? (
-          <Button variant="ghost" size="sm" onClick={() => handleCancel(r.id)} className="text-red-ink hover:text-red-ink hover:bg-red/10 transition-all rounded-[9px] h-8 px-3">
+          <Button variant="ghost" size="sm" onClick={() => handleCancel(r.id)} className="text-red-ink hover:text-red-ink hover:bg-red/10 transition-all rounded-[var(--radius-segment)] h-8 px-3">
             <XCircle className="w-4 h-4 mr-1.5" />
             Cancelar
           </Button>
@@ -344,7 +344,7 @@ export default function VacationsPage() {
 
       {/* Modern Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md rounded-[20px] p-0 overflow-hidden border-0 shadow-2xl">
+        <DialogContent className="sm:max-w-md rounded-[var(--radius-modal)] p-0 overflow-hidden border-0 shadow-2xl">
           <div className="bg-gradient-to-r from-primary to-primary/70 p-6 text-primary-foreground text-center">
             <div className="w-12 h-12 bg-primary-foreground/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
               <Sun className="w-6 h-6 text-amber drop-shadow-sm" />
@@ -452,7 +452,7 @@ export default function VacationsPage() {
             </div>
           </div>
 
-          <div className="bg-background p-4 px-6 border-t border-border flex justify-end gap-3 rounded-b-[20px]">
+          <div className="bg-background p-4 px-6 border-t border-border flex justify-end gap-3 rounded-b-[var(--radius-modal)]">
             <Button variant="outline" onClick={() => setDialogOpen(false)} className="rounded-xl h-10 px-5 font-medium border-border text-text-2 hover:bg-muted hover:text-foreground">
               Cancelar
             </Button>

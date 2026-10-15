@@ -507,7 +507,7 @@ export default function BiometricRegistrationView({
 
         {/* ---------- COLUMNA CENTRAL (Cámara y Scanner Biométrico) ---------- */}
         <div className="lg:col-span-6 flex flex-col items-center order-1 lg:order-2">
-          <div className="bg-inset border border-line rounded-[16px] p-5 w-full flex flex-col items-center space-y-4 shadow-sm">
+          <div className="bg-inset border border-line rounded-[var(--radius-card)] p-5 w-full flex flex-col items-center space-y-4 shadow-sm">
             {/* Viewport de Cámara */}
             <div className="bg-muted rounded-2xl w-full h-[360px] sm:h-[420px] relative overflow-hidden flex items-center justify-center border border-line">
               {photo ? (
@@ -751,7 +751,7 @@ export default function BiometricRegistrationView({
       {/* ==================== 4. WARNING MODAL (Día no laborable) ==================== */}
       {showWarningModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/70 backdrop-blur-sm p-4">
-          <div className="bg-inset border border-line rounded-[20px] p-6 sm:p-8 max-w-sm w-full shadow-2xl text-foreground">
+          <div className="bg-inset border border-line rounded-[var(--radius-modal)] p-6 sm:p-8 max-w-sm w-full shadow-2xl text-foreground">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-amber/10 border border-amber/20 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-6 h-6 text-amber" />

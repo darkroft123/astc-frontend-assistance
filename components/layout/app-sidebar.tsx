@@ -120,7 +120,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex flex-col h-full">
       {/* 1. Perfil del usuario */}
       <div className="flex items-center gap-3 px-1 mb-3">
-        <div className="h-11 w-11 rounded-[14px] bg-gradient-to-br from-[#38bdf8] via-[#818cf8] to-[#c084fc] flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
+        <div className="h-11 w-11 rounded-[var(--radius-kpi)] bg-avatar-gradient flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
           {getInitials(displayName)}
         </div>
 
@@ -135,7 +135,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       {/* 2. Tarjeta del Rol y Turno */}
-      <div className="bg-raised border border-line rounded-[16px] p-3.5 mb-4">
+      <div className="bg-raised border border-line rounded-[var(--radius-card)] p-3.5 mb-4">
         <div>
           <span className={cn("font-mono text-[10.5px] leading-[15.8px] uppercase tracking-[0.05em] font-medium", roleAccent)}>
             {roleLabel}
@@ -166,7 +166,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   window.dispatchEvent(new CustomEvent("astc-project-changed", { detail: val }));
                 }
               }}
-              className="w-full bg-field border border-line-2 rounded-[12px] px-2 py-1.5 text-[11px] text-text-2 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+              className="w-full bg-field border border-line-2 rounded-[var(--radius-control)] px-2 py-1.5 text-[11px] text-text-2 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id} className="bg-surface text-foreground">
@@ -201,7 +201,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={onNavigate}
               className={cn(
-                "flex items-center justify-between rounded-[11px] px-3.5 py-2.5 text-[15px] leading-[22.5px] font-normal transition-all group",
+                "flex items-center justify-between rounded-[var(--radius-nav)] px-3.5 py-2.5 text-[15px] leading-[22.5px] font-normal transition-all group",
                 isActive
                   ? "bg-raised text-foreground border border-primary/30 shadow-sm font-medium"
                   : "text-text-3 hover:text-foreground hover:bg-raised"
@@ -235,7 +235,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             logout();
             onNavigate?.();
           }}
-          className="w-full flex items-center gap-3 rounded-[11px] px-3.5 py-2.5 text-[15px] font-normal text-text-3 hover:text-red-ink hover:bg-red/10 transition-all group"
+          className="w-full flex items-center gap-3 rounded-[var(--radius-nav)] px-3.5 py-2.5 text-[15px] font-normal text-text-3 hover:text-red-ink hover:bg-red/10 transition-all group"
         >
           <LogOut strokeWidth={2} className="h-[18px] w-[18px] shrink-0 text-text-3 group-hover:text-red-ink transition-colors" />
           <span>Cerrar sesión</span>

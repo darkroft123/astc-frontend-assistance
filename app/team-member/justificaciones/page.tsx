@@ -122,7 +122,7 @@ export default function JustificationsPage() {
           onPeriodChange={(r) => { setDateRange(r); setPeriod(r.period); setPage(1); }}
         />
 
-        <Card className="flex-1 border border-border shadow-sm bg-card rounded-[16px] overflow-hidden flex flex-col">
+        <Card className="flex-1 border border-border shadow-sm bg-card rounded-[var(--radius-card)] overflow-hidden flex flex-col">
           <CardContent className="p-4 flex-1 flex flex-col overflow-hidden">
 
             <div className="flex flex-col gap-4 mb-6">
@@ -209,7 +209,7 @@ export default function JustificationsPage() {
         </Card>
 
         <div className="flex justify-center pb-2">
-          <div className="flex items-center gap-4 bg-card border border-border rounded-[9px] px-5 py-2 shadow-sm">
+          <div className="flex items-center gap-4 bg-card border border-border rounded-[var(--radius-segment)] px-5 py-2 shadow-sm">
             <p className="text-xs text-text-2 font-medium">Página <span className="font-bold text-foreground">{page}</span> de {totalPages}</p>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" className="h-8 w-8 p-0" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}><ChevronLeft className="w-4 h-4" /></Button>
