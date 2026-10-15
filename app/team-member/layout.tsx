@@ -16,10 +16,16 @@ export default function TeamMemberLayout({ children }: { children: React.ReactNo
         <MobileSidebar>
           <SidebarNav onNavigate={() => {}} />
         </MobileSidebar>
-        <main className="flex-1 min-w-0 md:ml-[268px] overflow-auto p-4 md:p-6 bg-background pb-6 md:pb-6 relative">
+        <main className="flex-1 min-w-0 md:ml-[268px] overflow-x-hidden overflow-y-auto p-4 md:p-6 bg-background pb-6 md:pb-6 relative">
+          {/* Ambient light for all screens in dark mode (-250px top) */}
+          <div className="absolute top-[-250px] right-[-100px] w-[650px] h-[500px] bg-purple-600/20 blur-[140px] rounded-full pointer-events-none hidden dark:block z-0" />
+          <div className="absolute top-[-100px] right-[80px] w-[350px] h-[300px] bg-indigo-500/15 blur-[120px] rounded-full pointer-events-none hidden dark:block z-0" />
+
           <div className="absolute top-4 right-4 z-50"><NotificationBell /></div>
           <div className="md:hidden mb-4"><HamburgerButton /></div>
-          {children}
+          <div className="relative z-10">
+            {children}
+          </div>
         </main>
       </MobileSidebarProvider>
     </div>
