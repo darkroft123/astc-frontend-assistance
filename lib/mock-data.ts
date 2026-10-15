@@ -17,7 +17,7 @@ export const MOCK_USER = {
 export const MOCK_PROJECTS = [
   {
     id: "proj-101",
-    name: "test06",
+    name: "testo6",
     code: "TEST06",
     workStartTime: "08:00:00",
     workEndTime: "17:00:00",
@@ -32,10 +32,10 @@ export const MOCK_TODAY_ATTENDANCE = {
   id: "att-today-002",
   userId: "user-002",
   projectId: "proj-101",
-  date: new Date().toISOString().split("T")[0],
-  checkIn: "08:05:00",
-  checkOut: null,
-  status: "ASISTENCIA",
+  date: "2026-09-02",
+  checkIn: "08:52:00",
+  checkOut: "09:07:00",
+  status: "EARLY",
 };
 
 export const MOCK_DASHBOARD_USER = {
