@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, ArrowLeft, CalendarIcon, Loader2, FileCheck, AlertCircle } from "lucide-react";
+import { Upload, ChevronLeft, ArrowLeft, Loader2, FileCheck, Info, Calendar as CalendarIcon, FileText, Send } from "lucide-react";
 import { saveJustification, editJustification, getJustificationDetail, submitJustification } from "@/app/services/assistance.service";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 
@@ -17,6 +17,22 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
+function formatDateSpanish(dateStr: string): string {
+  try {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    if (!y || !m || !d) return dateStr;
+    const dateObj = new Date(y, m - 1, d);
+    return new Intl.DateTimeFormat("es-ES", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(dateObj);
+  } catch {
+    return dateStr;
+  }
+}
+
 function JustifyAbsencePageContent() {
   const { token, hydrated, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const router = useRouter();
@@ -24,7 +40,8 @@ function JustifyAbsencePageContent() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const absenceId = searchParams.get("absenceId");
-  const date = searchParams.get("date") ?? "Sin fecha";
+  const dateRaw = searchParams.get("date") ?? "2026-09-01";
+  const formattedDate = formatDateSpanish(dateRaw);
   const justificationId = searchParams.get("justificationId");
   const isEditMode = !!justificationId;
 
@@ -94,54 +111,149 @@ function JustifyAbsencePageContent() {
   const backHref = isEditMode ? "/team-member/justificaciones" : "/team-member/faltas";
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl border-border shadow-lg rounded-[var(--radius-card)] overflow-hidden">
-        <CardContent className="p-5 sm:p-6 space-y-4">
+    <div className="w-full max-w-[560px] mx-auto p-4 space-y-4 pb-20">
+      {/* Top back navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => router.push(backHref)}
+          className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Volver a justificaciones</span>
+        </button>
+      </div>
 
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.push(backHref)} className="text-text-4 hover:text-primary transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">{isEditMode ? "Editar justificación" : "Justificar ausencia"}</h1>
-              <p className="text-xs text-muted-foreground">{isEditMode ? "Actualice los datos de su justificación" : date}</p>
+      {/* Title header with gradient icon */}
+      <div className="flex items-center gap-3.5 pt-1">
+        <div className="w-12 h-12 rounded-2xl bg-avatar-gradient flex items-center justify-center text-white shadow-lg shrink-0">
+          <FileText className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+            {isEditMode ? "Editar justificación" : "Justificar ausencia"}
+          </h1>
+          <p className="text-xs text-text-4 mt-0.5">
+            Explica el motivo y adjunta un comprobante si lo tienes.
+          </p>
+        </div>
+      </div>
+
+      {/* Ausencia a justificar card */}
+      <div className="rounded-2xl border border-border/80 bg-raised/60 p-4 flex items-center gap-3.5">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+          <CalendarIcon className="w-5 h-5" />
+        </div>
+        <div>
+          <p className="text-[10px] font-mono font-bold tracking-wider text-muted-foreground uppercase">
+            AUSENCIA A JUSTIFICAR
+          </p>
+          <p className="text-sm font-bold text-foreground capitalize mt-0.5">
+            {formattedDate}
+          </p>
+        </div>
+      </div>
+
+      {/* Form Card */}
+      <div className="rounded-2xl border border-border/70 bg-card p-5 space-y-5 shadow-sm">
+        {/* Motivo */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-foreground">
+              Motivo <span className="text-rose-500">*</span>
+            </label>
+            <span className="text-xs font-mono text-text-4">
+              {reason.length}/240
+            </span>
+          </div>
+
+          <Textarea
+            value={reason}
+            maxLength={240}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Describa el motivo de su inasistencia..."
+            className="min-h-[130px] rounded-xl border border-border/70 bg-field/40 resize-none p-3.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-text-4/60"
+          />
+
+          <p className="text-xs text-text-4">
+            Sea claro y específico para facilitar la revisión.
+          </p>
+        </div>
+
+        {/* Documento */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-foreground">
+            Documento <span className="text-text-4 font-normal">(opcional)</span>
+          </label>
+          <input
+            type="file"
+            hidden
+            ref={fileInputRef}
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`w-full border-dashed border-2 p-4 rounded-xl flex items-center gap-3.5 transition-all cursor-pointer ${
+              documentFile
+                ? "border-emerald-500/40 bg-emerald-500/10"
+                : "border-border/70 bg-field/30 hover:border-primary/50 hover:bg-field/50"
+            }`}
+          >
+            <div
+              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                documentFile
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-surface border border-border/80 text-text-4"
+              }`}
+            >
+              {documentFile ? <FileCheck className="w-5 h-5" /> : <Upload className="w-5 h-5" />}
             </div>
-          </div>
+            <div className="text-left">
+              <p className="font-semibold text-xs sm:text-sm text-foreground">
+                {documentFile
+                  ? documentFile.name
+                  : existingDocumentUrl
+                  ? "Archivo actual — toque para reemplazar"
+                  : "Adjuntar comprobante"}
+              </p>
+              <p className="text-[11px] text-text-4 mt-0.5">
+                PDF, JPG o PNG (máx. 5 MB)
+              </p>
+            </div>
+          </button>
+        </div>
+      </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Motivo</label>
-            <Textarea value={reason} onChange={(e) => setReason(e.target.value)}
-              placeholder="Describa el motivo de su inasistencia..."
-              className="min-h-[100px] rounded-xl border-border resize-none p-3 text-sm" />
-            <p className="text-[10px] text-text-4 flex items-center gap-1">
-              <AlertCircle className="w-3 h-3" /> Sea claro para facilitar la revisión.
-            </p>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-text-4 uppercase tracking-wider">Documento (opcional)</label>
-            <input type="file" hidden ref={fileInputRef} onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)} />
-            <button onClick={() => fileInputRef.current?.click()}
-              className={`w-full border-dashed border-2 p-4 rounded-2xl flex items-center gap-3 transition-all ${documentFile ? "border-green/20 bg-green/10" : "border-border bg-inset hover:border-primary/30 hover:bg-primary/10"}`}>
-              <div className={`p-2 rounded-xl ${documentFile ? "bg-green/10 text-green-ink" : "bg-card text-muted-foreground"}`}>
-                {documentFile ? <FileCheck className="w-5 h-5" /> : <Upload className="w-5 h-5" />}
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-sm text-muted-foreground">{documentFile ? documentFile.name : existingDocumentUrl ? "Archivo actual  toque para reemplazar" : "Adjuntar comprobante"}</p>
-                <p className="text-xs text-muted-foreground">PDF, JPG o PNG (máx. 5MB)</p>
-              </div>
-            </button>
-          </div>
-
-          <div className="flex gap-3 pt-1">
-            <Button variant="outline" className="flex-1 h-11 rounded-xl font-semibold" onClick={() => router.push(backHref)} disabled={isSubmitting}>Cancelar</Button>
-            <Button className="flex-1 h-11 rounded-xl font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md" onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin mr-1" /> Enviando...</> : isEditMode ? "Guardar cambios" : "Enviar justificación"}
-            </Button>
-          </div>
-
-        </CardContent>
-      </Card>
+      {/* Action buttons */}
+      <div className="flex gap-3 pt-2">
+        <button
+          type="button"
+          className="flex-1 h-12 rounded-xl font-bold text-sm bg-surface hover:bg-surface/80 border border-border text-foreground transition-all cursor-pointer"
+          onClick={() => router.push(backHref)}
+          disabled={isSubmitting}
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          className="flex-1 h-12 rounded-xl font-bold text-sm bg-surface hover:bg-surface/80 border border-border text-foreground transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          onClick={handleSubmit}
+          disabled={isSubmitting || !reason.trim()}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Enviando...</span>
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4" />
+              <span>{isEditMode ? "Guardar cambios" : "Enviar justificación"}</span>
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 }

@@ -65,14 +65,15 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
   useEffect(() => {
     if (hydrated && user?.id) {
+      const uid = String(user.id);
       notificationService
-        .getUnreadCount(user.id)
+        .getUnreadCount(uid)
         .then(setUnreadCount)
         .catch((err) => console.error("Failed to fetch unread count", err));
 
       const interval = setInterval(() => {
         notificationService
-          .getUnreadCount(user.id)
+          .getUnreadCount(uid)
           .then(setUnreadCount)
           .catch((err) => console.error("Failed to fetch unread count", err));
       }, 60000);
@@ -114,13 +115,13 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       ? "text-amber"
       : role === "ADMIN"
       ? "text-violet-ink"
-      : "text-cyan";
+      : "text-violet";
 
   return (
     <div className="flex flex-col h-full">
       {/* 1. Perfil del usuario */}
       <div className="flex items-center gap-3 px-1 mb-3">
-        <div className="h-11 w-11 rounded-[var(--radius-kpi)] bg-avatar-gradient flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
+        <div className="h-11 w-11 rounded-2xl bg-avatar-gradient flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm">
           {getInitials(displayName)}
         </div>
 
@@ -149,7 +150,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             {project?.workStartTime && project?.workEndTime
               ? `${project.workStartTime} - ${project.workEndTime}`
               : "08:00 - 17:00"}
-            {project?.shiftType ? ` • ${project.shiftType}` : " • Turno A"}
+            {(project as any)?.shiftType ? ` • ${(project as any).shiftType}` : " • Turno A"}
           </span>
         </div>
 
@@ -203,7 +204,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               className={cn(
                 "flex items-center justify-between rounded-[var(--radius-nav)] px-3.5 py-2.5 text-[15px] leading-[22.5px] font-normal transition-all group",
                 isActive
-                  ? "bg-raised text-foreground border border-primary/30 shadow-sm font-medium"
+                  ? "bg-violet/10 dark:bg-[#1a172e] text-foreground border border-violet/30 shadow-sm font-medium"
                   : "text-text-3 hover:text-foreground hover:bg-raised"
               )}
             >
@@ -212,7 +213,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                   strokeWidth={2}
                   className={cn(
                     "h-[18px] w-[18px] shrink-0 transition-colors",
-                    isActive ? "text-primary" : "text-text-3 group-hover:text-foreground"
+                    isActive ? "text-violet" : "text-text-3 group-hover:text-foreground"
                   )}
                 />
                 <span className="truncate">{displayName}</span>
@@ -247,7 +248,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AppSidebar() {
   return (
-    <aside className="hidden md:flex w-[268px] h-screen fixed left-0 top-0 z-50 bg-sidebar border-r border-line flex-col overflow-hidden px-4 py-5">
+    <aside className="hidden md:flex w-[290px] h-screen fixed left-0 top-0 z-50 bg-sidebar border-r border-line flex-col overflow-hidden px-4 py-5">
       <SidebarNav />
     </aside>
   );

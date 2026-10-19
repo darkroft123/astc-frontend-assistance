@@ -1,98 +1,106 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Clock, XCircle, LogOut, BarChart3, ArrowRight } from "lucide-react";
+import { CheckCircle2, FileText, AlertTriangle, BarChart3 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/jwt/auth/auth.provider";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import { getTodayAttendance } from "@/app/services/assistance.service";
-import { JustificarModal } from "./JustificarModal";
 
-export function QuickActions() {
+interface QuickActionsProps {
+  pendingCount?: number;
+}
+
+export function QuickActions({ pendingCount = 1 }: QuickActionsProps) {
   const router = useRouter();
   const { token } = useAuth();
   const { project } = useUserProject();
-
   const [isEntryDone, setIsEntryDone] = useState(false);
-  const [showJustificar, setShowJustificar] = useState(false);
 
   useEffect(() => {
     if (!token || !project) return;
-    getTodayAttendance(token, project.id).then((att) => {
-      if (att?.checkIn && !att?.checkOut) setIsEntryDone(true);
-    });
+    getTodayAttendance(token, project.id)
+      .then((att) => {
+        if (att?.checkIn && !att?.checkOut) setIsEntryDone(true);
+      })
+      .catch(() => {});
   }, [token, project]);
 
   return (
-    <>
-      <Card className="w-full h-full border border-border rounded-[var(--radius-card)] shadow-sm bg-card">
-        <CardContent className="p-5 flex flex-col justify-between h-full">
-          <div>
-            <h3 className="font-sans font-bold text-lg text-foreground tracking-tight">
-              Acciones Rápidas
-            </h3>
-            <p className="font-sans text-xs text-muted-foreground mt-0.5">
-              Gestión de asistencia personal y solicitudes
-            </p>
-          </div>
+    <Card className="w-full border border-border/80 rounded-2xl shadow-sm bg-card overflow-hidden">
+      <CardContent className="p-5 sm:p-6 space-y-4">
+        <div>
+          <h3 className="font-sans font-bold text-lg sm:text-xl text-foreground tracking-tight">
+            Acciones rápidas
+          </h3>
+          <p className="font-sans text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Gestión de tu asistencia personal
+          </p>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3.5 mt-4 flex-1 items-stretch">
-            {/* Primary Action Button (Registrar / Marcar Entrada o Salida) */}
-            <button
-              onClick={() => router.push("/team-member/registrar")}
-              className={`h-24 sm:h-28 w-full justify-center text-sm font-semibold rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98] ${
-                isEntryDone
-                  ? "bg-green hover:bg-green/90 text-primary-foreground border border-transparent"
-                  : "bg-brand-gradient hover:opacity-95 text-primary-foreground border border-transparent"
-              }`}
-            >
-              {isEntryDone ? (
-                <LogOut className="w-6 h-6 shrink-0" />
-              ) : (
-                <CheckCircle2 className="w-6 h-6 shrink-0" />
-              )}
-              <span className="font-sans font-bold text-sm tracking-tight">
-                {isEntryDone ? "Marcar Salida" : "Marcar Entrada"}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          {/* Button 1: Registrar asistencia */}
+          <button
+            onClick={() => router.push("/team-member/registrar")}
+            className="w-full min-h-[72px] sm:min-h-[80px] p-3.5 sm:p-4 rounded-xl border border-border/80 bg-surface/70 hover:bg-raised transition-all text-left flex items-center gap-3 sm:gap-3.5 group cursor-pointer"
+          >
+            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <div className="flex flex-col leading-tight">
+              <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors">
+                {isEntryDone ? "Marcar" : "Registrar"}
               </span>
-            </button>
+              <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors">
+                {isEntryDone ? "salida" : "asistencia"}
+              </span>
+            </div>
+          </button>
 
-            {/* Justificar */}
-            <button
-              onClick={() => setShowJustificar(true)}
-              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-amber/10 hover:bg-amber/15 border border-amber/20 text-amber-ink rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
-            >
-              <Clock className="w-6 h-6 shrink-0" />
-              <span className="font-sans font-bold text-sm tracking-tight">
-                Justificar
+          {/* Button 2: Justificar falta (Highlighted with amber border and solid yellow circle badge) */}
+          <button
+            onClick={() => router.push("/team-member/justificar")}
+            className="w-full min-h-[72px] sm:min-h-[80px] p-3.5 sm:p-4 rounded-xl border border-amber-500/70 bg-surface/70 hover:bg-amber-500/10 transition-all text-left flex items-center justify-between group cursor-pointer"
+          >
+            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+              <FileText className="w-5 h-5 text-amber-400 shrink-0" />
+              <div className="flex flex-col leading-tight">
+                <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-amber-400 transition-colors">
+                  Justificar
+                </span>
+                <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-amber-400 transition-colors">
+                  falta
+                </span>
+              </div>
+            </div>
+            {pendingCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-[#EAB308] text-black font-extrabold text-xs flex items-center justify-center shrink-0 ml-1.5 shadow-xs">
+                {pendingCount}
               </span>
-            </button>
+            )}
+          </button>
 
-            {/* Ver Faltas */}
-            <button
-              onClick={() => router.push("/team-member/faltas")}
-              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-red/10 hover:bg-red/15 border border-red/20 text-red-ink rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
-            >
-              <XCircle className="w-6 h-6 shrink-0" />
-              <span className="font-sans font-bold text-sm tracking-tight">
-                Ver Faltas
-              </span>
-            </button>
+          {/* Button 3: Ver faltas */}
+          <button
+            onClick={() => router.push("/team-member/faltas")}
+            className="w-full min-h-[72px] sm:min-h-[80px] p-3.5 sm:p-4 rounded-xl border border-border/80 bg-surface/70 hover:bg-raised transition-all text-left flex items-center gap-3 sm:gap-3.5 group cursor-pointer"
+          >
+            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+            <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors leading-tight">
+              Ver faltas
+            </span>
+          </button>
 
-            {/* Ver Asistencias */}
-            <button
-              onClick={() => router.push("/team-member/asistencias")}
-              className="h-24 sm:h-28 w-full justify-center text-sm font-semibold bg-primary/10 hover:bg-primary/15 border border-primary/20 text-primary rounded-2xl flex flex-col items-center gap-2 transition-all cursor-pointer active:scale-[0.98]"
-            >
-              <BarChart3 className="w-6 h-6 shrink-0" />
-              <span className="font-sans font-bold text-sm tracking-tight">
-                Historial
-              </span>
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-      <JustificarModal open={showJustificar} onOpenChange={setShowJustificar} />
-    </>
+          {/* Button 4: Ver historial */}
+          <button
+            onClick={() => router.push("/team-member/asistencias")}
+            className="w-full min-h-[72px] sm:min-h-[80px] p-3.5 sm:p-4 rounded-xl border border-border/80 bg-surface/70 hover:bg-raised transition-all text-left flex items-center gap-3 sm:gap-3.5 group cursor-pointer"
+          >
+            <BarChart3 className="w-5 h-5 text-blue-400 shrink-0" />
+            <span className="font-sans font-semibold text-xs sm:text-sm text-foreground group-hover:text-primary transition-colors leading-tight">
+              Ver historial
+            </span>
+          </button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

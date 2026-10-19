@@ -107,7 +107,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     tokenService.clear();
     setTokenState(null);
-    window.location.assign(getApiBaseUrl(3003));
+    const currentTheme =
+      (typeof localStorage !== "undefined" && localStorage.getItem("theme")) ||
+      (typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light");
+    if (typeof document !== "undefined") {
+      document.cookie = `theme=${currentTheme}; path=/; max-age=31536000; SameSite=Lax`;
+    }
+    const targetUrl = getApiBaseUrl(3003);
+    const sep = targetUrl.includes("?") ? "&" : "?";
+    window.location.assign(`${targetUrl}${sep}theme=${currentTheme}`);
   };
 
   const isAuthenticated = useMemo(() => {

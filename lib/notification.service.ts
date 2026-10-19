@@ -1,4 +1,5 @@
 import { ASTCNotificationSDK } from "./notification-sdk";
+export type { InAppNotification } from "./notification-sdk";
 
 export const notificationService = new ASTCNotificationSDK(4000, "");
 

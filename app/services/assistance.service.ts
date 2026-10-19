@@ -829,7 +829,7 @@ export async function requestVacation(
     comment?: string;
   }
 ): Promise<VacationRequest> {
-  const data = await projectGraphqlRequest<{ RequestVacation: VacationRequest }>(
+  const data = await projectGraphqlRequest<{ requestVacation: VacationRequest }>(
     `
     mutation requestVacation($input: VacationRequestInput!) {
       requestVacation(input: $input) {
@@ -854,7 +854,7 @@ export async function cancelVacation(
   token: string,
   requestId: string
 ): Promise<VacationRequest> {
-  const data = await projectGraphqlRequest<{ CancelVacation: VacationRequest }>(
+  const data = await projectGraphqlRequest<{ cancelVacation: VacationRequest }>(
     `
     mutation cancelVacation($requestId: String!) {
       cancelVacation(requestId: $requestId) {

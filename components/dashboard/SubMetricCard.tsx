@@ -62,7 +62,7 @@ export function SubMetricCard({ label, value, icon, color = "zinc", className }:
         >
           {icon}
         </div>
-        <span className={cn("text-[11px] font-mono uppercase tracking-wider", current.label)}>
+        <span className={cn("text-xs font-semibold tracking-tight", current.label)}>
           {label}
         </span>
       </div>

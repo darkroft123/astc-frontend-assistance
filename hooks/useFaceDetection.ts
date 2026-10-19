@@ -24,11 +24,12 @@ export function useFaceDetection(
     const waitForVideoReady = (video: HTMLVideoElement) => {
       return new Promise<void>((resolve) => {
         const check = () => {
+          if (!mountedRef.current) return;
           if (
             video &&
             video.videoWidth > 0 &&
             video.videoHeight > 0 &&
-            video.readyState >= 3 &&
+            video.readyState >= 2 &&
             !video.paused
           ) {
             resolve();
@@ -76,7 +77,7 @@ export function useFaceDetection(
       } catch (error) {
         initializingRef.current = false;
         console.error("FaceDetector init error:", error);
-        setFaceMessage("Error al cargar detector");
+        setFaceMessage("Detector no disponible");
       }
     };
 
@@ -86,41 +87,44 @@ export function useFaceDetection(
       const video = videoRef.current;
       const detector = detectorRef.current;
 
-      if (!video || !detector || video.paused) {
-        rafRef.current = requestAnimationFrame(detect);
+      if (!video || !detector || video.paused || video.ended) {
+        if (mountedRef.current) rafRef.current = requestAnimationFrame(detect);
         return;
       }
 
       const isReady =
         video.videoWidth > 0 &&
         video.videoHeight > 0 &&
-        video.readyState >= 3;
+        video.readyState >= 2;
 
       if (!isReady) {
-        rafRef.current = requestAnimationFrame(detect);
+        if (mountedRef.current) rafRef.current = requestAnimationFrame(detect);
         return;
       }
 
-      const now = performance.now();
+      const now = Math.round(performance.now());
 
-      if (now - lastRunRef.current < 33) {
-        rafRef.current = requestAnimationFrame(detect);
+      // Ensure at least 40ms has passed AND now is strictly greater than last timestamp
+      if (now - lastRunRef.current < 40 || now <= lastRunRef.current) {
+        if (mountedRef.current) rafRef.current = requestAnimationFrame(detect);
         return;
       }
-
-      lastRunRef.current = now;
 
       try {
+        if (!detectorRef.current || !mountedRef.current) return;
+
+        // Perform video detection with monotonic timestamp
         const result = detector.detectForVideo(video, now);
+        lastRunRef.current = now;
 
         if (!mountedRef.current) return;
 
-        if (result.detections.length === 0) {
+        if (!result || !result.detections || result.detections.length === 0) {
           setFaceInside(false);
           setFaceMessage("No se detecta rostro");
           setQualityMessage("Mira a la cámara");
         } else {
-          const box = result.detections[0].boundingBox;
+          const box = result.detections[0]?.boundingBox;
 
           if (!box) return;
 
@@ -140,10 +144,12 @@ export function useFaceDetection(
           setQualityMessage(centered ? "Buen encuadre" : "Ajusta posición");
         }
       } catch (err) {
-        console.debug("Detection skipped frame");
+        // Suppress transient frame detection glitches from MediaPipe
       }
 
-      rafRef.current = requestAnimationFrame(detect);
+      if (mountedRef.current) {
+        rafRef.current = requestAnimationFrame(detect);
+      }
     };
 
     init();
@@ -151,10 +157,20 @@ export function useFaceDetection(
     return () => {
       mountedRef.current = false;
 
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
 
-      detectorRef.current?.close();
+      const activeDetector = detectorRef.current;
       detectorRef.current = null;
+      if (activeDetector) {
+        try {
+          activeDetector.close();
+        } catch {
+          /* ignore */
+        }
+      }
     };
   }, [cameraOn, videoRef]);
 
