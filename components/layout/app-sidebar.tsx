@@ -16,6 +16,13 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatAvatarUrl } from "@/lib/avatar-url";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { useAuth } from "@/app/jwt/auth/auth.provider";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import { getGraphQLUrl } from "@/lib/api-host";
@@ -157,24 +164,27 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         {/* Selector de proyecto si hay múltiples */}
         {projects.length > 1 && (
           <div className="mt-2">
-            <select
+            <Select
               value={project?.id || ""}
-              onChange={(e) => {
-                const val = e.target.value;
+              onValueChange={(val) => {
                 selectProject(val);
                 if (typeof window !== "undefined") {
                   localStorage.setItem("selected_project_id", val);
                   window.dispatchEvent(new CustomEvent("astc-project-changed", { detail: val }));
                 }
               }}
-              className="w-full bg-field border border-line-2 rounded-[var(--radius-control)] px-2 py-1.5 text-[11px] text-text-2 focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
             >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id} className="bg-surface text-foreground">
-                  {p.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-full h-8 rounded-xl border border-border bg-field text-[11px] text-text-2">
+                <SelectValue placeholder="Seleccionar proyecto" />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="text-xs">
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>
