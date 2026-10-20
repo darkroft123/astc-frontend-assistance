@@ -1,541 +1,778 @@
 "use client";
+
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { DataTable } from "@/components/DataTable";
-
+import Link from "next/link";
 import {
   Search,
   FileText,
   Calendar as CalendarIcon,
-  RefreshCw,
-  RotateCcw,
+  RotateCw,
   ChevronLeft,
   ChevronRight,
-  Loader2,
   Eye,
   Pencil,
   Send,
   CheckCircle2,
   Clock,
   TrendingUp,
+  AlertTriangle,
+  Folder,
 } from "lucide-react";
-import { StatusBadge } from "@/components/atoms/status-badge";
-import { SubMetricCard } from "@/components/dashboard/SubMetricCard";
-
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { listJustifications, submitJustification } from "@/app/services/assistance.service";
 import { formatDateTime } from "@/lib/timezone";
+import { DateRangeModal, DateRange } from "@/components/ui/date-range-modal";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+type Period =
+  | "today"
+  | "thisweek"
+  | "month"
+  | "3months"
+  | "6months"
+  | "9months"
+  | "total"
+  | "custom";
 
-import type { Period, DateRange, JustificationItem, JustificationPage } from "@/components/types/dashboard";
-import { DateRangeModal } from "@/components/ui/date-range-modal";
-
-const PAGE_SIZE = 5;
-
-const periodOptions: { key: Period | "custom"; label: string }[] = [
-  { key: "today", label: "Hoy" },
-  { key: "thisweek", label: "Esta semana" },
-  { key: "month", label: "Este mes" },
-  { key: "3months", label: "3 meses" },
-  { key: "6months", label: "6 meses" },
-  { key: "9months", label: "9 meses" },
-  { key: "total", label: "Total" },
-  { key: "custom", label: "Personalizado" },
+const PERIOD_TABS: { id: Period; label: string }[] = [
+  { id: "today", label: "Hoy" },
+  { id: "thisweek", label: "Esta semana" },
+  { id: "month", label: "Este mes" },
+  { id: "3months", label: "3 meses" },
+  { id: "6months", label: "6 meses" },
+  { id: "9months", label: "9 meses" },
+  { id: "total", label: "Total" },
 ];
 
-const defaultSampleJustifications: JustificationItem[] = [
+export type TMJustificationRow = {
+  id: string;
+  userId: string;
+  userName: string;
+  userRoleBadge?: string;
+  userEmail: string;
+  projectName?: string;
+  motivo: string;
+  documentUrl?: string | null;
+  fecha: string;
+  estado: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "OBSERVATION";
+  comment?: string | null;
+};
+
+const DEFAULT_TM_JUSTIFICATIONS: TMJustificationRow[] = [
   {
-    id: "just-sample-1",
-    userId: "user-1",
-    absenceId: "abs-1",
-    submittedAt: "2026-09-02T09:23:00.000Z",
-    description: "tsteo",
-    documentUrl: null,
+    id: "just-001",
+    userId: "usr-carlos",
+    userName: "carlos mamani",
+    userRoleBadge: "Trabajador",
+    userEmail: "mamanigutierrezcarlos123@gmail.com",
+    projectName: "testo6",
+    motivo: "Cita médica programada en el hospital central con constancia adjunta.",
+    documentUrl: "https://example.com/comprobante_medico.pdf",
+    fecha: "02/09/2026",
+    estado: "SUBMITTED",
     comment: null,
-    status: "PENDING",
+  },
+  {
+    id: "just-002",
+    userId: "usr-carlos",
+    userName: "carlos mamani",
+    userRoleBadge: "Trabajador",
+    userEmail: "mamanigutierrezcarlos123@gmail.com",
+    projectName: "testo6",
+    motivo: "Trámite personal documentario en notaría pública.",
+    documentUrl: "https://example.com/constancia_notarial.pdf",
+    fecha: "28/08/2026",
+    estado: "APPROVED",
+    comment: "Aprobada por el Jefe de Proyecto.",
+  },
+  {
+    id: "just-003",
+    userId: "usr-carlos",
+    userName: "carlos mamani",
+    userRoleBadge: "Trabajador",
+    userEmail: "mamanigutierrezcarlos123@gmail.com",
+    projectName: "gestion de asistencia",
+    motivo: "Emergencia odontológica de urgencia sin aviso previo.",
+    documentUrl: null,
+    fecha: "15/08/2026",
+    estado: "OBSERVATION",
+    comment: "Favor de adjuntar la constancia de atención médica para proceder con la aprobación.",
+  },
+  {
+    id: "just-004",
+    userId: "usr-carlos",
+    userName: "carlos mamani",
+    userRoleBadge: "Trabajador",
+    userEmail: "mamanigutierrezcarlos123@gmail.com",
+    projectName: "proyecto testeo",
+    motivo: "Inasistencia por contingencia imprevista en el transporte público.",
+    documentUrl: null,
+    fecha: "10/08/2026",
+    estado: "REJECTED",
+    comment: "No cumple con el plazo reglamentario de 48 horas.",
   },
 ];
 
 export default function JustificationsPage() {
   const router = useRouter();
-  const { hydrated, token, user, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
+  const { hydrated, token, user } = useAuthGuard(["TEAM_MEMBER"]);
 
-  const [period, setPeriod] = useState<Period>("month");
+  const [activePeriod, setActivePeriod] = useState<Period>("month");
+  const [dateRangeModalOpen, setDateRangeModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>({
-    fromDate: "2026-09-01",
-    toDate: "2026-09-03",
-    label: "Este mes",
-    period: "month",
+    from: "01/09/2026",
+    to: "03/09/2026",
   });
-  const [customModalOpen, setCustomModalOpen] = useState(false);
 
-  const [items, setItems] = useState<JustificationItem[]>(defaultSampleJustifications);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<{ items: TMJustificationRow[]; total: number }>({
+    items: DEFAULT_TM_JUSTIFICATIONS,
+    total: DEFAULT_TM_JUSTIFICATIONS.length,
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(1);
-  const [reloadKey, setReloadKey] = useState(0);
-
+  const size = 10;
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "PENDING" | "SUBMITTED" | "OBSERVATION" | "APPROVED" | "REJECTED">("all");
+  const [statusFilter, setStatusFilter] = useState("TODOS");
+  const [projectFilter, setProjectFilter] = useState("all");
   const [submittingId, setSubmittingId] = useState<string | null>(null);
 
-  const handlePeriodSelect = (p: Period) => {
-    setPeriod(p);
-    setPage(1);
-    const today = new Date();
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+  const projects = [
+    { id: "all", name: "Todos los proyectos (3)" },
+    { id: "p1", name: "gestion de asistencia" },
+    { id: "p2", name: "proyecto testeo" },
+    { id: "p3", name: "testo6" },
+  ];
 
-    if (p === "today") {
-      const d = formatDate(today);
-      setDateRange({ fromDate: d, toDate: d, label: "Hoy", period: p });
-    } else if (p === "thisweek") {
-      const dayOfWeek = today.getDay();
-      const monday = new Date(today);
-      monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
-      setDateRange({ fromDate: formatDate(monday), toDate: formatDate(today), label: "Esta semana", period: p });
-    } else if (p === "month") {
-      setDateRange({ fromDate: "2026-09-01", toDate: "2026-09-03", label: "Este mes", period: p });
-    } else if (p === "3months") {
-      const d = new Date(today);
-      d.setMonth(d.getMonth() - 3);
-      setDateRange({ fromDate: formatDate(d), toDate: formatDate(today), label: "3 meses", period: p });
-    } else if (p === "6months") {
-      const d = new Date(today);
-      d.setMonth(d.getMonth() - 6);
-      setDateRange({ fromDate: formatDate(d), toDate: formatDate(today), label: "6 meses", period: p });
-    } else if (p === "9months") {
-      const d = new Date(today);
-      d.setMonth(d.getMonth() - 9);
-      setDateRange({ fromDate: formatDate(d), toDate: formatDate(today), label: "9 meses", period: p });
-    } else {
-      setDateRange({ fromDate: "2024-01-01", toDate: "2026-09-03", label: "Total", period: p });
+  const fetchData = useCallback(async () => {
+    if (!token) {
+      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+      return;
     }
-  };
-
-  const formatDateDisplay = (dateStr: string) => {
+    setIsLoading(true);
     try {
-      const [year, month, day] = dateStr.split("-");
-      if (year && month && day) return `${day}/${month}/${year}`;
-      return dateStr;
+      const res = await listJustifications(token, {
+        page: page - 1,
+        size,
+        status: statusFilter === "TODOS" ? null : statusFilter,
+        fromDate: dateRange.from,
+        toDate: dateRange.to,
+      });
+
+      const fetched = res?.items ?? [];
+      if (fetched.length > 0) {
+        setData({
+          items: fetched.map((i: any) => ({
+            id: i.id,
+            userId: i.userId || user?.username || "usr-carlos",
+            userName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "carlos mamani",
+            userRoleBadge: "Trabajador",
+            userEmail: user?.email || "mamanigutierrezcarlos123@gmail.com",
+            projectName: i.projectName || "testo6",
+            motivo: i.description || "Sin motivo",
+            documentUrl: i.documentUrl || null,
+            fecha: i.absenceDate
+              ? new Date(i.absenceDate + "T12:00:00Z").toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })
+              : "02/09/2026",
+            estado: i.status || "SUBMITTED",
+            comment: i.comment || null,
+          })),
+          total: res?.total ?? fetched.length,
+        });
+      } else {
+        setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+      }
     } catch {
-      return dateStr;
-    }
-  };
-
-  const metrics = useMemo(() => {
-    const total = totalItems || items.length;
-    const aprobadas = items.filter(i => i.status === "APPROVED").length;
-    const pendientes = items.filter(i => i.status === "PENDING" || i.status === "SUBMITTED").length;
-    const rate = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
-    return { total, aprobadas, pendientes, rate };
-  }, [items, totalItems]);
-
-  const handleSubmit = useCallback(async (id: string) => {
-    if (!token || submittingId) return;
-    if (!confirm("¿Enviar esta justificación para revisión del Jefe de Proyecto?")) return;
-    try {
-      setSubmittingId(id);
-      await submitJustification(token, id);
-      setReloadKey(k => k + 1);
-    } catch (err) {
-      console.error("Error submitting justification:", err);
-      alert("Error al enviar la justificación");
+      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
     } finally {
-      setSubmittingId(null);
+      setIsLoading(false);
     }
-  }, [token, submittingId]);
+  }, [token, page, statusFilter, dateRange, user]);
 
   useEffect(() => {
-    if (!hydrated || checkingAuth || !token || !user) return;
-    let cancelled = false;
+    if (hydrated) {
+      fetchData();
+    }
+  }, [hydrated, fetchData]);
 
-    (async () => {
+  const handleSubmit = useCallback(
+    async (id: string) => {
+      if (!token || submittingId) return;
+      if (!confirm("¿Enviar esta justificación para revisión del Jefe de Proyecto?")) return;
       try {
-        setLoading(true);
-        const result: JustificationPage = await listJustifications(token, {
-          page: page - 1,
-          size: PAGE_SIZE,
-          status: statusFilter === "all" ? null : statusFilter,
-          fromDate: dateRange.fromDate,
-          toDate: dateRange.toDate,
-        });
-        if (cancelled) return;
-        const fetched = result?.items ?? [];
-        if (fetched.length > 0) {
-          setItems(fetched);
-          setTotalItems(result?.total ?? fetched.length);
-        } else {
-          setItems(defaultSampleJustifications);
-          setTotalItems(1);
-        }
+        setSubmittingId(id);
+        await submitJustification(token, id);
+        fetchData();
       } catch (err) {
-        console.error("Error fetching justifications, fallback to default:", err);
-        if (!cancelled) {
-          setItems(defaultSampleJustifications);
-          setTotalItems(1);
-        }
+        console.error("Error submitting justification:", err);
+        alert("Error al enviar la justificación");
       } finally {
-        if (!cancelled) setLoading(false);
+        setSubmittingId(null);
       }
-    })();
+    },
+    [token, submittingId, fetchData]
+  );
 
-    return () => { cancelled = true; };
-  }, [hydrated, checkingAuth, token, user, dateRange, statusFilter, page, reloadKey]);
+  const filteredItems = useMemo(() => {
+    return data.items.filter((item) => {
+      const matchSearch =
+        !search.trim() ||
+        item.motivo.toLowerCase().includes(search.toLowerCase()) ||
+        item.userName.toLowerCase().includes(search.toLowerCase());
+      const matchStatus =
+        statusFilter === "TODOS" ||
+        item.estado === statusFilter ||
+        (statusFilter === "PENDING" && (item.estado === "PENDING" || item.estado === "SUBMITTED"));
+      const matchProject =
+        projectFilter === "all" ||
+        item.projectName?.toLowerCase() === projectFilter.toLowerCase();
+      return matchSearch && matchStatus && matchProject;
+    });
+  }, [data.items, search, statusFilter, projectFilter]);
 
-  const filteredData = useMemo(() => {
-    return items.filter(item =>
-      item.description?.toLowerCase().includes(search.toLowerCase()) ||
-      item.status?.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [items, search]);
+  const total = data.total || data.items.length;
+  const pendientes = data.items.filter(
+    (i) => i.estado === "SUBMITTED" || i.estado === "PENDING"
+  ).length;
+  const aprobadas = data.items.filter((i) => i.estado === "APPROVED").length;
+  const porcentaje = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
 
-  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-
-  if (!hydrated || checkingAuth || !token || !user) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
-  }
+  const getStatusBadge = (st: string) => {
+    switch (st) {
+      case "APPROVED":
+        return {
+          label: "Aprobada",
+          cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+          dot: "bg-emerald-400",
+        };
+      case "REJECTED":
+        return {
+          label: "Rechazada",
+          cls: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+          dot: "bg-rose-400",
+        };
+      case "OBSERVATION":
+        return {
+          label: "Observada",
+          cls: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+          dot: "bg-amber-400",
+        };
+      case "SUBMITTED":
+      default:
+        return {
+          label: "Enviada",
+          cls: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+          dot: "bg-blue-400",
+        };
+    }
+  };
 
   return (
-    <div className="w-full min-h-screen pb-12">
-      <div className="w-full max-w-[1400px] mx-auto px-0 md:px-0 space-y-4 md:space-y-6">
-
-        {/* ================= 1. HEADER (EXACT SVG DESIGN) ================= */}
+    <div className="w-full space-y-6 text-foreground font-sans bg-transparent pb-12 max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8">
+      {/* 1. TOP HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-            COLABORADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
-          </p>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
+          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+            <span className="font-mono text-[10.5px] font-semibold uppercase tracking-wider text-purple-400">
+              PANEL DE ASISTENCIA
+            </span>
+            <span className="text-xs text-muted-foreground font-sans">
+              · Solicitudes del trabajador
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Mis justificaciones
           </h1>
-          <p className="text-xs sm:text-sm text-text-4 mt-1">
-            Gestión y seguimiento de tus solicitudes de justificación y documentos adjuntos.
+          <p className="text-xs text-muted-foreground mt-1">
+            Revisión, estado y gestión de tus solicitudes de justificación y comprobantes.
           </p>
         </div>
 
-        {/* ================= 2. PERIOD BAR ================= */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-1 bg-raised border border-border/80 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
-            {periodOptions.map((opt) => (
+        <Link
+          href="/team-member/justificar"
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition-all cursor-pointer self-start md:self-auto"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          <span>Nueva justificación</span>
+        </Link>
+      </div>
+
+      {/* 2. PERIOD SELECTOR - Desktop View */}
+      <div className="hidden md:flex items-center gap-3 flex-wrap">
+        <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-[#0C0E18] border border-[#1E2335]">
+          {PERIOD_TABS.map((tab) => {
+            const isActive = activePeriod === tab.id;
+            return (
               <button
-                key={opt.key}
-                onClick={() => {
-                  if (opt.key === "custom") {
-                    setCustomModalOpen(true);
-                  } else {
-                    handlePeriodSelect(opt.key);
-                  }
-                }}
-                className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center ${
-                  period === opt.key
-                    ? "bg-surface text-foreground shadow-sm border border-line-2 font-bold"
-                    : "text-text-4 hover:text-foreground hover:bg-surface/50"
+                key={tab.id}
+                type="button"
+                onClick={() => setActivePeriod(tab.id)}
+                className={`py-2 px-3.5 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "bg-[#1E2338] text-white border border-[#2D354E] font-semibold shadow-xs"
+                    : "text-[#8F96AE] hover:text-white"
                 }`}
               >
-                {opt.label}
+                {tab.label}
               </button>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 sm:flex-initial px-4 py-2.5 rounded-2xl border border-border/80 bg-raised/80 font-mono text-xs text-text-3 font-semibold flex items-center justify-center shadow-2xs">
-              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
-            </div>
+        <button
+          type="button"
+          onClick={() => setDateRangeModalOpen(true)}
+          className="h-10 px-4 rounded-2xl bg-[#0C0E18] border border-[#1E2335] text-xs font-medium text-[#8F96AE] hover:text-white flex items-center gap-2 transition-colors cursor-pointer shrink-0 shadow-xs"
+          title="Seleccionar rango personalizado"
+        >
+          <CalendarIcon className="w-4 h-4 text-[#A855F7]" />
+          <span>Rango personalizado</span>
+        </button>
+
+        <div className="h-10 px-4 rounded-2xl bg-[#0C0E18] border border-[#1E2335] flex items-center gap-2 text-xs font-mono shrink-0 shadow-xs">
+          <span className="text-[#8F96AE]">Período:</span>
+          <span className="text-[#EEF0F6] font-semibold">
+            {dateRange.from} → {dateRange.to}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. PERIOD SELECTOR TABS (Mobile only) */}
+      <div className="md:hidden flex items-center gap-1.5 p-1 rounded-xl bg-card/60 border border-border/80 overflow-x-auto scrollbar-none">
+        {PERIOD_TABS.map((tab) => {
+          const isActive = activePeriod === tab.id;
+          return (
             <button
-              type="button"
-              onClick={() => setCustomModalOpen(true)}
-              className="w-11 h-11 rounded-2xl border border-border/80 bg-raised/80 hover:bg-surface text-text-3 hover:text-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center shadow-2xs"
-              title="Abrir selector de rango personalizado"
+              key={tab.id}
+              onClick={() => setActivePeriod(tab.id)}
+              className={`flex-1 min-w-[75px] py-2 px-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap text-center ${
+                isActive
+                  ? "bg-slate-800 text-white font-semibold shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <CalendarIcon className="w-4 h-4" />
+              {tab.label}
             </button>
+          );
+        })}
+      </div>
+
+      {/* 3. DATE RANGE SELECTOR BAR (Mobile only) */}
+      <div className="md:hidden flex items-center gap-2">
+        <div className="flex-1 flex items-center gap-2 px-3.5 h-11 rounded-xl border border-border bg-card/60 text-xs font-mono text-muted-foreground">
+          <CalendarIcon className="w-4 h-4 text-muted-foreground shrink-0" />
+          <span>{dateRange.from} → {dateRange.to}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setDateRangeModalOpen(true)}
+          className="w-11 h-11 rounded-xl border border-border bg-card/60 hover:bg-card text-muted-foreground hover:text-foreground flex items-center justify-center shrink-0 transition-colors"
+          title="Seleccionar rango"
+        >
+          <CalendarIcon className="w-4 h-4" />
+        </button>
+      </div>
+
+      <DateRangeModal
+        isOpen={dateRangeModalOpen}
+        onClose={() => setDateRangeModalOpen(false)}
+        fromDate={dateRange.from}
+        toDate={dateRange.to}
+        onApply={(from, to) => {
+          setDateRange({ from, to });
+          setActivePeriod("custom");
+        }}
+      />
+
+      {/* 4. 4 KPI CARDS (Matching PM Design System) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
+        {/* Card 1: Total solicitudes */}
+        <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl border border-border/60 bg-background/50 flex items-center justify-center text-muted-foreground shrink-0">
+              <AlertTriangle className="w-4 h-4" />
+            </div>
+            <p className="text-xs text-muted-foreground font-medium">Total solicitudes</p>
+          </div>
+          <div className="mt-2.5 sm:mt-3">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{total}</p>
           </div>
         </div>
 
-        <DateRangeModal
-          isOpen={customModalOpen}
-          onClose={() => setCustomModalOpen(false)}
-          fromDate={dateRange.fromDate}
-          toDate={dateRange.toDate}
-          onApply={(from, to) => {
-            setDateRange({
-              fromDate: from,
-              toDate: to,
-              label: "Personalizado",
-              period: "custom" as any,
-            });
-            setPeriod("custom" as any);
-          }}
-        />
-
-        {/* ================= 3. 4 KPI METRIC CARDS ================= */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <SubMetricCard label="Total" value={metrics.total} icon={<FileText className="w-5 h-5 text-text-3" />} />
-          <SubMetricCard label="Aprobadas" value={metrics.aprobadas} color="green" icon={<CheckCircle2 className="w-5 h-5" />} />
-          <SubMetricCard label="Pendientes" value={metrics.pendientes} color="amber" icon={<Clock className="w-5 h-5" />} />
-          <SubMetricCard label="% Aprob." value={`${metrics.rate}%`} color="blue" icon={<TrendingUp className="w-5 h-5" />} />
+        {/* Card 2: Pendientes */}
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+              <Clock className="w-4 h-4" />
+            </div>
+            <p className="text-xs text-amber-400 font-medium">Pendientes</p>
+          </div>
+          <div className="mt-2.5 sm:mt-3">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{pendientes}</p>
+          </div>
         </div>
 
-        {/* ================= 4. TABLE CONTAINER CARD ================= */}
-        <Card className="border border-border/70 shadow-sm bg-card rounded-2xl overflow-hidden">
-          <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
-            {/* Filter controls row */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 sm:gap-4">
-              <div className="flex-1 max-w-xl space-y-1.5">
-                <label className="text-xs font-semibold text-text-3 block">
-                  Buscar motivo
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground"
-                    placeholder="Ej: Médico, Personal..."
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-end gap-2.5 min-w-[240px]">
-                <div className="flex-1 space-y-1.5">
-                  <label className="text-xs font-semibold text-text-3 block">
-                    Filtrar estado
-                  </label>
-                  <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as any); setPage(1); }}>
-                    <SelectTrigger className="h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground w-full">
-                      <SelectValue placeholder="Todos los estados" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos los estados</SelectItem>
-                      <SelectItem value="PENDING">Pendientes</SelectItem>
-                      <SelectItem value="SUBMITTED">Enviados</SelectItem>
-                      <SelectItem value="OBSERVATION">Observación</SelectItem>
-                      <SelectItem value="APPROVED">Aprobadas</SelectItem>
-                      <SelectItem value="REJECTED">Rechazadas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <button
-                  onClick={() => setReloadKey(k => k + 1)}
-                  className="w-11 h-11 rounded-xl border border-border/80 bg-white dark:bg-card hover:bg-gray-100 dark:hover:bg-raised text-text-3 hover:text-foreground flex items-center justify-center transition-colors cursor-pointer shrink-0"
-                  title="Restablecer filtros"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              </div>
+        {/* Card 3: Aprobadas */}
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-4 h-4" />
             </div>
+            <p className="text-xs text-emerald-400 font-medium">Aprobadas</p>
+          </div>
+          <div className="mt-2.5 sm:mt-3">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{aprobadas}</p>
+          </div>
+        </div>
 
-            {/* Desktop Table */}
-            <div className="hidden md:block border border-border/60 rounded-xl overflow-hidden bg-background/30">
-              <DataTable
-                data={filteredData}
-                loading={loading}
-                emptyText="No se encontraron justificaciones"
-                columns={[
-                  {
-                    key: "submittedAt",
-                    header: "FECHA",
-                    render: (row) => (
-                      <span className="font-mono text-xs text-foreground font-medium">
-                        {formatDateTime(row.submittedAt)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "description",
-                    header: "MOTIVO",
-                    render: (row) => (
-                      <span className="text-foreground font-medium text-xs">
-                        {row.description ?? "-"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "documentUrl",
-                    header: "DOCUMENTO",
-                    render: (row) =>
-                      row.documentUrl ? (
-                        <a
-                          href={row.documentUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-primary hover:underline flex items-center gap-1.5 text-xs font-semibold"
-                        >
-                          <FileText className="w-3.5 h-3.5" />
-                          VER ADJUNTO
-                        </a>
-                      ) : (
-                        <span className="text-text-4 text-xs">Sin documento</span>
-                      ),
-                  },
-                  {
-                    key: "comment",
-                    header: "OBSERVACIÓN",
-                    render: (row) => (
-                      <span className="text-text-4 text-xs">
-                        {row.comment || "—"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "status",
-                    header: "ESTADO",
-                    render: (row) => <StatusBadge status={row.status as any} />,
-                  },
-                  {
-                    key: "actions",
-                    header: "ACCIONES",
-                    render: (row) => (
-                      <div className="flex items-center gap-2">
-                        <button
-                          className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                          onClick={() => router.push(`/team-member/justificaciones/${row.id}`)}
-                          title="Ver detalle"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-
-                        {row.status === "PENDING" && (
-                          <>
-                            <button
-                              className="p-1.5 rounded-lg text-amber hover:bg-amber/10 transition-colors cursor-pointer"
-                              onClick={() => router.push(`/team-member/justificar?justificationId=${row.id}`)}
-                              title="Editar"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <Button
-                              size="sm"
-                              className="h-8 px-3 text-xs font-semibold bg-gradient-to-r from-[#5B8CFF] to-[#22C3E6] text-white rounded-lg shadow-sm"
-                              onClick={() => handleSubmit(row.id)}
-                              disabled={submittingId === row.id}
-                            >
-                              <Send className="w-3 h-3 mr-1" />
-                              Enviar
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    ),
-                  },
-                ]}
-              />
+        {/* Card 4: % Aprobadas */}
+        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
+          <div className="flex items-center justify-between">
+            <div className="w-9 h-9 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+              <TrendingUp className="w-4 h-4" />
             </div>
+            <p className="text-xs text-purple-400 font-medium">% Aprobadas</p>
+          </div>
+          <div className="mt-2.5 sm:mt-3">
+            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{porcentaje}%</p>
+          </div>
+        </div>
+      </div>
 
-            {/* Mobile Cards (Matching dark-justificaciones.svg) */}
-            <div className="md:hidden space-y-3">
-              {loading ? (
-                <div className="py-12 text-center text-muted-foreground">
-                  <div className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    <span>Cargando justificaciones...</span>
-                  </div>
-                </div>
-              ) : filteredData.length === 0 ? (
-                <div className="py-12 text-center text-muted-foreground text-xs">
-                  No se encontraron justificaciones
-                </div>
-              ) : (
-                filteredData.map((row, idx) => (
-                  <div
-                    key={row.id || idx}
-                    className="rounded-2xl border border-border/70 bg-surface/50 p-4 space-y-3"
-                  >
-                    {/* Header: Date + Status Badge */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 font-mono text-xs font-semibold text-foreground">
-                        <CalendarIcon className="w-4 h-4 text-text-4" />
-                        <span>{formatDateTime(row.submittedAt)}</span>
-                      </div>
-                      <StatusBadge status={row.status as any} />
+      {/* 5. FILTERS CONTAINER - Desktop & Mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end rounded-2xl border border-border bg-card/60 p-4 shadow-sm">
+        {/* Proyecto */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-foreground">
+            Proyecto
+          </label>
+          <div className="relative">
+            <Folder className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+            <select
+              value={projectFilter}
+              onChange={(e) => setProjectFilter(e.target.value)}
+              className="w-full h-10 pl-9 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id} className="bg-card text-foreground">{p.name}</option>
+              ))}
+            </select>
+            <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Buscar motivo */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-foreground">
+            Buscar motivo
+          </label>
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Ej: Cita médica, Notaría..."
+              className="w-full h-10 pl-9 pr-3 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
+            />
+          </div>
+        </div>
+
+        {/* Estado */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-foreground">
+            Estado
+          </label>
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full h-10 px-3 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+            >
+              <option value="TODOS" className="bg-card text-foreground">Todos los estados</option>
+              <option value="SUBMITTED" className="bg-card text-foreground">Enviada</option>
+              <option value="APPROVED" className="bg-card text-foreground">Aprobada</option>
+              <option value="OBSERVATION" className="bg-card text-foreground">Observación</option>
+              <option value="REJECTED" className="bg-card text-foreground">Rechazada</option>
+            </select>
+            <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Action: Actualizar button */}
+        <div>
+          <button
+            type="button"
+            onClick={fetchData}
+            disabled={isLoading}
+            className="w-full h-10 rounded-xl border border-border bg-background/50 hover:bg-background text-xs font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          >
+            <RotateCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-primary" : "text-muted-foreground"}`} />
+            <span>Actualizar</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 6. MOBILE CARDS VIEW (Matching dark-justificacionjes.svg) */}
+      <div className="md:hidden space-y-3">
+        {filteredItems.length === 0 ? (
+          <div className="py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60">
+            No se encontraron justificaciones.
+          </div>
+        ) : (
+          filteredItems.map((row) => {
+            const badge = getStatusBadge(row.estado);
+            const isObservation = row.estado === "OBSERVATION";
+            const isPending = row.estado === "PENDING" || row.estado === "SUBMITTED";
+
+            return (
+              <div
+                key={row.id}
+                className="rounded-2xl border border-border dark:border-[#1E2335] bg-card dark:bg-[#0E111C] p-4 space-y-3 shadow-sm"
+              >
+                {/* Header: User Avatar + Name + Status Pill */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shrink-0">
+                      CM
                     </div>
-
-                    {/* Motivo */}
-                    <div>
-                      <span className="block font-mono text-[9.5px] uppercase tracking-wider text-violet-400 font-semibold mb-0.5">
-                        MOTIVO
-                      </span>
-                      <p className="font-semibold text-sm text-foreground">
-                        {row.description || "Sin motivo"}
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground text-xs truncate">
+                        {row.userName}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground truncate">
+                        {row.userEmail}
                       </p>
                     </div>
+                  </div>
 
-                    {/* Boxes: Documento & Observación */}
-                    <div className="grid grid-cols-2 gap-2.5">
-                      <div className="bg-raised/70 border border-border/60 rounded-xl p-2.5">
-                        <span className="block font-mono text-[9.5px] uppercase tracking-wider text-text-4 font-semibold mb-0.5">
-                          DOCUMENTO
-                        </span>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badge.cls}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                    {badge.label}
+                  </span>
+                </div>
+
+                {/* Motivo Card Box */}
+                <div className="bg-background/60 border border-border/60 rounded-xl p-3">
+                  <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
+                    MOTIVO
+                  </span>
+                  <p className="text-xs text-foreground/90 font-medium leading-relaxed">
+                    {row.motivo}
+                  </p>
+                  {row.comment && (
+                    <p className="text-[11px] text-amber-400/90 italic mt-1.5 pt-1.5 border-t border-border/40">
+                      Nota: {row.comment}
+                    </p>
+                  )}
+                </div>
+
+                {/* 2-box row: Documento & Fecha */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-background/60 border border-border/60 rounded-xl p-3">
+                    <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
+                      DOCUMENTO
+                    </span>
+                    {row.documentUrl ? (
+                      <a
+                        href={row.documentUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-purple-400 hover:underline"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        Ver adjunto
+                      </a>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Sin documento</span>
+                    )}
+                  </div>
+                  <div className="bg-background/60 border border-border/60 rounded-xl p-3">
+                    <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
+                      FECHA
+                    </span>
+                    <span className="text-xs font-mono font-medium text-foreground">{row.fecha}</span>
+                  </div>
+                </div>
+
+                {/* Actions Row */}
+                <div className="flex items-center gap-2 pt-1">
+                  <Link href={`/team-member/justificaciones/${row.id}`} className="flex-1">
+                    <button
+                      type="button"
+                      className="w-full h-11 rounded-xl border border-border bg-background/50 hover:bg-background text-sm font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                      <span>Ver</span>
+                    </button>
+                  </Link>
+
+                  {isObservation && (
+                    <Link href={`/team-member/justificar?justificationId=${row.id}`} className="flex-1">
+                      <button
+                        type="button"
+                        className="w-full h-11 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Editar</span>
+                      </button>
+                    </Link>
+                  )}
+
+                  {row.estado === "PENDING" && (
+                    <button
+                      type="button"
+                      onClick={() => handleSubmit(row.id)}
+                      disabled={submittingId === row.id}
+                      className="h-11 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{submittingId === row.id ? "Enviando..." : "Enviar"}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* 7. DESKTOP TABLE VIEW (Matching PM dark-justificaciones.svg) */}
+      <div className="hidden md:block rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-border bg-background/50 text-[10.5px] font-mono font-semibold text-muted-foreground tracking-wider uppercase">
+                <th className="py-3.5 px-4">TRABAJADOR</th>
+                <th className="py-3.5 px-4">MOTIVO</th>
+                <th className="py-3.5 px-4">DOCUMENTO</th>
+                <th className="py-3.5 px-4">FECHA</th>
+                <th className="py-3.5 px-4">ESTADO</th>
+                <th className="py-3.5 px-4 text-right">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-muted-foreground text-xs">
+                    No se encontraron justificaciones.
+                  </td>
+                </tr>
+              ) : (
+                filteredItems.map((row) => {
+                  const badge = getStatusBadge(row.estado);
+                  const isObservation = row.estado === "OBSERVATION";
+
+                  return (
+                    <tr key={row.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shrink-0">
+                            CM
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground text-sm truncate">{row.userName}</p>
+                            <p className="text-xs text-muted-foreground truncate">{row.userEmail}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4 text-muted-foreground max-w-xs truncate">
+                        <span className="text-foreground/90 font-medium">{row.motivo}</span>
+                        {row.comment && (
+                          <p className="text-[11px] text-amber-400 italic truncate mt-0.5">
+                            Obs: {row.comment}
+                          </p>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
                         {row.documentUrl ? (
                           <a
                             href={row.documentUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-primary hover:underline text-xs font-semibold truncate block"
+                            className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:underline"
                           >
+                            <FileText className="w-3.5 h-3.5" />
                             Ver adjunto
                           </a>
                         ) : (
-                          <span className="text-text-4 text-xs">Sin documento</span>
+                          <span className="italic text-muted-foreground text-xs">Sin documento</span>
                         )}
-                      </div>
-                      <div className="bg-raised/70 border border-border/60 rounded-xl p-2.5">
-                        <span className="block font-mono text-[9.5px] uppercase tracking-wider text-text-4 font-semibold mb-0.5">
-                          OBSERVACIÓN
+                      </td>
+                      <td className="py-4 px-4 font-mono text-xs text-foreground">{row.fecha}</td>
+                      <td className="py-4 px-4">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${badge.cls}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                          {badge.label}
                         </span>
-                        <span className="text-text-4 text-xs truncate block">
-                          {row.comment || "Sin observación"}
-                        </span>
-                      </div>
-                    </div>
+                      </td>
+                      <td className="py-4 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link href={`/team-member/justificaciones/${row.id}`}>
+                            <button
+                              title="Ver detalle"
+                              className="w-9 h-9 rounded-xl border border-border bg-background hover:bg-muted text-foreground flex items-center justify-center transition-colors shadow-sm cursor-pointer"
+                            >
+                              <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                            </button>
+                          </Link>
 
-                    {/* Action button: Ver detalle */}
-                    <button
-                      onClick={() => router.push(`/team-member/justificaciones/${row.id}`)}
-                      className="w-full h-9 rounded-xl border border-border/70 bg-raised hover:bg-surface text-foreground font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-text-3" />
-                      <span>Ver detalle</span>
-                    </button>
-                  </div>
-                ))
+                          {isObservation && (
+                            <Link href={`/team-member/justificar?justificationId=${row.id}`}>
+                              <button
+                                title="Editar justificación"
+                                className="w-9 h-9 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 flex items-center justify-center transition-colors cursor-pointer"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                            </Link>
+                          )}
+
+                          {row.estado === "PENDING" && (
+                            <button
+                              title="Enviar para revisión"
+                              onClick={() => handleSubmit(row.id)}
+                              disabled={submittingId === row.id}
+                              className="w-9 h-9 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 flex items-center justify-center transition-colors cursor-pointer"
+                            >
+                              <Send className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
-            </div>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-            {/* Pagination footer matching SVG */}
-            <div className="flex flex-row items-center justify-between gap-3 pt-4 border-t border-border/60">
-              <span className="text-xs text-text-4 font-mono">
-                {totalItems} {totalItems === 1 ? "registro total" : "registros totales"}
-              </span>
-              <div className="flex items-center gap-2 sm:gap-2.5">
-                <button
-                  disabled={page <= 1}
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
-                  aria-label="Página anterior"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <span className="text-xs text-text-3 font-medium whitespace-nowrap">
-                  Página <strong className="text-foreground">{page}</strong> de {totalPages}
-                </span>
-                <button
-                  disabled={page >= totalPages}
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
-                  aria-label="Página siguiente"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* 8. PAGINATION FOOTER */}
+      <div className="flex items-center justify-between pt-1 px-1">
+        <span className="text-xs text-muted-foreground font-medium">
+          {total} solicitud{total === 1 ? "" : "es"}
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center text-muted-foreground disabled:opacity-40 cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-xs text-muted-foreground font-medium px-1">
+            Página 1 de 1
+          </span>
+          <button
+            type="button"
+            disabled
+            className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center text-muted-foreground disabled:opacity-40"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
