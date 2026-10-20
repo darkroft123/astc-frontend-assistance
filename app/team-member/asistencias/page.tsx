@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogClose, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -607,6 +607,7 @@ export default function AttendanceHistoryPage() {
         <Dialog open={!!selectedPhotoUrl} onOpenChange={(open) => !open && setSelectedPhotoUrl(null)}>
           <DialogContent className="sm:max-w-xl p-3 border-0 bg-transparent shadow-none">
             <DialogTitle className="sr-only">Foto de asistencia</DialogTitle>
+            <DialogDescription className="sr-only">Foto de asistencia ampliada</DialogDescription>
             <div className="relative bg-card rounded-2xl p-2 border border-border">
               <DialogClose className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors cursor-pointer">
                 <XIcon className="w-4 h-4" />
