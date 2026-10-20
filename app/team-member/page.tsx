@@ -194,7 +194,7 @@ export default function DashboardPage() {
 
   return (
     <div className="w-full min-h-screen pb-10">
-      <div className="max-w-[1400px] mx-auto space-y-6">
+      <div className="w-full max-w-[1400px] mx-auto px-0 md:px-0 space-y-4 md:space-y-6">
         {/* ================= 1. HEADER (SVG OFFICIAL STRUCTURE) ================= */}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pt-1">
           <div>

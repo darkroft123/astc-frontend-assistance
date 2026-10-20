@@ -249,7 +249,7 @@ export default function AttendanceHistoryPage() {
 
   return (
     <div className="w-full min-h-screen pb-12">
-      <div className="max-w-[1400px] mx-auto space-y-6">
+      <div className="w-full max-w-[1400px] mx-auto px-0 md:px-0 space-y-4 md:space-y-6">
         {/* ================= 1. HEADER (EXACT SVG CLEAN DESIGN) ================= */}
         <div className="flex items-center justify-between gap-4">
           <div>

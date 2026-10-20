@@ -39,10 +39,12 @@ export function GeneralSummaryCard({
 
   const R = 38;
   const C = 2 * Math.PI * R;
+  const GAP = 5;
+  const totalAvailable = C - 3 * GAP;
 
-  const attLen = total > 0 ? (att / total) * C : 0.4 * C;
-  const absLen = total > 0 ? (abs / total) * C : 0.4 * C;
-  const pendLen = total > 0 ? (pend / total) * C : 0.2 * C;
+  const attLen = total > 0 ? (att / total) * totalAvailable : 0.4 * totalAvailable;
+  const absLen = total > 0 ? (abs / total) * totalAvailable : 0.4 * totalAvailable;
+  const pendLen = total > 0 ? (pend / total) * totalAvailable : 0.2 * totalAvailable;
 
   return (
     <Card className="h-full rounded-2xl shadow-sm overflow-hidden border border-border/70 bg-card flex flex-col justify-between">
@@ -85,7 +87,6 @@ export function GeneralSummaryCard({
                 strokeWidth="11"
                 strokeDasharray={`${attLen} ${C}`}
                 strokeDashoffset="0"
-                strokeLinecap="round"
               />
               {/* Faltas (Red / Coral) */}
               <circle
@@ -96,8 +97,7 @@ export function GeneralSummaryCard({
                 stroke="#F87171"
                 strokeWidth="11"
                 strokeDasharray={`${absLen} ${C}`}
-                strokeDashoffset={-attLen}
-                strokeLinecap="round"
+                strokeDashoffset={-(attLen + GAP)}
               />
               {/* Pendientes (Amber) */}
               <circle
@@ -108,8 +108,7 @@ export function GeneralSummaryCard({
                 stroke="#FBBF24"
                 strokeWidth="11"
                 strokeDasharray={`${pendLen} ${C}`}
-                strokeDashoffset={-(attLen + absLen)}
-                strokeLinecap="round"
+                strokeDashoffset={-(attLen + GAP + absLen + GAP)}
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

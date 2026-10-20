@@ -210,7 +210,7 @@ export default function AttendancePreviewPage() {
   const timestampText = "2/9/2026, 10:55:21 p. m.";
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className="w-full max-w-6xl mx-auto px-0 md:px-0 space-y-4 md:space-y-6">
       {/* 1. HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
