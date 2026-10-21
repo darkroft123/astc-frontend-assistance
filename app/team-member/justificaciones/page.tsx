@@ -89,6 +89,13 @@ export default function JustificationsPage() {
     ];
   }, [userProjects]);
 
+  const userKey = user?.username || user?.id || "";
+  const userFullName =
+    user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.username || "Usuario");
+  const userEmail = user?.email || "";
+  const fromDate = dateRange.from;
+  const toDate = dateRange.to;
+
   const fetchData = useCallback(async () => {
     if (!token) {
       setData({ items: [], total: 0 });
@@ -106,18 +113,18 @@ export default function JustificationsPage() {
         page: page - 1,
         size,
         status: statusFilter === "TODOS" ? null : statusFilter,
-        fromDate: dateRange.from,
-        toDate: dateRange.to,
+        fromDate,
+        toDate,
       });
 
       const fetched = res?.items ?? [];
       setData({
         items: fetched.map((i: any) => ({
           id: i.id,
-          userId: i.userId || user?.username || "",
-          userName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.username || "Usuario"),
+          userId: i.userId || userKey,
+          userName: userFullName,
           userRoleBadge: "Trabajador",
-          userEmail: user?.email || "",
+          userEmail: userEmail,
           projectName: i.projectName || "General",
           motivo: i.description || "Sin motivo",
           documentUrl: i.documentUrl || null,
@@ -134,7 +141,7 @@ export default function JustificationsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [token, page, statusFilter, dateRange, user]);
+  }, [token, page, statusFilter, fromDate, toDate, userKey, userFullName, userEmail]);
 
   useEffect(() => {
     if (hydrated) {
