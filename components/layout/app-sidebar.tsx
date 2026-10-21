@@ -103,19 +103,19 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const displayName =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
-      : user?.username || "carlos mamani";
+      : user?.username || "Usuario";
 
-  const displayEmail = user?.email || "mamanigutierrezcarlos123@gmail.com";
+  const displayEmail = user?.email || "";
   const avatarSrc = formatAvatarUrl(user?.avatarUrl);
 
   const roleLabel =
     role === "TEAM_MEMBER"
-      ? "COLABORADOR"
+      ? "TRABAJADOR"
       : role === "PROJECT_MANAGER"
       ? "JEFE DE PROYECTO"
       : role === "ADMIN"
       ? "ADMINISTRADOR"
-      : "COLABORADOR";
+      : "TRABAJADOR";
 
   const roleAccent =
     role === "PROJECT_MANAGER"

@@ -45,44 +45,14 @@ import { StatusBadge } from "@/components/atoms/status-badge";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import type { VacationEligibility } from "@/components/types/dashboard";
 
-const defaultSampleVacations = [
-  {
-    id: "v-sample-1",
-    startDate: "2026-09-07",
-    endDate: "2026-10-08",
-    businessDays: 29,
-    status: "PENDING",
-    createdAt: "2026-09-02T10:00:00.000Z",
-  },
-  {
-    id: "v-sample-2",
-    startDate: "2026-08-26",
-    endDate: "2026-08-26",
-    businessDays: 1,
-    status: "REJECTED",
-    createdAt: "2026-09-01T10:00:00.000Z",
-  },
-];
-
 export default function VacationsPage() {
   const { hydrated, token, user, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const { toast } = useToast();
 
-  const [vacations, setVacations] = useState<any[]>(defaultSampleVacations);
-  const [balance, setBalance] = useState<any>({
-    totalDays: 30,
-    availableDays: 2,
-    pendingDays: 28,
-    usedDays: 0,
-  });
+  const [vacations, setVacations] = useState<any[]>([]);
+  const [balance, setBalance] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [eligibility, setEligibility] = useState<VacationEligibility | null>({
-    isEligible: true,
-    requiredDays: 0,
-    daysElapsed: 365,
-    daysRemaining: 0,
-    joinDate: "2025-01-01",
-  });
+  const [eligibility, setEligibility] = useState<VacationEligibility | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -130,12 +100,12 @@ export default function VacationsPage() {
         getMyProjects(token).catch(() => null),
       ]);
 
-      if (Array.isArray(vacList) && vacList.length > 0) {
+      if (Array.isArray(vacList)) {
         setVacations(vacList);
-      } else if (vacList && Array.isArray((vacList as any).data) && (vacList as any).data.length > 0) {
+      } else if (vacList && Array.isArray((vacList as any).data)) {
         setVacations((vacList as any).data);
       } else {
-        setVacations(defaultSampleVacations);
+        setVacations([]);
       }
 
       if (bal) {
@@ -315,7 +285,7 @@ export default function VacationsPage() {
     );
   }
 
-  const safeVacations = Array.isArray(vacations) ? vacations : defaultSampleVacations;
+  const safeVacations = Array.isArray(vacations) ? vacations : [];
   const filtered = statusFilter === "ALL" ? safeVacations : safeVacations.filter((v: any) => v.status === statusFilter);
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -328,7 +298,7 @@ export default function VacationsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-              COLABORADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
+              TRABAJADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
             </p>
             <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
               Gestión de vacaciones

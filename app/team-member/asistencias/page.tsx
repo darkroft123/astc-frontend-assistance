@@ -67,29 +67,7 @@ type AttendanceRecord = {
   locationName?: string | null;
 };
 
-const defaultSampleRecords: AttendanceRecord[] = [
-  {
-    id: "sample-1",
-    date: "2026-09-02",
-    checkIn: "2026-09-02T08:52:00Z",
-    checkOut: "2026-09-02T09:07:00Z",
-    status: "SALIDA_TEMPRANA",
-    locationName: "Condevilla Señor",
-    latitude: -12.0184,
-    longitude: -77.0817,
-  },
-  {
-    id: "sample-2",
-    date: "2026-09-01",
-    checkIn: "2026-09-01T11:28:00Z",
-    checkOut: "2026-09-01T13:59:00Z",
-    status: "SALIDA_TEMPRANA",
-    locationName: "Condevilla Señor",
-    latitude: -12.0184,
-    longitude: -77.0817,
-    photoUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
-  },
-];
+
 
 function formatTimeOnly(dateStr?: string | null): string {
   if (!dateStr) return "—";
@@ -199,19 +177,13 @@ export default function AttendanceHistoryPage() {
         if (cancelled) return;
 
         const items = res?.items ?? [];
-        if (items.length > 0) {
-          setAttendanceRecords(items);
-          setTotalCount(res?.total ?? items.length);
-        } else {
-          // If no backend records exist in mock dev, present the official SVG sample dataset
-          setAttendanceRecords(defaultSampleRecords);
-          setTotalCount(defaultSampleRecords.length);
-        }
+        setAttendanceRecords(items);
+        setTotalCount(res?.total ?? items.length);
       } catch (err) {
-        console.error("Error loading attendance, using default samples:", err);
+        console.error("Error loading attendance:", err);
         if (!cancelled) {
-          setAttendanceRecords(defaultSampleRecords);
-          setTotalCount(defaultSampleRecords.length);
+          setAttendanceRecords([]);
+          setTotalCount(0);
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -232,7 +204,7 @@ export default function AttendanceHistoryPage() {
   }, [attendanceRecords, searchDate]);
 
   const metrics = useMemo(() => {
-    const total = totalCount || 2;
+    const total = totalCount || 0;
     const presentes = attendanceRecords.filter((r) => r.status === "PRESENTE").length;
     const faltas = attendanceRecords.filter((r) => r.status === "FALTA").length;
     const rate = total > 0 ? Math.round((presentes / total) * 100) : 0;
@@ -254,7 +226,7 @@ export default function AttendanceHistoryPage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-              COLABORADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
+              TRABAJADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
             </p>
             <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
               Historial de asistencia

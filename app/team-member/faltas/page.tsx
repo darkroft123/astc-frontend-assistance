@@ -31,11 +31,7 @@ import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import type { Period, DateRange, AbsenceItem, JustificationItem } from "@/components/types/dashboard";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
 
-const defaultSampleAbsences: AbsenceItem[] = [
-  { id: "abs-1", date: "2026-09-02", type: "TARDE", justified: false },
-  { id: "abs-2", date: "2026-09-01", type: "TARDE", justified: false },
-  { id: "abs-3", date: "2026-08-27", type: "TARDE", justified: false },
-];
+
 
 const periodOptions: { key: Period | "custom"; label: string }[] = [
   { key: "today", label: "Hoy" },
@@ -75,16 +71,16 @@ export default function AbsencesPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "justified">("all");
   const [absenceRecords, setAbsenceRecords] = useState<AbsenceItem[]>([]);
-  const [pendingAbsenceIds, setPendingAbsenceIds] = useState<Set<string>>(new Set(["abs-1", "abs-3"]));
-  const [totalCount, setTotalCount] = useState(6);
+  const [pendingAbsenceIds, setPendingAbsenceIds] = useState<Set<string>>(new Set());
+  const [totalCount, setTotalCount] = useState(0);
 
   const metrics = useMemo(() => {
-    const total = totalCount || 6;
-    const justificadas = 0;
-    const pendientes = 4;
-    const sinJustificar = 2;
+    const total = totalCount || absenceRecords.length;
+    const justificadas = absenceRecords.filter((r) => r.justified).length;
+    const pendientes = absenceRecords.filter((r) => !r.justified && pendingAbsenceIds.has(r.id)).length;
+    const sinJustificar = Math.max(0, total - justificadas - pendientes);
     return { total, justificadas, pendientes, sinJustificar };
-  }, [totalCount]);
+  }, [totalCount, absenceRecords, pendingAbsenceIds]);
 
   const loadData = async () => {
     if (!token || checkingAuth) return;
@@ -101,17 +97,12 @@ export default function AbsencesPage() {
       });
 
       const items = result?.items ?? [];
-      if (items.length > 0) {
-        setAbsenceRecords(items);
-        setTotalCount(result?.total ?? items.length);
-      } else {
-        setAbsenceRecords(defaultSampleAbsences);
-        setTotalCount(6);
-      }
+      setAbsenceRecords(items);
+      setTotalCount(result?.total ?? items.length);
     } catch (error) {
-      console.error("Error loading absences, fallback to defaults:", error);
-      setAbsenceRecords(defaultSampleAbsences);
-      setTotalCount(6);
+      console.error("Error loading absences:", error);
+      setAbsenceRecords([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -132,7 +123,7 @@ export default function AbsencesPage() {
           fromDate: dateRange.fromDate,
           toDate: dateRange.toDate,
         });
-        const pending = new Set<string>(["abs-1", "abs-3"]);
+        const pending = new Set<string>();
         (jResult?.items ?? []).forEach((j: JustificationItem) => {
           if (j.absenceId && (j.status === "PENDING" || j.status === "SUBMITTED" || j.status === "OBSERVATION")) {
             pending.add(j.absenceId);
@@ -200,7 +191,7 @@ export default function AbsencesPage() {
         {/* ================= 1. HEADER (EXACT SVG DESIGN) ================= */}
         <div>
           <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-            COLABORADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
+            TRABAJADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
           </p>
           <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
             Mis faltas

@@ -22,31 +22,6 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react";
-import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
-import { getJustificationDetail, submitJustification } from "@/app/services/assistance.service";
-
-const DEFAULT_MOCK_JUSTIFICATION = {
-  id: "just-001",
-  description: "Cita médica programada en el hospital central con constancia adjunta.",
-  documentUrl: "https://example.com/comprobante.pdf",
-  status: "SUBMITTED",
-  comment: null,
-  submittedAt: "2026-09-02T09:15:00Z",
-  reviewedAt: null,
-  userId: "usr-01",
-  absenceDate: "2026-09-02",
-  absenceType: "MOTIVO_MEDICO",
-  projectName: "testo6",
-  history: [
-    {
-      id: "hist-1",
-      newStatus: "SUBMITTED",
-      changedAt: "2026-09-02T09:15:00Z",
-      comment: "Solicitud enviada para revisión del Jefe de Proyecto.",
-    },
-  ],
-};
-
 function formatDate(value?: string | null) {
   if (!value) return "-";
   try {
@@ -83,7 +58,7 @@ function eventLabel(e: any) {
 export default function JustificationDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = (params?.id as string) || "just-001";
+  const id = (params?.id as string) || "";
   const { hydrated, token, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const [detail, setDetail] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -93,8 +68,8 @@ export default function JustificationDetailPage() {
 
   useEffect(() => {
     if (!hydrated || checkingAuth) return;
-    if (!token) {
-      setDetail({ ...DEFAULT_MOCK_JUSTIFICATION, id });
+    if (!token || !id) {
+      setDetail(null);
       return;
     }
     let isCurrent = true;
@@ -102,14 +77,12 @@ export default function JustificationDetailPage() {
       try {
         setLoading(true);
         const r = await getJustificationDetail(token, id);
-        if (isCurrent && r) {
-          setDetail(r);
-        } else if (isCurrent) {
-          setDetail({ ...DEFAULT_MOCK_JUSTIFICATION, id });
+        if (isCurrent) {
+          setDetail(r || null);
         }
       } catch {
         if (isCurrent) {
-          setDetail({ ...DEFAULT_MOCK_JUSTIFICATION, id });
+          setDetail(null);
         }
       } finally {
         if (isCurrent) setLoading(false);
@@ -144,7 +117,30 @@ export default function JustificationDetailPage() {
     }
   };
 
-  const currentJustification = detail || { ...DEFAULT_MOCK_JUSTIFICATION, id };
+  if (!hydrated || checkingAuth || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4">
+        <p className="text-muted-foreground text-sm">Justificación no encontrada</p>
+        <Link
+          href="/team-member/justificaciones"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C084FC] hover:underline"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Volver a justificaciones
+        </Link>
+      </div>
+    );
+  }
+
+  const currentJustification = detail;
   const st = currentJustification.status || "SUBMITTED";
   const isApproved = st === "APPROVED";
   const isRejected = st === "REJECTED";
@@ -179,14 +175,6 @@ export default function JustificationDetailPage() {
       dot: "bg-blue-400",
     };
   }, [isApproved, isRejected, isObservation]);
-
-  if (!hydrated || checkingAuth || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-      </div>
-    );
-  }
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">

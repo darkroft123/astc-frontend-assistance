@@ -20,7 +20,7 @@ import {
   Folder,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
-import { listJustifications, submitJustification } from "@/app/services/assistance.service";
+import { listJustifications, submitJustification, getMyProjects } from "@/app/services/assistance.service";
 import { formatDateTime } from "@/lib/timezone";
 import { DateRangeModal, DateRange } from "@/components/ui/date-range-modal";
 
@@ -48,70 +48,15 @@ export type TMJustificationRow = {
   id: string;
   userId: string;
   userName: string;
-  userRoleBadge?: string;
+  userRoleBadge: string;
   userEmail: string;
-  projectName?: string;
+  projectName: string;
   motivo: string;
   documentUrl?: string | null;
   fecha: string;
   estado: "SUBMITTED" | "PENDING" | "APPROVED" | "REJECTED" | "OBSERVATION";
   comment?: string | null;
 };
-
-const DEFAULT_TM_JUSTIFICATIONS: TMJustificationRow[] = [
-  {
-    id: "just-001",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "testo6",
-    motivo: "Cita médica programada en el hospital central con constancia adjunta.",
-    documentUrl: "https://example.com/comprobante_medico.pdf",
-    fecha: "02/09/2026",
-    estado: "SUBMITTED",
-    comment: null,
-  },
-  {
-    id: "just-002",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "testo6",
-    motivo: "Trámite personal documentario en notaría pública.",
-    documentUrl: "https://example.com/constancia_notarial.pdf",
-    fecha: "28/08/2026",
-    estado: "APPROVED",
-    comment: "Aprobada por el Jefe de Proyecto.",
-  },
-  {
-    id: "just-003",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "gestion de asistencia",
-    motivo: "Emergencia odontológica de urgencia sin aviso previo.",
-    documentUrl: null,
-    fecha: "15/08/2026",
-    estado: "OBSERVATION",
-    comment: "Favor de adjuntar la constancia de atención médica para proceder con la aprobación.",
-  },
-  {
-    id: "just-004",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "proyecto testeo",
-    motivo: "Inasistencia por contingencia imprevista en el transporte público.",
-    documentUrl: null,
-    fecha: "10/08/2026",
-    estado: "REJECTED",
-    comment: "No cumple con el plazo reglamentario de 48 horas.",
-  },
-];
 
 export default function JustificationsPage() {
   const router = useRouter();
@@ -125,8 +70,8 @@ export default function JustificationsPage() {
   });
 
   const [data, setData] = useState<{ items: TMJustificationRow[]; total: number }>({
-    items: DEFAULT_TM_JUSTIFICATIONS,
-    total: DEFAULT_TM_JUSTIFICATIONS.length,
+    items: [],
+    total: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -135,21 +80,28 @@ export default function JustificationsPage() {
   const [statusFilter, setStatusFilter] = useState("TODOS");
   const [projectFilter, setProjectFilter] = useState("all");
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [userProjects, setUserProjects] = useState<any[]>([]);
 
-  const projects = [
-    { id: "all", name: "Todos los proyectos (3)" },
-    { id: "p1", name: "gestion de asistencia" },
-    { id: "p2", name: "proyecto testeo" },
-    { id: "p3", name: "testo6" },
-  ];
+  const projects = useMemo(() => {
+    return [
+      { id: "all", name: `Todos los proyectos (${userProjects.length})` },
+      ...userProjects.map((p) => ({ id: p.id, name: p.name })),
+    ];
+  }, [userProjects]);
 
   const fetchData = useCallback(async () => {
     if (!token) {
-      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+      setData({ items: [], total: 0 });
       return;
     }
     setIsLoading(true);
     try {
+      getMyProjects(token)
+        .then((projs) => {
+          if (projs && Array.isArray(projs)) setUserProjects(projs);
+        })
+        .catch(() => {});
+
       const res = await listJustifications(token, {
         page: page - 1,
         size,
@@ -159,30 +111,26 @@ export default function JustificationsPage() {
       });
 
       const fetched = res?.items ?? [];
-      if (fetched.length > 0) {
-        setData({
-          items: fetched.map((i: any) => ({
-            id: i.id,
-            userId: i.userId || user?.username || "usr-carlos",
-            userName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "carlos mamani",
-            userRoleBadge: "Trabajador",
-            userEmail: user?.email || "mamanigutierrezcarlos123@gmail.com",
-            projectName: i.projectName || "testo6",
-            motivo: i.description || "Sin motivo",
-            documentUrl: i.documentUrl || null,
-            fecha: i.absenceDate
-              ? new Date(i.absenceDate + "T12:00:00Z").toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })
-              : "02/09/2026",
-            estado: i.status || "SUBMITTED",
-            comment: i.comment || null,
-          })),
-          total: res?.total ?? fetched.length,
-        });
-      } else {
-        setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
-      }
+      setData({
+        items: fetched.map((i: any) => ({
+          id: i.id,
+          userId: i.userId || user?.username || "",
+          userName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.username || "Usuario"),
+          userRoleBadge: "Trabajador",
+          userEmail: user?.email || "",
+          projectName: i.projectName || "General",
+          motivo: i.description || "Sin motivo",
+          documentUrl: i.documentUrl || null,
+          fecha: i.absenceDate
+            ? new Date(i.absenceDate + "T12:00:00Z").toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })
+            : "",
+          estado: i.status || "SUBMITTED",
+          comment: i.comment || null,
+        })),
+        total: res?.total ?? fetched.length,
+      });
     } catch {
-      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+      setData({ items: [], total: 0 });
     } finally {
       setIsLoading(false);
     }
