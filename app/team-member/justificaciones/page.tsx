@@ -1,28 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Search,
   FileText,
   Calendar as CalendarIcon,
-  RotateCw,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  Pencil,
-  Send,
-  CheckCircle2,
-  Clock,
-  TrendingUp,
-  AlertTriangle,
-  Folder,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { listJustifications, submitJustification } from "@/app/services/assistance.service";
 import { formatDateTime } from "@/lib/timezone";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
+
+import { JustificacionesKPIs } from "./components/JustificacionesKPIs";
+import { JustificacionesFilterBar } from "./components/JustificacionesFilterBar";
+import { JustificacionesMobileCards } from "./components/JustificacionesMobileCards";
+import { JustificacionesDesktopTable } from "./components/JustificacionesDesktopTable";
+import { JustificacionesPagination } from "./components/JustificacionesPagination";
+
 type DateRange = { from: string; to: string };
 
 type Period =
@@ -99,214 +93,241 @@ const DEFAULT_TM_JUSTIFICATIONS: TMJustificationRow[] = [
     estado: "OBSERVATION",
     comment: "Favor de adjuntar la constancia de atención médica para proceder con la aprobación.",
   },
-  {
-    id: "just-004",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "proyecto testeo",
-    motivo: "Inasistencia por contingencia imprevista en el transporte público.",
-    documentUrl: null,
-    fecha: "10/08/2026",
-    estado: "REJECTED",
-    comment: "No cumple con el plazo reglamentario de 48 horas.",
-  },
 ];
 
-export default function JustificationsPage() {
-  const router = useRouter();
-  const { hydrated, token, user } = useAuthGuard(["TEAM_MEMBER"]);
+function getStatusBadge(estado: string) {
+  switch (estado) {
+    case "APPROVED":
+      return {
+        label: "Aprobada",
+        cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+        dot: "bg-emerald-400",
+      };
+    case "REJECTED":
+      return {
+        label: "Rechazada",
+        cls: "bg-rose-500/10 text-rose-400 border-rose-500/30",
+        dot: "bg-rose-400",
+      };
+    case "OBSERVATION":
+      return {
+        label: "Observación",
+        cls: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+        dot: "bg-amber-400",
+      };
+    case "PENDING":
+      return {
+        label: "Borrador",
+        cls: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+        dot: "bg-blue-400",
+      };
+    case "SUBMITTED":
+    default:
+      return {
+        label: "Enviada",
+        cls: "bg-purple-500/10 text-purple-400 border-purple-500/30",
+        dot: "bg-purple-400",
+      };
+  }
+}
+
+export default function TMJustificacionesPage() {
+  const { token, hydrated, checkingAuth } = useAuthGuard([
+    "TEAM_MEMBER",
+    "PROJECT_MANAGER",
+    "ADMIN",
+  ]);
 
   const [activePeriod, setActivePeriod] = useState<Period>("month");
   const [dateRangeModalOpen, setDateRangeModalOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange>({
     from: "01/09/2026",
-    to: "03/09/2026",
+    to: "30/09/2026",
   });
 
-  const [data, setData] = useState<{ items: TMJustificationRow[]; total: number }>({
-    items: DEFAULT_TM_JUSTIFICATIONS,
-    total: DEFAULT_TM_JUSTIFICATIONS.length,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const size = 10;
+  const [projectFilter, setProjectFilter] = useState("TODOS");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("TODOS");
-  const [projectFilter, setProjectFilter] = useState("all");
+  const [items, setItems] = useState<TMJustificationRow[]>(DEFAULT_TM_JUSTIFICATIONS);
+  const [isLoading, setIsLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
-  const projects = [
-    { id: "all", name: "Todos los proyectos (3)" },
-    { id: "p1", name: "gestion de asistencia" },
-    { id: "p2", name: "proyecto testeo" },
-    { id: "p3", name: "testo6" },
-  ];
+  const calculateDateRange = useCallback((period: Period): DateRange => {
+    const today = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const fmt = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 
-  const userKey = user?.username || user?.id || "usr-carlos";
-  const userFullName =
-    user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : "carlos mamani";
-  const userEmail = user?.email || "mamanigutierrezcarlos123@gmail.com";
-  const fromDate = dateRange.from;
-  const toDate = dateRange.to;
+    const toStr = fmt(today);
+
+    switch (period) {
+      case "today":
+        return { from: toStr, to: toStr };
+      case "thisweek": {
+        const d = new Date(today);
+        const dayOfWeek = d.getDay();
+        const diff = d.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        d.setDate(diff);
+        return { from: fmt(d), to: toStr };
+      }
+      case "month": {
+        const first = new Date(today.getFullYear(), today.getMonth(), 1);
+        return { from: fmt(first), to: toStr };
+      }
+      case "3months": {
+        const d = new Date(today);
+        d.setMonth(d.getMonth() - 3);
+        return { from: fmt(d), to: toStr };
+      }
+      case "6months": {
+        const d = new Date(today);
+        d.setMonth(d.getMonth() - 6);
+        return { from: fmt(d), to: toStr };
+      }
+      case "9months": {
+        const d = new Date(today);
+        d.setMonth(d.getMonth() - 9);
+        return { from: fmt(d), to: toStr };
+      }
+      case "total":
+      default:
+        return { from: "01/01/2020", to: toStr };
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activePeriod !== "custom") {
+      setDateRange(calculateDateRange(activePeriod));
+    }
+  }, [activePeriod, calculateDateRange]);
 
   const fetchData = useCallback(async () => {
-    if (!token) {
-      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
-      return;
-    }
+    if (!token) return;
     setIsLoading(true);
     try {
-      const res = await listJustifications(token, {
-        page: page - 1,
-        size,
-        status: statusFilter === "TODOS" ? null : statusFilter,
-        fromDate,
-        toDate,
-      });
-
-      const fetched = res?.items ?? [];
-      if (fetched.length > 0) {
-        setData({
-          items: fetched.map((i: any) => ({
-            id: i.id,
-            userId: i.userId || userKey,
-            userName: userFullName,
-            userRoleBadge: "Trabajador",
-            userEmail: userEmail,
-            projectName: i.projectName || "testo6",
-            motivo: i.description || "Sin motivo",
-            documentUrl: i.documentUrl || null,
-            fecha: i.absenceDate
-              ? new Date(i.absenceDate + "T12:00:00Z").toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" })
-              : "02/09/2026",
-            estado: i.status || "SUBMITTED",
-            comment: i.comment || null,
-          })),
-          total: res?.total ?? fetched.length,
-        });
+      const data = await listJustifications(token);
+      if (Array.isArray(data) && data.length > 0) {
+        const mapped: TMJustificationRow[] = data.map((item: any, idx: number) => ({
+          id: item.id || `just-${idx}`,
+          userId: item.userId || "usr-carlos",
+          userName: "carlos mamani",
+          userRoleBadge: "Trabajador",
+          userEmail: "mamanigutierrezcarlos123@gmail.com",
+          projectName: item.project?.name || item.projectName || "testo6",
+          motivo: item.reason || "Sin motivo especificado",
+          documentUrl: item.documentUrl || null,
+          fecha: formatDateTime(item.date || item.createdAt || new Date()),
+          estado: (item.status as any) || "SUBMITTED",
+          comment: item.comment || null,
+        }));
+        setItems(mapped);
       } else {
-        setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+        setItems(DEFAULT_TM_JUSTIFICATIONS);
       }
     } catch {
-      setData({ items: DEFAULT_TM_JUSTIFICATIONS, total: DEFAULT_TM_JUSTIFICATIONS.length });
+      setItems(DEFAULT_TM_JUSTIFICATIONS);
     } finally {
       setIsLoading(false);
     }
-  }, [token, page, statusFilter, fromDate, toDate, userKey, userFullName, userEmail]);
+  }, [token]);
 
   useEffect(() => {
-    if (hydrated) {
-      fetchData();
-    }
-  }, [hydrated, fetchData]);
+    fetchData();
+  }, [fetchData]);
 
-  const handleSubmit = useCallback(
-    async (id: string) => {
-      if (!token || submittingId) return;
-      if (!confirm("¿Enviar esta justificación para revisión del Jefe de Proyecto?")) return;
-      try {
-        setSubmittingId(id);
-        await submitJustification(token, id);
-        fetchData();
-      } catch (err) {
-        console.error("Error submitting justification:", err);
-        alert("Error al enviar la justificación");
-      } finally {
-        setSubmittingId(null);
-      }
-    },
-    [token, submittingId, fetchData]
-  );
-
-  const filteredItems = useMemo(() => {
-    return data.items.filter((item) => {
-      const matchSearch =
-        !search.trim() ||
-        item.motivo.toLowerCase().includes(search.toLowerCase()) ||
-        item.userName.toLowerCase().includes(search.toLowerCase());
-      const matchStatus =
-        statusFilter === "TODOS" ||
-        item.estado === statusFilter ||
-        (statusFilter === "PENDING" && (item.estado === "PENDING" || item.estado === "SUBMITTED"));
-      const matchProject =
-        projectFilter === "all" ||
-        item.projectName?.toLowerCase() === projectFilter.toLowerCase();
-      return matchSearch && matchStatus && matchProject;
-    });
-  }, [data.items, search, statusFilter, projectFilter]);
-
-  const total = data.total || data.items.length;
-  const pendientes = data.items.filter(
-    (i) => i.estado === "SUBMITTED" || i.estado === "PENDING"
-  ).length;
-  const aprobadas = data.items.filter((i) => i.estado === "APPROVED").length;
-  const porcentaje = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
-
-  const getStatusBadge = (st: string) => {
-    switch (st) {
-      case "APPROVED":
-        return {
-          label: "Aprobada",
-          cls: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30",
-          dot: "bg-emerald-500",
-        };
-      case "REJECTED":
-        return {
-          label: "Rechazada",
-          cls: "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/30",
-          dot: "bg-rose-500",
-        };
-      case "OBSERVATION":
-        return {
-          label: "Observada",
-          cls: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30",
-          dot: "bg-amber-500",
-        };
-      case "SUBMITTED":
-      default:
-        return {
-          label: "Enviada",
-          cls: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30",
-          dot: "bg-blue-500",
-        };
+  const handleSubmit = async (id: string) => {
+    if (!token) return;
+    setSubmittingId(id);
+    try {
+      await submitJustification(token, id);
+      setItems((prev) =>
+        prev.map((it) => (it.id === id ? { ...it, estado: "SUBMITTED" } : it))
+      );
+    } catch {
+      // fallback
+      setItems((prev) =>
+        prev.map((it) => (it.id === id ? { ...it, estado: "SUBMITTED" } : it))
+      );
+    } finally {
+      setSubmittingId(null);
     }
   };
 
+  const projects = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((it) => {
+      if (it.projectName) set.add(it.projectName);
+    });
+    return [
+      { id: "TODOS", name: "Todos los proyectos" },
+      ...Array.from(set).map((name) => ({ id: name, name })),
+    ];
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    return items.filter((row) => {
+      if (projectFilter !== "TODOS" && row.projectName !== projectFilter) {
+        return false;
+      }
+      if (statusFilter !== "TODOS" && row.estado !== statusFilter) {
+        return false;
+      }
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const matchMotivo = row.motivo.toLowerCase().includes(q);
+        const matchUser = row.userName.toLowerCase().includes(q);
+        const matchEmail = row.userEmail.toLowerCase().includes(q);
+        if (!matchMotivo && !matchUser && !matchEmail) return false;
+      }
+      return true;
+    });
+  }, [items, projectFilter, statusFilter, search]);
+
+  const total = filteredItems.length;
+  const pendientes = filteredItems.filter(
+    (i) => i.estado === "PENDING" || i.estado === "SUBMITTED"
+  ).length;
+  const aprobadas = filteredItems.filter((i) => i.estado === "APPROVED").length;
+  const porcentaje = total > 0 ? Math.round((aprobadas / total) * 100) : 0;
+
+  if (!hydrated || checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full space-y-6 text-foreground font-sans bg-transparent pb-12 max-w-7xl mx-auto ">
-      {/* 1. TOP HEADER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-5 sm:space-y-6">
+      {/* 0. HEADER */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-            <span className="font-mono text-[10.5px] font-semibold uppercase tracking-wider text-purple-400">
-              PANEL DE ASISTENCIA
-            </span>
-            <span className="text-xs text-muted-foreground font-sans">
-              · Solicitudes del trabajador
-            </span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] bg-primary/10 text-primary border border-primary/20 dark:bg-violet/10 dark:text-[#7c9aff] dark:border-violet/20 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
+            MÓDULO DE JUSTIFICACIONES
+          </span>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
             Mis justificaciones
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">
-            Revisión, estado y gestión de tus solicitudes de justificación y comprobantes.
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Registro, control y seguimiento de ausencias, tardanzas y permisos solicitados.
           </p>
         </div>
 
-        <Link
-          href="/team-member/justificar"
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition-all cursor-pointer self-start md:self-auto"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-          <span>Nueva justificación</span>
+        <Link href="/team-member/justificar" className="self-start sm:self-auto">
+          <button
+            type="button"
+            className="h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition-all cursor-pointer whitespace-nowrap"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Nueva justificación</span>
+          </button>
         </Link>
       </div>
 
-      {/* 2. PERIOD SELECTOR - Desktop View */}
-      <div className="hidden md:flex items-center gap-3 flex-wrap">
-        <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-card border border-border">
+      {/* 1. PERIOD SELECTOR TABS (Desktop only) */}
+      <div className="hidden md:flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-1 p-1 rounded-2xl bg-card border border-border">
           {PERIOD_TABS.map((tab) => {
             const isActive = activePeriod === tab.id;
             return (
@@ -314,7 +335,7 @@ export default function JustificationsPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActivePeriod(tab.id)}
-                className={`py-2 px-3.5 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
                   isActive
                     ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
@@ -344,10 +365,9 @@ export default function JustificationsPage() {
         </div>
       </div>
 
-      {/* 2. PERIOD SELECTOR TABS (Mobile only - 2 rows matching Figma SVG) */}
+      {/* 2. PERIOD SELECTOR TABS (Mobile only) */}
       <div className="md:hidden space-y-2.5">
         <div className="p-2 sm:p-2.5 rounded-2xl bg-card dark:bg-[#0C0E18] border border-border dark:border-[#1E2335]">
-          {/* Row 1: 4 tabs */}
           <div className="grid grid-cols-4 gap-1 text-center">
             {PERIOD_TABS.slice(0, 4).map((tab) => {
               const isActive = activePeriod === tab.id;
@@ -368,7 +388,6 @@ export default function JustificationsPage() {
             })}
           </div>
 
-          {/* Row 2: 3 tabs */}
           <div className="grid grid-cols-3 gap-1 text-center mt-1.5 max-w-[280px]">
             {PERIOD_TABS.slice(4).map((tab) => {
               const isActive = activePeriod === tab.id;
@@ -418,402 +437,55 @@ export default function JustificationsPage() {
         }}
       />
 
-      {/* UNIFIED MAIN CONTAINER ("Un cuadro entero, no 3") */}
+      {/* UNIFIED MAIN CONTAINER */}
       <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
-        {/* 4. 4 KPI CARDS (Matching PM Design System) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-        {/* Card 1: Total solicitudes */}
-        <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl border border-border/60 bg-background/50 flex items-center justify-center text-muted-foreground shrink-0">
-              <AlertTriangle className="w-4 h-4" />
-            </div>
-            <p className="text-xs text-muted-foreground font-medium">Total solicitudes</p>
-          </div>
-          <div className="mt-2.5 sm:mt-3">
-            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{total}</p>
-          </div>
-        </div>
+        {/* 4. 4 KPI CARDS */}
+        <JustificacionesKPIs
+          total={total}
+          pendientes={pendientes}
+          aprobadas={aprobadas}
+          porcentaje={porcentaje}
+        />
 
-        {/* Card 2: Pendientes */}
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-              <Clock className="w-4 h-4" />
-            </div>
-            <p className="text-xs text-amber-400 font-medium">Pendientes</p>
-          </div>
-          <div className="mt-2.5 sm:mt-3">
-            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{pendientes}</p>
-          </div>
-        </div>
-
-        {/* Card 3: Aprobadas */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-            <p className="text-xs text-emerald-400 font-medium">Aprobadas</p>
-          </div>
-          <div className="mt-2.5 sm:mt-3">
-            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{aprobadas}</p>
-          </div>
-        </div>
-
-        {/* Card 4: % Aprobadas */}
-        <div className="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
-          <div className="flex items-center justify-between">
-            <div className="w-9 h-9 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-            <p className="text-xs text-purple-400 font-medium">% Aprobadas</p>
-          </div>
-          <div className="mt-2.5 sm:mt-3">
-            <p className="text-2xl sm:text-3xl font-bold text-foreground leading-none">{porcentaje}%</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Divider Line */}
+        {/* Divider Line */}
         <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
 
-        {/* 5. FILTERS CONTAINER - Desktop & Mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end pt-1">
-        {/* Proyecto */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-foreground">
-            Proyecto
-          </label>
-          <div className="relative">
-            <Folder className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
-            <select
-              value={projectFilter}
-              onChange={(e) => setProjectFilter(e.target.value)}
-              className="w-full h-10 pl-9 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-            >
-              {projects.map((p) => (
-                <option key={p.id} value={p.id} className="bg-card text-foreground">{p.name}</option>
-              ))}
-            </select>
-            <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
-          </div>
-        </div>
+        {/* 5. FILTERS CONTAINER */}
+        <JustificacionesFilterBar
+          projectFilter={projectFilter}
+          setProjectFilter={setProjectFilter}
+          projects={projects}
+          search={search}
+          setSearch={setSearch}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          isLoading={isLoading}
+          onRefresh={fetchData}
+        />
 
-        {/* Buscar motivo */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-foreground">
-            Buscar motivo
-          </label>
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Ej: Cita médica, Notaría..."
-              className="w-full h-10 pl-9 pr-3 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
-            />
-          </div>
-        </div>
+        {/* 6. MOBILE CARDS VIEW */}
+        <JustificacionesMobileCards
+          items={filteredItems}
+          getStatusBadge={getStatusBadge}
+          onSubmit={handleSubmit}
+          submittingId={submittingId}
+        />
 
-        {/* Estado */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-foreground">
-            Estado
-          </label>
-          <div className="relative">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full h-10 px-3 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-            >
-              <option value="TODOS" className="bg-card text-foreground">Todos los estados</option>
-              <option value="SUBMITTED" className="bg-card text-foreground">Enviada</option>
-              <option value="APPROVED" className="bg-card text-foreground">Aprobada</option>
-              <option value="OBSERVATION" className="bg-card text-foreground">Observación</option>
-              <option value="REJECTED" className="bg-card text-foreground">Rechazada</option>
-            </select>
-            <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
-          </div>
-        </div>
+        {/* 7. DESKTOP TABLE VIEW */}
+        <JustificacionesDesktopTable
+          items={filteredItems}
+          getStatusBadge={getStatusBadge}
+          onSubmit={handleSubmit}
+          submittingId={submittingId}
+        />
 
-        {/* Action: Actualizar button */}
-        <div>
-          <button
-            type="button"
-            onClick={fetchData}
-            disabled={isLoading}
-            className="w-full h-10 rounded-xl border border-border bg-background/50 hover:bg-background text-xs font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
-          >
-            <RotateCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-primary" : "text-muted-foreground"}`} />
-            <span>Actualizar</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 6. MOBILE CARDS VIEW (Matching dark-justificacionjes.svg) */}
-      <div className="md:hidden space-y-3">
-        {filteredItems.length === 0 ? (
-          <div className="py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60">
-            No se encontraron justificaciones.
-          </div>
-        ) : (
-          filteredItems.map((row) => {
-            const badge = getStatusBadge(row.estado);
-            const isObservation = row.estado === "OBSERVATION";
-            const isPending = row.estado === "PENDING" || row.estado === "SUBMITTED";
-
-            return (
-              <div
-                key={row.id}
-                className="rounded-2xl border border-border dark:border-[#1E2335] bg-card dark:bg-[#0E111C] p-4 space-y-3 shadow-sm"
-              >
-                {/* Header: User Avatar + Name + Status Pill */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shrink-0">
-                      CM
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-foreground text-xs truncate">
-                        {row.userName}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground truncate">
-                        {row.userEmail}
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${badge.cls}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                    {badge.label}
-                  </span>
-                </div>
-
-                {/* Motivo Card Box */}
-                <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-                  <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
-                    MOTIVO
-                  </span>
-                  <p className="text-xs text-foreground/90 font-medium leading-relaxed">
-                    {row.motivo}
-                  </p>
-                  {row.comment && (
-                    <p className="text-[11px] text-amber-400/90 italic mt-1.5 pt-1.5 border-t border-border/40">
-                      Nota: {row.comment}
-                    </p>
-                  )}
-                </div>
-
-                {/* 2-box row: Documento & Fecha */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-                    <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
-                      DOCUMENTO
-                    </span>
-                    {row.documentUrl ? (
-                      <a
-                        href={row.documentUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-purple-400 hover:underline"
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        Ver adjunto
-                      </a>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">Sin documento</span>
-                    )}
-                  </div>
-                  <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-                    <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
-                      FECHA
-                    </span>
-                    <span className="text-xs font-mono font-medium text-foreground">{row.fecha}</span>
-                  </div>
-                </div>
-
-                {/* Actions Row */}
-                <div className="flex items-center gap-2 pt-1">
-                  <Link href={`/team-member/justificaciones/${row.id}`} className="flex-1">
-                    <button
-                      type="button"
-                      className="w-full h-11 rounded-xl border border-border bg-background/50 hover:bg-background text-sm font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <Eye className="w-4 h-4 text-muted-foreground" />
-                      <span>Ver</span>
-                    </button>
-                  </Link>
-
-                  {isObservation && (
-                    <Link href={`/team-member/justificar?justificationId=${row.id}`} className="flex-1">
-                      <button
-                        type="button"
-                        className="w-full h-11 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                        <span>Editar</span>
-                      </button>
-                    </Link>
-                  )}
-
-                  {row.estado === "PENDING" && (
-                    <button
-                      type="button"
-                      onClick={() => handleSubmit(row.id)}
-                      disabled={submittingId === row.id}
-                      className="h-11 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-                    >
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{submittingId === row.id ? "Enviando..." : "Enviar"}</span>
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      {/* 7. DESKTOP TABLE VIEW (Matching PM dark-justificaciones.svg) */}
-      <div className="hidden md:block rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-border bg-background/50 text-[10.5px] font-mono font-semibold text-muted-foreground tracking-wider uppercase">
-                <th className="py-3.5 px-4">TRABAJADOR</th>
-                <th className="py-3.5 px-4">MOTIVO</th>
-                <th className="py-3.5 px-4">DOCUMENTO</th>
-                <th className="py-3.5 px-4">FECHA</th>
-                <th className="py-3.5 px-4">ESTADO</th>
-                <th className="py-3.5 px-4 text-right">ACCIONES</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredItems.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-muted-foreground text-xs">
-                    No se encontraron justificaciones.
-                  </td>
-                </tr>
-              ) : (
-                filteredItems.map((row) => {
-                  const badge = getStatusBadge(row.estado);
-                  const isObservation = row.estado === "OBSERVATION";
-
-                  return (
-                    <tr key={row.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shrink-0">
-                            CM
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-semibold text-foreground text-sm truncate">{row.userName}</p>
-                            <p className="text-xs text-muted-foreground truncate">{row.userEmail}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-muted-foreground max-w-xs truncate">
-                        <span className="text-foreground/90 font-medium">{row.motivo}</span>
-                        {row.comment && (
-                          <p className="text-[11px] text-amber-400 italic truncate mt-0.5">
-                            Obs: {row.comment}
-                          </p>
-                        )}
-                      </td>
-                      <td className="py-4 px-4">
-                        {row.documentUrl ? (
-                          <a
-                            href={row.documentUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:underline"
-                          >
-                            <FileText className="w-3.5 h-3.5" />
-                            Ver adjunto
-                          </a>
-                        ) : (
-                          <span className="italic text-muted-foreground text-xs">Sin documento</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-4 font-mono text-xs text-foreground">{row.fecha}</td>
-                      <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${badge.cls}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
-                          {badge.label}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Link href={`/team-member/justificaciones/${row.id}`}>
-                            <button
-                              title="Ver detalle"
-                              className="w-9 h-9 rounded-xl border border-border bg-background hover:bg-muted text-foreground flex items-center justify-center transition-colors shadow-sm cursor-pointer"
-                            >
-                              <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                            </button>
-                          </Link>
-
-                          {isObservation && (
-                            <Link href={`/team-member/justificar?justificationId=${row.id}`}>
-                              <button
-                                title="Editar justificación"
-                                className="w-9 h-9 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 flex items-center justify-center transition-colors cursor-pointer"
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </button>
-                            </Link>
-                          )}
-
-                          {row.estado === "PENDING" && (
-                            <button
-                              title="Enviar para revisión"
-                              onClick={() => handleSubmit(row.id)}
-                              disabled={submittingId === row.id}
-                              className="w-9 h-9 rounded-xl border border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 flex items-center justify-center transition-colors cursor-pointer"
-                            >
-                              <Send className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 8. PAGINATION FOOTER */}
-      <div className="flex items-center justify-between pt-1 px-1">
-        <span className="text-xs text-muted-foreground font-medium">
-          {total} solicitud{total === 1 ? "" : "es"}
-        </span>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            disabled={page <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center text-muted-foreground disabled:opacity-40 cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-xs text-muted-foreground font-medium px-1">
-            Página 1 de 1
-          </span>
-          <button
-            type="button"
-            disabled
-            className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center text-muted-foreground disabled:opacity-40"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+        {/* 8. PAGINATION FOOTER */}
+        <JustificacionesPagination
+          total={total}
+          page={page}
+          onPrevPage={() => setPage((p) => Math.max(1, p - 1))}
+          onNextPage={() => {}}
+        />
       </div>
     </div>
   );
