@@ -75,7 +75,7 @@ export default function JustificationsPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const size = 10;
+  const size = 5;
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("TODOS");
   const [projectFilter, setProjectFilter] = useState("all");
@@ -185,6 +185,7 @@ export default function JustificationsPage() {
   }, [data.items, search, statusFilter, projectFilter]);
 
   const total = data.total || data.items.length;
+  const totalPages = Math.max(1, Math.ceil(total / size));
   const pendientes = data.items.filter(
     (i) => i.estado === "SUBMITTED" || i.estado === "PENDING"
   ).length;
@@ -745,11 +746,12 @@ export default function JustificationsPage() {
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="text-xs text-muted-foreground font-medium px-1">
-            Página 1 de 1
+            Página {page} de {totalPages}
           </span>
           <button
             type="button"
-            disabled
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
             className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center text-muted-foreground disabled:opacity-40"
           >
             <ChevronRight className="w-4 h-4" />

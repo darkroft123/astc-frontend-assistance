@@ -167,7 +167,7 @@ export default function AttendanceHistoryPage() {
         setLoading(true);
         const res = await listAttendance(token, {
           page: currentPage - 1,
-          size: 10,
+          size: 5,
           projectId: project?.id ?? null,
           fromDate: dateRange.fromDate,
           toDate: dateRange.toDate,

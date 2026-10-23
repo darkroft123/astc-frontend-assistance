@@ -81,6 +81,7 @@ export default function AbsencesPage() {
     const sinJustificar = Math.max(0, total - justificadas - pendientes);
     return { total, justificadas, pendientes, sinJustificar };
   }, [totalCount, absenceRecords, pendingAbsenceIds]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / 5));
 
   const loadData = async () => {
     if (!token || checkingAuth) return;
@@ -513,10 +514,10 @@ export default function AbsencesPage() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="text-xs text-text-3 font-medium whitespace-nowrap">
-                  Página <strong className="text-foreground">{currentPage}</strong> de 2
+                  Página <strong className="text-foreground">{currentPage}</strong> de {totalPages}
                 </span>
                 <button
-                  disabled={currentPage >= 2}
+                  disabled={currentPage >= totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                   className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   aria-label="Página siguiente"
