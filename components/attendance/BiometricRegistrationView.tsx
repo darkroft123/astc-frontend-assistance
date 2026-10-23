@@ -337,7 +337,7 @@ export default function BiometricRegistrationView({
           </div>
 
           {/* Digital Time pill */}
-          <div className="flex items-center gap-2 bg-[#0B1B2B] dark:bg-[#071927] border border-cyan-500/40 text-cyan-500 dark:text-[#00E5FF] px-4 py-2 rounded-xl font-mono text-sm font-semibold tracking-wide shadow-inner">
+          <div className="flex items-center gap-2 bg-cyan-500/10 dark:bg-[#071927] border border-cyan-500/30 dark:border-cyan-500/40 text-cyan-700 dark:text-[#00E5FF] px-4 py-2 rounded-xl font-mono text-sm font-semibold tracking-wide shadow-xs">
             <span>{time || "10:51:42 p. m."}</span>
           </div>
 
@@ -351,7 +351,7 @@ export default function BiometricRegistrationView({
       {/* ==================== 2. AIRPLANE / OFFLINE BANNER (SOLO SE MUESTRA SI REALMENTE ESTÁ OFFLINE) ==================== */}
       {(isOffline || pendingCount > 0) && (
         <div className="w-full">
-          <div className="bg-[#14120B] dark:bg-[#14120B] bg-amber-500/10 border border-[#D97706]/40 dark:border-[#D97706]/40 border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-sm">
+          <div className="bg-amber-50 dark:bg-[#14120B] border border-amber-200 dark:border-[#D97706]/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-sm">
             <div className="flex items-start sm:items-center gap-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                 <Plane className="w-5 h-5 text-[#F59E0B] rotate-[-45deg]" />
@@ -617,7 +617,7 @@ export default function BiometricRegistrationView({
               <span className="font-mono text-[11px] uppercase tracking-wider text-indigo-500 dark:text-[#818CF8] font-semibold">
                 PROYECTO
               </span>
-              <span className="font-mono text-[11px] px-3 py-0.5 rounded-full bg-[#2A2046] text-[#C4B5FD] border border-[#8B5CF6]/30 font-medium">
+              <span className="font-mono text-[11px] px-3 py-0.5 rounded-full bg-purple-100 dark:bg-[#2A2046] text-purple-700 dark:text-[#C4B5FD] border border-purple-200 dark:border-[#8B5CF6]/30 font-medium">
                 {schedule?.shiftType === "PERMANENT" || schedule?.shiftType === "REGULAR"
                   ? "Regular"
                   : schedule?.shiftType || "Regular"}
@@ -663,7 +663,7 @@ export default function BiometricRegistrationView({
               <span className="font-sans text-sm font-bold text-foreground">
                 {previousRecord.label}
               </span>
-              <span className="font-mono text-[11px] font-semibold px-3 py-0.5 rounded-full bg-[#0B2E24] text-[#34D399] border border-[#10B981]/30">
+              <span className="font-mono text-[11px] font-semibold px-3 py-0.5 rounded-full bg-emerald-50 dark:bg-[#0B2E24] text-emerald-700 dark:text-[#34D399] border border-emerald-200 dark:border-[#10B981]/30">
                 ● {previousRecord.status}
               </span>
             </div>
@@ -679,7 +679,7 @@ export default function BiometricRegistrationView({
               <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-500 dark:text-[#34D399] font-semibold">
                 VACACIONES
               </span>
-              <span className="font-mono text-[11px] font-semibold px-3 py-0.5 rounded-full bg-[#2B2011] text-[#FBBF24] border border-[#F59E0B]/30">
+              <span className="font-mono text-[11px] font-semibold px-3 py-0.5 rounded-full bg-amber-50 dark:bg-[#2B2011] text-amber-700 dark:text-[#FBBF24] border border-amber-200 dark:border-[#F59E0B]/30">
                 {primaryVacation?.status === "APPROVED" ? "Aprobadas" : "Pendiente"}
               </span>
             </div>
