@@ -22,7 +22,8 @@ import {
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { listJustifications, submitJustification } from "@/app/services/assistance.service";
 import { formatDateTime } from "@/lib/timezone";
-import { DateRangeModal, DateRange } from "@/components/ui/date-range-modal";
+import { DateRangeModal } from "@/components/ui/date-range-modal";
+type DateRange = { from: string; to: string };
 
 type Period =
   | "today"
@@ -248,27 +249,27 @@ export default function JustificationsPage() {
       case "APPROVED":
         return {
           label: "Aprobada",
-          cls: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
-          dot: "bg-emerald-400",
+          cls: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30",
+          dot: "bg-emerald-500",
         };
       case "REJECTED":
         return {
           label: "Rechazada",
-          cls: "bg-rose-500/10 text-rose-400 border-rose-500/30",
-          dot: "bg-rose-400",
+          cls: "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/30",
+          dot: "bg-rose-500",
         };
       case "OBSERVATION":
         return {
           label: "Observada",
-          cls: "bg-amber-500/10 text-amber-400 border-amber-500/30",
-          dot: "bg-amber-400",
+          cls: "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30",
+          dot: "bg-amber-500",
         };
       case "SUBMITTED":
       default:
         return {
           label: "Enviada",
-          cls: "bg-blue-500/10 text-blue-400 border-blue-500/30",
-          dot: "bg-blue-400",
+          cls: "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/30",
+          dot: "bg-blue-500",
         };
     }
   };
@@ -305,7 +306,7 @@ export default function JustificationsPage() {
 
       {/* 2. PERIOD SELECTOR - Desktop View */}
       <div className="hidden md:flex items-center gap-3 flex-wrap">
-        <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-[#0C0E18] border border-[#1E2335]">
+        <div className="inline-flex items-center gap-1 p-1 rounded-2xl bg-card border border-border">
           {PERIOD_TABS.map((tab) => {
             const isActive = activePeriod === tab.id;
             return (
@@ -315,8 +316,8 @@ export default function JustificationsPage() {
                 onClick={() => setActivePeriod(tab.id)}
                 className={`py-2 px-3.5 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? "bg-[#1E2338] text-white border border-[#2D354E] font-semibold shadow-xs"
-                    : "text-[#8F96AE] hover:text-white"
+                    ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}
@@ -328,16 +329,16 @@ export default function JustificationsPage() {
         <button
           type="button"
           onClick={() => setDateRangeModalOpen(true)}
-          className="h-10 px-4 rounded-2xl bg-[#0C0E18] border border-[#1E2335] text-xs font-medium text-[#8F96AE] hover:text-white flex items-center gap-2 transition-colors cursor-pointer shrink-0 shadow-xs"
+          className="h-10 px-4 rounded-2xl bg-card border border-border text-xs font-medium text-foreground hover:text-primary hover:text-foreground flex items-center gap-2 transition-colors cursor-pointer shrink-0 shadow-xs"
           title="Seleccionar rango personalizado"
         >
           <CalendarIcon className="w-4 h-4 text-[#A855F7]" />
           <span>Rango personalizado</span>
         </button>
 
-        <div className="h-10 px-4 rounded-2xl bg-[#0C0E18] border border-[#1E2335] flex items-center gap-2 text-xs font-mono shrink-0 shadow-xs">
-          <span className="text-[#8F96AE]">Período:</span>
-          <span className="text-[#EEF0F6] font-semibold">
+        <div className="h-10 px-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/40 flex items-center gap-2 text-xs font-mono shrink-0 shadow-xs">
+          <span className="text-muted-foreground">Período:</span>
+          <span className="text-blue-600 dark:text-blue-400 font-semibold">
             {dateRange.from} → {dateRange.to}
           </span>
         </div>
@@ -345,7 +346,7 @@ export default function JustificationsPage() {
 
       {/* 2. PERIOD SELECTOR TABS (Mobile only - 2 rows matching Figma SVG) */}
       <div className="md:hidden space-y-2.5">
-        <div className="p-2 sm:p-2.5 rounded-2xl bg-[#0C0E18] border border-[#1E2335]">
+        <div className="p-2 sm:p-2.5 rounded-2xl bg-card dark:bg-[#0C0E18] border border-border dark:border-[#1E2335]">
           {/* Row 1: 4 tabs */}
           <div className="grid grid-cols-4 gap-1 text-center">
             {PERIOD_TABS.slice(0, 4).map((tab) => {
@@ -357,8 +358,8 @@ export default function JustificationsPage() {
                   onClick={() => setActivePeriod(tab.id)}
                   className={`py-1.5 px-1 rounded-xl text-xs transition-all cursor-pointer truncate ${
                     isActive
-                      ? "bg-[#1E2338] text-white border border-[#2D354E] font-semibold shadow-xs"
-                      : "text-[#8F96AE] hover:text-white font-medium"
+                      ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground font-medium"
                   }`}
                 >
                   {tab.label}
@@ -378,8 +379,8 @@ export default function JustificationsPage() {
                   onClick={() => setActivePeriod(tab.id)}
                   className={`py-1.5 px-1 rounded-xl text-xs transition-all cursor-pointer truncate ${
                     isActive
-                      ? "bg-[#1E2338] text-white border border-[#2D354E] font-semibold shadow-xs"
-                      : "text-[#8F96AE] hover:text-white font-medium"
+                      ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-foreground font-medium"
                   }`}
                 >
                   {tab.label}
@@ -391,14 +392,14 @@ export default function JustificationsPage() {
 
         {/* 3. DATE RANGE SELECTOR BAR (Mobile only) */}
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-11 px-3.5 rounded-2xl bg-[#0C0E18] border border-[#1E2335] flex items-center justify-center gap-2 text-xs font-mono text-[#8F96AE]">
+          <div className="flex-1 h-11 px-3.5 rounded-2xl bg-card dark:bg-[#0C0E18] border border-border dark:border-[#1E2335] flex items-center justify-center gap-2 text-xs font-mono text-muted-foreground">
             <CalendarIcon className="w-3.5 h-3.5 text-[#A855F7]" />
-            <span className="text-[#EEF0F6] font-semibold">{dateRange.from} → {dateRange.to}</span>
+            <span className="text-foreground font-semibold">{dateRange.from} → {dateRange.to}</span>
           </div>
           <button
             type="button"
             onClick={() => setDateRangeModalOpen(true)}
-            className="w-11 h-11 rounded-2xl bg-[#0C0E18] border border-[#1E2335] text-[#8F96AE] hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-xs"
+            className="w-11 h-11 rounded-2xl bg-card border border-border text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-xs"
             title="Seleccionar rango"
           >
             <CalendarIcon className="w-4 h-4" />
@@ -417,7 +418,9 @@ export default function JustificationsPage() {
         }}
       />
 
-      {/* 4. 4 KPI CARDS (Matching PM Design System) */}
+      {/* UNIFIED MAIN CONTAINER ("Un cuadro entero, no 3") */}
+      <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
+        {/* 4. 4 KPI CARDS (Matching PM Design System) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
         {/* Card 1: Total solicitudes */}
         <div className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 flex flex-col justify-between shadow-sm min-h-[96px] sm:min-h-[104px]">
@@ -472,8 +475,11 @@ export default function JustificationsPage() {
         </div>
       </div>
 
-      {/* 5. FILTERS CONTAINER - Desktop & Mobile */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end rounded-2xl border border-border bg-card/60 p-4 shadow-sm">
+      {/* Divider Line */}
+        <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
+
+        {/* 5. FILTERS CONTAINER - Desktop & Mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end pt-1">
         {/* Proyecto */}
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-foreground">
@@ -807,6 +813,7 @@ export default function JustificationsPage() {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

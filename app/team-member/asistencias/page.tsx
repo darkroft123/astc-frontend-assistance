@@ -323,7 +323,9 @@ export default function AttendanceHistoryPage() {
           }}
         />
 
-        {/* ================= 3. 4 KPI METRIC CARDS ================= */}
+        {/* UNIFIED MAIN CONTAINER ("Un cuadro entero, no 3") */}
+        <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
+          {/* ================= 3. 4 KPI METRIC CARDS ================= */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <SubMetricCard
             label="Total"
@@ -351,8 +353,11 @@ export default function AttendanceHistoryPage() {
         </div>
 
         {/* ================= 4. MAIN TABLE CARD ================= */}
-        <Card className="border border-border/70 shadow-sm bg-card rounded-2xl overflow-hidden">
-          <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+          {/* Divider Line */}
+          <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
+
+          {/* Table & Filters Content */}
+          <div className="space-y-4 sm:space-y-5 pt-1">
             {/* Filter controls row */}
             <div className="flex flex-col md:flex-row items-stretch md:items-end justify-between gap-3 sm:gap-4">
               {/* Search date */}
@@ -600,8 +605,8 @@ export default function AttendanceHistoryPage() {
                 </button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Photo Lightbox */}
         <Dialog open={!!selectedPhotoUrl} onOpenChange={(open) => !open && setSelectedPhotoUrl(null)}>

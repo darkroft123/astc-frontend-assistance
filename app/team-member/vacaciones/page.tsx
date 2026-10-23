@@ -375,7 +375,9 @@ export default function VacationsPage() {
           </div>
         )}
 
-        {/* ================= 3. 4 KPI METRIC CARDS (EXACT SVG DESIGN) ================= */}
+        {/* UNIFIED MAIN CONTAINER ("Un cuadro entero, no 3") */}
+        <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
+          {/* ================= 3. 4 KPI METRIC CARDS (EXACT SVG DESIGN) ================= */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Total días */}
           <div className="rounded-2xl border border-border/70 bg-card p-5 flex flex-col justify-between shadow-sm">
@@ -423,8 +425,11 @@ export default function VacationsPage() {
         </div>
 
         {/* ================= 4. TABLE CARD ================= */}
-        <Card className="border border-border/70 shadow-sm bg-card rounded-2xl overflow-hidden">
-          <CardContent className="p-5 sm:p-6 space-y-5">
+          {/* Divider Line */}
+          <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
+
+          {/* Table & Filters Content */}
+          <div className="space-y-4 sm:space-y-5 pt-1">
             <div className="flex items-center justify-between">
               <h2 className="text-base sm:text-lg font-bold text-foreground">
                 Historial de solicitudes
@@ -556,8 +561,8 @@ export default function VacationsPage() {
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
       </div>
 
