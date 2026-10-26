@@ -9,7 +9,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { useCamera } from "@/hooks/useCamera";
 import { useFaceDetection } from "@/hooks/useFaceDetection";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
-import { useUserProject, DEFAULT_MOCK_PROJECT } from "@/features/attendance/hooks/useUserProject";
+import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import {
   getTodayAttendance,
   getEffectiveSchedule,
