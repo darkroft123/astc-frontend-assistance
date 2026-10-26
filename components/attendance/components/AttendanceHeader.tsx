@@ -23,7 +23,7 @@ interface AttendanceHeaderProps {
 }
 
 export function AttendanceHeader({
-  projectName = "testo6",
+  projectName = "",
   schedule,
   projects = [],
   selectedProjectId = "",
@@ -49,7 +49,7 @@ export function AttendanceHeader({
               Registro biométrico
             </h1>
             <p className="font-sans text-xs sm:text-sm font-light text-muted-foreground mt-0.5">
-              Proyecto {projectName} · turno regular{" "}
+              Proyecto {projectName || projects[0]?.name || "Principal"} · turno regular{" "}
               {schedule?.expectedStartTime?.slice(0, 5) || "08:00"} -{" "}
               {schedule?.expectedEndTime?.slice(0, 5) || "17:00"}
             </p>

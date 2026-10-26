@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import {
   Loader2,
   ChevronLeft,
@@ -117,31 +118,8 @@ export default function JustificationDetailPage() {
     }
   };
 
-  if (!hydrated || checkingAuth || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
-      </div>
-    );
-  }
-
-  if (!detail) {
-    return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4">
-        <p className="text-muted-foreground text-sm">Justificación no encontrada</p>
-        <Link
-          href="/team-member/justificaciones"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C084FC] hover:underline"
-        >
-          <ChevronLeft className="w-4 h-4" />
-          Volver a justificaciones
-        </Link>
-      </div>
-    );
-  }
-
   const currentJustification = detail;
-  const st = currentJustification.status || "SUBMITTED";
+  const st = currentJustification?.status || "SUBMITTED";
   const isApproved = st === "APPROVED";
   const isRejected = st === "REJECTED";
   const isObservation = st === "OBSERVATION";
@@ -175,6 +153,29 @@ export default function JustificationDetailPage() {
       dot: "bg-blue-400",
     };
   }, [isApproved, isRejected, isObservation]);
+
+  if (!hydrated || checkingAuth || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    );
+  }
+
+  if (!detail) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4">
+        <p className="text-muted-foreground text-sm">Justificación no encontrada</p>
+        <Link
+          href="/team-member/justificaciones"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C084FC] hover:underline"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Volver a justificaciones
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">

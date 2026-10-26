@@ -578,7 +578,7 @@ export default function VacationsPage() {
                       {startDate ? format(startDate, "dd/MM/yyyy") : "Seleccionar"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-border" align="start">
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-2xl border-border bg-card z-[150]" align="start">
                     <Calendar
                       mode="single" selected={startDate} onSelect={setStartDate}
                       locale={es} className="rounded-xl"
@@ -596,7 +596,7 @@ export default function VacationsPage() {
                       {endDate ? format(endDate, "dd/MM/yyyy") : "Seleccionar"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 rounded-xl shadow-lg border-border" align="start">
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-2xl border-border bg-card z-[150]" align="start">
                     <Calendar
                       mode="single" selected={endDate} onSelect={setEndDate}
                       locale={es} className="rounded-xl"
