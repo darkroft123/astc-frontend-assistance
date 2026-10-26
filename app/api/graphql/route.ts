@@ -85,14 +85,106 @@ export async function POST(req: Request) {
     }
 
     // 4. Justifications
+    if (query.includes("getJustificationDetailPM") || query.includes("getJustificationDetail")) {
+      const jId = body.variables?.id || "just-001";
+      const detailData = {
+        id: jId,
+        absenceId: "abs-01",
+        userId: "user-002",
+        description: "Cita médica programada en el hospital central con constancia adjunta.",
+        documentUrl: "https://example.com/comprobante_medico.pdf",
+        status: "SUBMITTED",
+        comment: null,
+        submittedAt: "2026-09-02T09:15:00Z",
+        reviewedAt: null,
+        reviewedBy: null,
+        absenceDate: "2026-09-02",
+        absenceType: "MOTIVO_MEDICO",
+        projectName: "testo6",
+        history: [
+          {
+            id: "hist-1",
+            previousStatus: null,
+            newStatus: "SUBMITTED",
+            comment: "Solicitud enviada para revisión del Jefe de Proyecto.",
+            changedBy: "Carlos Mamani",
+            changedAt: "2026-09-02T09:15:00Z",
+          },
+        ],
+      };
+      return NextResponse.json({
+        data: {
+          getJustificationDetailPM: detailData,
+          getJustificationDetail: detailData,
+        },
+      });
+    }
+
+    if (query.includes("submitJustification")) {
+      return NextResponse.json({
+        data: {
+          submitJustification: {
+            id: body.variables?.id || "just-001",
+            status: "SUBMITTED",
+            submittedAt: new Date().toISOString(),
+          },
+        },
+      });
+    }
+
     if (query.includes("listJustifications")) {
       return NextResponse.json({
         data: {
           listJustifications: {
-            items: MOCK_JUSTIFICATIONS_LIST,
+            items: [
+              {
+                id: "just-001",
+                absenceId: "abs-01",
+                userId: "user-002",
+                description: "Cita médica programada en el hospital central con constancia adjunta.",
+                documentUrl: "https://example.com/comprobante_medico.pdf",
+                status: "SUBMITTED",
+                comment: null,
+                submittedAt: "2026-09-02T09:15:00Z",
+                absenceDate: "2026-09-02",
+              },
+              {
+                id: "just-002",
+                absenceId: "abs-02",
+                userId: "user-002",
+                description: "Trámite personal documentario en notaría pública.",
+                documentUrl: "https://example.com/constancia_notarial.pdf",
+                status: "APPROVED",
+                comment: "Aprobada por el Jefe de Proyecto.",
+                submittedAt: "2026-08-28T10:00:00Z",
+                absenceDate: "2026-08-28",
+              },
+              {
+                id: "just-003",
+                absenceId: "abs-03",
+                userId: "user-002",
+                description: "Emergencia odontológica de urgencia sin aviso previo.",
+                documentUrl: null,
+                status: "OBSERVATION",
+                comment: "Favor de adjuntar la constancia de atención médica para proceder con la aprobación.",
+                submittedAt: "2026-08-15T14:30:00Z",
+                absenceDate: "2026-08-15",
+              },
+              {
+                id: "just-004",
+                absenceId: "abs-04",
+                userId: "user-002",
+                description: "Inasistencia por contingencia imprevista en el transporte público.",
+                documentUrl: null,
+                status: "REJECTED",
+                comment: "No cumple con el plazo reglamentario de 48 horas.",
+                submittedAt: "2026-08-10T08:45:00Z",
+                absenceDate: "2026-08-10",
+              },
+            ],
             page: 1,
             size: 20,
-            total: MOCK_JUSTIFICATIONS_LIST.length,
+            total: 4,
           },
         },
       });

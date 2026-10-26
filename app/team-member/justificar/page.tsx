@@ -111,7 +111,7 @@ function JustifyAbsencePageContent() {
   const backHref = isEditMode ? "/team-member/justificaciones" : "/team-member/faltas";
 
   return (
-    <div className="w-full max-w-[560px] mx-auto px-0 md:px-4 py-2 md:py-4 space-y-4 pb-20">
+    <div className="w-full max-w-[560px] mx-auto px-0 md:px-4  space-y-4 pb-20">
       {/* Top back navigation */}
       <div className="flex items-center justify-between">
         <button

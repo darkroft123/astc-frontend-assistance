@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Resolves scheme (https/http) based on environment.
  */
 function getProtocol(): string {

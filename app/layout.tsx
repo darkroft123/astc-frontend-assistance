@@ -21,8 +21,15 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "ASTC CN - Sistema de Asistencia",
-  description: "Sistema de gestión de asistencia para empleados",
+  title: "ASTC-TEAM MEMBER",
+  description: "Sistema de gestión de asistencia ASTC - Team Member",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({

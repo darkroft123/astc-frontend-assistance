@@ -249,7 +249,7 @@ export default function NotificationsPage() {
   /* ================= LIST VIEW (MATCHES OFFICIAL FIGMA) ================= */
   return (
     <div className="relative min-h-screen bg-transparent pb-12">
-      <div className="w-full max-w-4xl mx-auto px-0 md:px-8 py-2 md:py-8 space-y-5 relative z-10">
+      <div className="w-full max-w-4xl mx-auto px-0 md:px-8  space-y-5 relative z-10">
         {/* 1. HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3.5">
