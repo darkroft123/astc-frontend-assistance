@@ -110,8 +110,8 @@ export default function AttendanceHistoryPage() {
 
   const [period, setPeriod] = useState<Period>("month");
   const [dateRange, setDateRange] = useState<DateRange>({
-    fromDate: "2026-09-01",
-    toDate: "2026-09-03",
+    fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0],
+    toDate: new Date().toISOString().split("T")[0],
     label: "Este mes",
     period: "month",
   });
@@ -140,7 +140,7 @@ export default function AttendanceHistoryPage() {
       monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
       setDateRange({ fromDate: formatDate(monday), toDate: formatDate(today), label: "Esta semana", period: p });
     } else if (p === "month") {
-      setDateRange({ fromDate: "2026-09-01", toDate: "2026-09-03", label: "Este mes", period: p });
+      setDateRange({ fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0], toDate: new Date().toISOString().split("T")[0], label: "Este mes", period: p });
     } else if (p === "3months") {
       const d = new Date(today);
       d.setMonth(d.getMonth() - 3);
@@ -154,7 +154,7 @@ export default function AttendanceHistoryPage() {
       d.setMonth(d.getMonth() - 9);
       setDateRange({ fromDate: formatDate(d), toDate: formatDate(today), label: "9 meses", period: p });
     } else {
-      setDateRange({ fromDate: "2026-01-01", toDate: formatDate(today), label: "Total", period: p });
+      setDateRange({ fromDate: "2024-01-01", toDate: formatDate(today), label: "Total", period: p });
     }
   };
 

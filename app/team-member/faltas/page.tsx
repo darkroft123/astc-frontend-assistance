@@ -60,7 +60,7 @@ export default function AbsencesPage() {
   const [period, setPeriod] = useState<Period>("total");
   const [dateRange, setDateRange] = useState<DateRange>({
     fromDate: "2024-01-01",
-    toDate: "2026-09-03",
+    toDate: new Date().toISOString().split("T")[0],
     label: "Total general",
     period: "total",
   });
@@ -152,7 +152,7 @@ export default function AbsencesPage() {
       monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
       setDateRange({ fromDate: formatDate(monday), toDate: formatDate(today), label: "Esta semana", period: p });
     } else if (p === "month") {
-      setDateRange({ fromDate: "2026-09-01", toDate: "2026-09-03", label: "Este mes", period: p });
+      setDateRange({ fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0], toDate: new Date().toISOString().split("T")[0], label: "Este mes", period: p });
     } else if (p === "3months") {
       const d = new Date(today);
       d.setMonth(d.getMonth() - 3);
@@ -166,7 +166,7 @@ export default function AbsencesPage() {
       d.setMonth(d.getMonth() - 9);
       setDateRange({ fromDate: formatDate(d), toDate: formatDate(today), label: "9 meses", period: p });
     } else {
-      setDateRange({ fromDate: "2024-01-01", toDate: "2026-09-03", label: "Total", period: p });
+      setDateRange({ fromDate: "2024-01-01", toDate: new Date().toISOString().split("T")[0], label: "Total", period: p });
     }
   };
 

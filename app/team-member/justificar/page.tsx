@@ -40,7 +40,7 @@ function JustifyAbsencePageContent() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const absenceId = searchParams.get("absenceId");
-  const dateRaw = searchParams.get("date") ?? "2026-09-01";
+  const dateRaw = searchParams.get("date") ?? new Date().toISOString().split("T")[0];
   const formattedDate = formatDateSpanish(dateRaw);
   const justificationId = searchParams.get("justificationId");
   const isEditMode = !!justificationId;
