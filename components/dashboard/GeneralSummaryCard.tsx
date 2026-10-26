@@ -17,7 +17,7 @@ interface GeneralSummaryCardProps {
 }
 
 export function GeneralSummaryCard({
-  selectedProject = { name: "testo6" },
+  selectedProject,
   attendanceRate = 50,
   metrics,
   teamMembersCount,
@@ -58,7 +58,7 @@ export function GeneralSummaryCard({
             </p>
           </div>
           <span className="font-semibold text-xs bg-violet/10 text-violet px-3 py-1 rounded-full border border-violet/20">
-            {selectedProject?.name || "testo6"}
+            {selectedProject?.name || "Sin proyecto asignado"}
           </span>
         </div>
 

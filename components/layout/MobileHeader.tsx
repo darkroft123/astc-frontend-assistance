@@ -18,7 +18,7 @@ export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
-    return user?.username || user?.email?.split("@")[0] || "carlos mamani";
+    return user?.username || user?.email?.split("@")[0] || "Usuario";
   }, [user]);
 
   const initials = useMemo(() => {

@@ -303,7 +303,7 @@ export default function BiometricRegistrationView({
     <div className="w-full space-y-6 text-foreground font-sans bg-transparent">
       {/* 1. TOP HEADER & OFFLINE BANNER */}
       <AttendanceHeader
-        projectName={project?.name || "testo6"}
+        projectName={project?.name || "Sin proyecto asignado"}
         schedule={schedule}
         projects={projects}
         selectedProjectId={project?.id || ""}

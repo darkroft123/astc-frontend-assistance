@@ -81,8 +81,8 @@ export default function DashboardPage() {
   const { hydrated, token, user, role, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const { project, projects, selectProject, loadingProject } = useUserProject();
 
-  const displayName = user?.firstName || user?.username || "carlos";
-  const projectName = project?.name || "testo6";
+  const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : user?.username || user?.email || "Colaborador";
+  const projectName = project?.name || "Sin proyecto asignado";
   const startTime = project?.workStartTime?.slice(0, 5) || "08:00";
   const endTime = project?.workEndTime?.slice(0, 5) || "17:00";
 

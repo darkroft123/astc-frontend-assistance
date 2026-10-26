@@ -53,47 +53,6 @@ export type TMJustificationRow = {
   comment?: string | null;
 };
 
-const DEFAULT_TM_JUSTIFICATIONS: TMJustificationRow[] = [
-  {
-    id: "just-001",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "testo6",
-    motivo: "Cita médica programada en el hospital central con constancia adjunta.",
-    documentUrl: "https://example.com/comprobante_medico.pdf",
-    fecha: "02/09/2026",
-    estado: "SUBMITTED",
-    comment: null,
-  },
-  {
-    id: "just-002",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "testo6",
-    motivo: "Trámite personal documentario en notaría pública.",
-    documentUrl: "https://example.com/constancia_notarial.pdf",
-    fecha: "28/08/2026",
-    estado: "APPROVED",
-    comment: "Aprobada por el Jefe de Proyecto.",
-  },
-  {
-    id: "just-003",
-    userId: "usr-carlos",
-    userName: "carlos mamani",
-    userRoleBadge: "Trabajador",
-    userEmail: "mamanigutierrezcarlos123@gmail.com",
-    projectName: "gestion de asistencia",
-    motivo: "Emergencia odontológica de urgencia sin aviso previo.",
-    documentUrl: null,
-    fecha: "15/08/2026",
-    estado: "OBSERVATION",
-    comment: "Favor de adjuntar la constancia de atención médica para proceder con la aprobación.",
-  },
-];
 
 function getStatusBadge(estado: string) {
   switch (estado) {
@@ -132,7 +91,7 @@ function getStatusBadge(estado: string) {
 }
 
 export default function TMJustificacionesPage() {
-  const { token, hydrated, checkingAuth } = useAuthGuard([
+  const { token, user, hydrated, checkingAuth } = useAuthGuard([
     "TEAM_MEMBER",
     "PROJECT_MANAGER",
     "ADMIN",
@@ -148,7 +107,7 @@ export default function TMJustificacionesPage() {
   const [projectFilter, setProjectFilter] = useState("TODOS");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("TODOS");
-  const [items, setItems] = useState<TMJustificationRow[]>(DEFAULT_TM_JUSTIFICATIONS);
+  const [items, setItems] = useState<TMJustificationRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -209,11 +168,11 @@ export default function TMJustificacionesPage() {
       if (Array.isArray(data) && data.length > 0) {
         const mapped: TMJustificationRow[] = data.map((item: any, idx: number) => ({
           id: item.id || `just-${idx}`,
-          userId: item.userId || "usr-carlos",
-          userName: "carlos mamani",
-          userRoleBadge: "Trabajador",
-          userEmail: "mamanigutierrezcarlos123@gmail.com",
-          projectName: item.project?.name || item.projectName || "testo6",
+          userId: item.userId || user?.id || "",
+          userName: item.user?.fullName || item.userName || (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : (user?.username || "Usuario")),
+          userRoleBadge: "Colaborador",
+          userEmail: item.user?.email || item.userEmail || user?.email || "",
+          projectName: item.project?.name || item.projectName || "Sin proyecto asignado",
           motivo: item.reason || "Sin motivo especificado",
           documentUrl: item.documentUrl || null,
           fecha: formatDateTime(item.date || item.createdAt || new Date()),
@@ -222,10 +181,10 @@ export default function TMJustificacionesPage() {
         }));
         setItems(mapped);
       } else {
-        setItems(DEFAULT_TM_JUSTIFICATIONS);
+        setItems([]);
       }
     } catch {
-      setItems(DEFAULT_TM_JUSTIFICATIONS);
+        setItems([]);
     } finally {
       setIsLoading(false);
     }
