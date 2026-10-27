@@ -143,7 +143,7 @@ const periodOptions: { key: Period; label: string }[] = [
 
 export default function AttendanceHistoryPage() {
   const { hydrated, token, checkingAuth, user } = useAuthGuard(["TEAM_MEMBER"]);
-  const { project, projects, selectProject } = useUserProject();
+  const { project, projects, selectProject, selectedProjectId } = useUserProject();
 
   const [period, setPeriod] = useState<Period>("month");
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -205,7 +205,7 @@ export default function AttendanceHistoryPage() {
         const res = await listAttendance(token, {
           page: currentPage - 1,
           size: 5,
-          projectId: project?.id ?? null,
+          projectId: (!selectedProjectId || selectedProjectId === "all") ? null : selectedProjectId,
           fromDate: dateRange.fromDate,
           toDate: dateRange.toDate,
           status: statusFilter !== "all" ? statusFilter : null,
@@ -232,7 +232,7 @@ export default function AttendanceHistoryPage() {
     return () => {
       cancelled = true;
     };
-  }, [hydrated, checkingAuth, token, currentPage, dateRange, statusFilter, project?.id]);
+  }, [hydrated, checkingAuth, token, currentPage, dateRange, statusFilter, selectedProjectId]);
 
   const filteredRecords = useMemo(() => {
     return attendanceRecords.filter((rec) => {

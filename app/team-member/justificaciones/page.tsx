@@ -254,7 +254,7 @@ export default function TMJustificacionesPage() {
 
   const filteredItems = useMemo(() => {
     return items.filter((row) => {
-      if (projectFilter !== "TODOS" && row.projectName !== projectFilter) {
+      if (projectFilter !== "TODOS" && row.projectName && row.projectName !== projectFilter) {
         return false;
       }
       if (statusFilter !== "TODOS" && row.estado !== statusFilter) {

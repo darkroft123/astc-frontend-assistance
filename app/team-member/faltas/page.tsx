@@ -55,7 +55,7 @@ function formatDateDisplay(dateStr: string): string {
 
 export default function AbsencesPage() {
   const { token, hydrated, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
-  const { project } = useUserProject();
+  const { project, selectedProjectId } = useUserProject();
 
   const [period, setPeriod] = useState<Period>("total");
   const [dateRange, setDateRange] = useState<DateRange>({
@@ -90,7 +90,7 @@ export default function AbsencesPage() {
       const result = await listAbsences(token, {
         page: currentPage - 1,
         size: 5,
-        projectId: project?.id ?? null,
+        projectId: (!selectedProjectId || selectedProjectId === "all") ? null : selectedProjectId,
         fromDate: dateRange.fromDate,
         toDate: dateRange.toDate,
         type: null,
@@ -111,7 +111,7 @@ export default function AbsencesPage() {
 
   useEffect(() => {
     loadData();
-  }, [currentPage, dateRange, token, project?.id, checkingAuth, statusFilter]);
+  }, [currentPage, dateRange, token, selectedProjectId, checkingAuth, statusFilter]);
 
   useEffect(() => {
     if (!token || checkingAuth) return;

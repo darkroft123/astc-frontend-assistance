@@ -41,7 +41,7 @@ const navigation = [
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, token, role, logout, hydrated } = useAuth();
-  const { project, projects, selectProject, loadingProject } = useUserProject();
+  const { project, projects, selectProject, loadingProject, selectedProjectId } = useUserProject();
   const [unreadCount, setUnreadCount] = useState(0);
   const [attendanceLabel, setAttendanceLabel] = useState("Registrar asistencia");
 
@@ -165,7 +165,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         {projects.length > 1 && (
           <div className="mt-2">
             <Select
-              value={project?.id || ""}
+              value={selectedProjectId || "all"}
               onValueChange={(val) => {
                 selectProject(val);
                 if (typeof window !== "undefined") {
@@ -178,6 +178,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                 <SelectValue placeholder="Seleccionar proyecto" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all" className="text-xs">
+                  Todos los proyectos ({projects.length})
+                </SelectItem>
                 {projects.map((p) => (
                   <SelectItem key={p.id} value={p.id} className="text-xs">
                     {p.name}

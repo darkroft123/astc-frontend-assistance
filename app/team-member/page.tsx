@@ -79,7 +79,7 @@ export default function DashboardPage() {
   const [customModalOpen, setCustomModalOpen] = useState(false);
 
   const { hydrated, token, user, role, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
-  const { project, projects, selectProject, loadingProject } = useUserProject();
+  const { project, projects, selectProject, loadingProject, selectedProjectId } = useUserProject();
 
   const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : user?.username || user?.email || "Colaborador";
   const projectName = project?.name || "Sin proyecto asignado";
@@ -111,7 +111,7 @@ export default function DashboardPage() {
           token,
           dateRange.fromDate,
           dateRange.toDate,
-          project?.id
+          (!selectedProjectId || selectedProjectId === "all") ? undefined : project?.id
         );
         if (cancelled) return;
         setMetrics({
@@ -136,7 +136,7 @@ export default function DashboardPage() {
     checkingAuth,
     token,
     user,
-    project?.id,
+    selectedProjectId,
     dateRange.fromDate,
     dateRange.toDate,
   ]);
