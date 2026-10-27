@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatAvatarUrl } from "@/lib/avatar-url";
 import { Menu } from "lucide-react";
 import { useMobileSidebar } from "./MobileSidebar";
 import { NotificationBell } from "./notification-bell";
@@ -54,9 +56,14 @@ export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
         </button>
 
         {/* User Avatar */}
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] flex items-center justify-center font-bold text-white text-xs shadow-sm shrink-0">
-          {initials}
-        </div>
+        <Avatar className="w-9 h-9 rounded-xl shrink-0 shadow-sm">
+          {formatAvatarUrl(user?.avatarUrl) && (
+            <AvatarImage src={formatAvatarUrl(user?.avatarUrl)!} alt={displayName} className="object-cover rounded-xl" />
+          )}
+          <AvatarFallback className="rounded-xl bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] font-bold text-white text-xs">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
 
         {/* Name and Turno */}
         <div className="min-w-0 flex-1 overflow-hidden">
