@@ -114,7 +114,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       : role === "PROJECT_MANAGER"
       ? "JEFE DE PROYECTO"
       : role === "ADMIN"
-      ? "ADMINISTRADOR"
+      ? "ADMIN"
       : "TRABAJADOR";
 
   const roleAccent =
