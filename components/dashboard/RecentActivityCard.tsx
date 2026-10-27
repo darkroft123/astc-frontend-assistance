@@ -37,7 +37,7 @@ const defaultRecords: AttendanceRecordSummary[] = [
 ];
 
 export function RecentActivityCard({
-  shiftText = "Turno 08:00 - 17:00",
+  shiftText = "Horario regular",
   records = defaultRecords,
 }: RecentActivityCardProps) {
   const router = useRouter();

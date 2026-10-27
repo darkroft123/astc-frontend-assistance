@@ -157,7 +157,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             {project?.workStartTime && project?.workEndTime
               ? `${project.workStartTime} - ${project.workEndTime}`
               : "08:00 - 17:00"}
-            {(project as any)?.shiftType ? ` • ${(project as any).shiftType}` : " • Turno A"}
+            {(project as any)?.shiftType ? ` • ${(project as any).shiftType}` : ""}
           </span>
         </div>
 

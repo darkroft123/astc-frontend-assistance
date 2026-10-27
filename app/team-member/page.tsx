@@ -43,9 +43,9 @@ interface Metrics {
 }
 
 const initialMetrics: Metrics = {
-  totalAttendances: 2,
-  totalAbsences: 2,
-  pendingJustifications: 1,
+  totalAttendances: 0,
+  totalAbsences: 0,
+  pendingJustifications: 0,
 };
 
 const getInitialRange = (): DateRange => {
@@ -115,9 +115,9 @@ export default function DashboardPage() {
         );
         if (cancelled) return;
         setMetrics({
-          totalAttendances: data.totalAttendances ?? 2,
-          totalAbsences: data.totalAbsences ?? 2,
-          pendingJustifications: data.pendingJustifications ?? 1,
+          totalAttendances: data?.totalAttendances ?? 0,
+          totalAbsences: data?.totalAbsences ?? 0,
+          pendingJustifications: data?.pendingJustifications ?? 0,
         });
       } catch (err) {
         console.error("Dashboard load error:", err);
