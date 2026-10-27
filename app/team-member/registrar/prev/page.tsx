@@ -129,7 +129,7 @@ export default function AttendancePreviewPage() {
 
     try {
       await registerAttendance(token!, {
-        projectId: project?.id || "proj-testo6",
+        projectId: project?.id || "",
         latitude: lat,
         longitude: lng,
         photoUrl: base64 || undefined,
@@ -138,7 +138,7 @@ export default function AttendancePreviewPage() {
       router.push("/team-member/asistencias");
     } catch (err: any) {
       console.warn("API registerAttendance failed, updating local mock state:", err);
-      cacheTodayAttendance(project?.id || "proj-testo6", {
+      cacheTodayAttendance(project?.id || "", {
         checkIn: time ? new Date(time).toISOString() : new Date().toISOString(),
         checkOut: null,
         status: "PRESENT",
@@ -176,12 +176,12 @@ export default function AttendancePreviewPage() {
     }
 
     try {
-      await checkOut(token!, project?.id || "proj-testo6", base64 || null, lat, lng);
+      await checkOut(token!, project?.id || "", base64 || null, lat, lng);
       clearSaved();
       router.push("/team-member/asistencias");
     } catch (err: any) {
       console.warn("API checkOut failed, updating local mock state:", err);
-      cacheTodayAttendance(project?.id || "proj-testo6", {
+      cacheTodayAttendance(project?.id || "", {
         checkIn: todayAtt?.checkIn || new Date().toISOString(),
         checkOut: time ? new Date(time).toISOString() : new Date().toISOString(),
         status: "PRESENT",
@@ -201,7 +201,7 @@ export default function AttendancePreviewPage() {
     );
   }
 
-  const projectName = project?.name || "testo6";
+  const projectName = project?.name || "Proyecto";
   const displayLat = lat ?? -12.0184;
   const displayLng = lng ?? -77.0817;
 

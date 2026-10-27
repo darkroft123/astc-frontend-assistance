@@ -62,7 +62,8 @@ export async function getDashboard(
 
 /* ================= LIST ABSENCES ================= */
 
-export async function listAbsences(token: string, params: any) {
+export async function listAbsences(token: string, params: any = {}) {
+  const p = params || {};
   if (!token) throw new Error("Token de autenticación no encontrado");
 
   const res = await fetch(getUrl(), {
@@ -104,13 +105,13 @@ export async function listAbsences(token: string, params: any) {
         }
       `,
       variables: {
-        page: Number(params.page ?? 0),
-        size: Number(params.size ?? 50),
-        projectId: params.projectId || null,
-        fromDate: params.fromDate || null,
-        toDate: params.toDate || null,
-        type: params.type || null,
-        justified: params.justified ?? null,
+        page: Number(p.page ?? 0),
+        size: Number(p.size ?? 50),
+        projectId: p.projectId || null,
+        fromDate: p.fromDate || null,
+        toDate: p.toDate || null,
+        type: p.type || null,
+        justified: p.justified ?? null,
       },
     }),
   });
@@ -126,7 +127,8 @@ export async function listAbsences(token: string, params: any) {
 
 /* ================= LIST ATTENDANCE ================= */
 
-export async function listAttendance(token: string, params: any) {
+export async function listAttendance(token: string, params: any = {}) {
+  const p = params || {};
   if (!token) throw new Error("Token de autenticación no encontrado");
 
   const res = await fetch(getUrl(), {
@@ -174,10 +176,10 @@ export async function listAttendance(token: string, params: any) {
       variables: {
         page: Number.isFinite(Number(params.page ?? 0)) ? Number(params.page ?? 0) : 0,
         size: Number.isFinite(Number(params.size ?? 50)) && Number(params.size ?? 50) > 0 ? Number(params.size ?? 50) : 100,
-        projectId: params.projectId || null,
-        fromDate: params.fromDate || null,
-        toDate: params.toDate || null,
-        status: params.status || null,
+        projectId: p.projectId || null,
+        fromDate: p.fromDate || null,
+        toDate: p.toDate || null,
+        status: p.status || null,
       },
     }),
   });
@@ -371,7 +373,8 @@ export async function saveJustification(token: string, input: any) {
 
 /* ================= LIST JUSTIFICATIONS ================= */
 
-export async function listJustifications(token: string, params: any) {
+export async function listJustifications(token: string, params: any = {}) {
+  const p = params || {};
   if (!token) throw new Error("Token de autenticación no encontrado");
 
   const res = await fetch(getUrl(), {

@@ -7,6 +7,7 @@ import {
   Calendar as CalendarIcon,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
+import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import { listJustifications, submitJustification, getMyProjects } from "@/app/services/assistance.service";
 import { formatDateTime } from "@/lib/timezone";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
@@ -91,6 +92,7 @@ function getStatusBadge(estado: string) {
 }
 
 export default function TMJustificacionesPage() {
+  const { project: currentProject, projects: userProjects } = useUserProject();
   const { token, user, hydrated, checkingAuth } = useAuthGuard([
     "TEAM_MEMBER",
     "PROJECT_MANAGER",
@@ -107,6 +109,29 @@ export default function TMJustificacionesPage() {
   const [projectFilter, setProjectFilter] = useState("TODOS");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("TODOS");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const handleProj = (e: Event) => {
+        const customEvent = e as CustomEvent<string>;
+        const newId = customEvent.detail ?? localStorage.getItem("selected_project_id");
+        if (!newId || newId === "all" || newId === "TODOS") {
+          setProjectFilter("TODOS");
+        } else {
+          const matched = userProjects.find((p) => p.id === newId);
+          if (matched?.name) {
+            setProjectFilter(matched.name);
+          }
+        }
+      };
+      window.addEventListener("astc-project-changed", handleProj);
+      window.addEventListener("storage", handleProj);
+      return () => {
+        window.removeEventListener("astc-project-changed", handleProj);
+        window.removeEventListener("storage", handleProj);
+      };
+    }
+  }, [userProjects]);
+
   const [items, setItems] = useState<TMJustificationRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
@@ -165,17 +190,18 @@ export default function TMJustificacionesPage() {
     setIsLoading(true);
     try {
       const data = await listJustifications(token);
-      if (Array.isArray(data) && data.length > 0) {
-        const mapped: TMJustificationRow[] = data.map((item: any, idx: number) => ({
+      const rawList = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+      if (rawList.length > 0) {
+        const mapped: TMJustificationRow[] = rawList.map((item: any, idx: number) => ({
           id: item.id || `just-${idx}`,
           userId: item.userId || user?.id || "",
           userName: item.user?.fullName || item.userName || (user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : (user?.username || "Usuario")),
-          userRoleBadge: "Colaborador",
+          userRoleBadge: "Trabajador",
           userEmail: item.user?.email || item.userEmail || user?.email || "",
-          projectName: item.project?.name || item.projectName || "Sin proyecto asignado",
-          motivo: item.reason || "Sin motivo especificado",
+          projectName: item.project?.name || item.projectName || (userProjects?.[0]?.name || "Proyecto Joyit Innovacion 1867"),
+          motivo: item.description || item.reason || "Sin motivo especificado",
           documentUrl: item.documentUrl || null,
-          fecha: formatDateTime(item.date || item.createdAt || new Date()),
+          fecha: formatDateTime(item.absenceDate || item.submittedAt || item.date || item.createdAt || new Date()),
           estado: (item.status as any) || "SUBMITTED",
           comment: item.comment || null,
         }));
@@ -213,15 +239,14 @@ export default function TMJustificacionesPage() {
   };
 
   const projects = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((it) => {
-      if (it.projectName) set.add(it.projectName);
-    });
+    const list = userProjects && userProjects.length > 0 ? userProjects : [];
+    const fromItems = items.map((it) => it.projectName).filter(Boolean);
+    const combined = Array.from(new Set([...list.map((p) => p.name), ...fromItems]));
     return [
       { id: "TODOS", name: "Todos los proyectos" },
-      ...Array.from(set).map((name) => ({ id: name, name })),
+      ...combined.map((name) => ({ id: name, name })),
     ];
-  }, [items]);
+  }, [userProjects, items]);
 
   const filteredItems = useMemo(() => {
     return items.filter((row) => {
