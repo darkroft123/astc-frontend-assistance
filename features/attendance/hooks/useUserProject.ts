@@ -58,13 +58,14 @@ export function useUserProject() {
     }
 
     if (cachedToken !== token) {
+      console.log("[useUserProject Assistance] Token changed, clearing cache");
       cachedToken = token;
       cachedProjects = [];
       cachedPromise = null;
       hasFetched = false;
     }
 
-    if (hasFetched) {
+    if (hasFetched && cachedProjects.length > 0) {
       setProjects(cachedProjects);
       setLoadingProject(false);
       return;
@@ -72,22 +73,25 @@ export function useUserProject() {
 
     if (!cachedPromise) {
       setLoadingProject(true);
+      console.log("[useUserProject Assistance] Fetching projects for user, role:", role);
       cachedPromise = getMyProjects(token)
         .then((data) => {
+          console.log("[useUserProject Assistance] getMyProjects returned:", data?.length, "projects");
           cachedProjects = data || [];
           hasFetched = true;
           return cachedProjects;
         })
         .catch((err) => {
-          console.warn("Backend project fetch failed:", err);
+          console.error("❌ [useUserProject Assistance] Backend project fetch failed:", err);
           cachedProjects = [];
-          hasFetched = true;
+          hasFetched = false;
           return [];
         });
     }
 
     cachedPromise.then((resolved) => {
       const list = resolved || [];
+      console.log("[useUserProject Assistance] Setting projects list, total:", list.length);
       setProjects(list);
       setLoadingProject(false);
       if (typeof window !== "undefined") {
@@ -115,7 +119,7 @@ export function useUserProject() {
 
   const project =
     selectedProjectId === "all" || !selectedProjectId
-      ? (projects.length === 1 ? projects[0] : null)
+      ? null
       : projects.find((p) => p.id === selectedProjectId) || null;
 
   return {
