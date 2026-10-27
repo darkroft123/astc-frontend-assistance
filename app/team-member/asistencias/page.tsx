@@ -84,6 +84,43 @@ function formatTimeOnly(dateStr?: string | null): string {
   }
 }
 
+function renderAttendanceStatus(rawStatus?: string | null) {
+  const s = (rawStatus || "").toUpperCase();
+  if (s.includes("ON_TIME") || s === "PRESENTE" || s === "ASISTENCIA" || s === "PRESENT") {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">
+        • Puntual
+      </span>
+    );
+  }
+  if (s.includes("TARDE") || s.includes("LATE")) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/15 text-amber-500 border border-amber-500/30">
+        • Tardanza
+      </span>
+    );
+  }
+  if (s.includes("OUTSIDE") || s.includes("EARLY")) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-500/15 text-purple-400 border border-purple-500/30">
+        • Fuera de horario
+      </span>
+    );
+  }
+  if (s.includes("FALTA") || s.includes("ABSENT")) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/15 text-rose-500 border border-rose-500/30">
+        • Falta
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-500/15 text-slate-400 border border-slate-500/30">
+      • {rawStatus || "Registrado"}
+    </span>
+  );
+}
+
 function formatDateDisplay(dateStr: string): string {
   if (!dateStr) return "";
   const parts = dateStr.split("-");
@@ -178,6 +215,7 @@ export default function AttendanceHistoryPage() {
 
         const items = res?.items ?? [];
         setAttendanceRecords(items);
+        console.log("[TM Asistencias] load returned items:", items.length, "total:", res?.total);
         setTotalCount(res?.total ?? items.length);
       } catch (err) {
         console.error("Error loading attendance:", err);
@@ -437,9 +475,7 @@ export default function AttendanceHistoryPage() {
                             {formatTimeOnly(rec.checkOut)}
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber/15 text-amber border border-amber/30">
-                              Salida temprana
-                            </span>
+                            {renderAttendanceStatus(rec.status)}
                           </td>
                           <td className="py-3.5 px-4 text-center">
                             {rec.photoUrl ? (
@@ -498,9 +534,7 @@ export default function AttendanceHistoryPage() {
                         <CalendarIcon className="w-4 h-4 text-text-4" />
                         <span>{rec.date}</span>
                       </div>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber/15 text-amber border border-amber/30">
-                        • Salida temprana
-                      </span>
+                      {renderAttendanceStatus(rec.status)}
                     </div>
 
                     {/* Entrada / Salida boxes */}

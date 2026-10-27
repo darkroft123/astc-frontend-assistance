@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Eye, Pencil, Send } from "lucide-react";
+import { FileText, Eye, Pencil, Send, Loader2 } from "lucide-react";
 import type { TMJustificationRow } from "../page";
 
 interface JustificacionesDesktopTableProps {
@@ -9,6 +9,7 @@ interface JustificacionesDesktopTableProps {
   getStatusBadge: (estado: string) => { label: string; cls: string; dot: string };
   onSubmit: (id: string) => void;
   submittingId: string | null;
+  isLoading?: boolean;
 }
 
 export function JustificacionesDesktopTable({
@@ -16,6 +17,7 @@ export function JustificacionesDesktopTable({
   getStatusBadge,
   onSubmit,
   submittingId,
+  isLoading = false,
 }: JustificacionesDesktopTableProps) {
   return (
     <div className="hidden md:block rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
@@ -32,7 +34,16 @@ export function JustificacionesDesktopTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {items.length === 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="py-12 text-center text-muted-foreground text-xs">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin text-[#A855F7]" />
+                    <span>Cargando justificaciones...</span>
+                  </div>
+                </td>
+              </tr>
+            ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-12 text-center text-muted-foreground text-xs">
                   No se encontraron justificaciones.

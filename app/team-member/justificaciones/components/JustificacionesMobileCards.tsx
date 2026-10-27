@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Eye, Pencil, Send } from "lucide-react";
+import { FileText, Eye, Pencil, Send, Loader2 } from "lucide-react";
 import type { TMJustificationRow } from "../page";
 
 interface JustificacionesMobileCardsProps {
@@ -9,6 +9,7 @@ interface JustificacionesMobileCardsProps {
   getStatusBadge: (estado: string) => { label: string; cls: string; dot: string };
   onSubmit: (id: string) => void;
   submittingId: string | null;
+  isLoading?: boolean;
 }
 
 export function JustificacionesMobileCards({
@@ -16,7 +17,17 @@ export function JustificacionesMobileCards({
   getStatusBadge,
   onSubmit,
   submittingId,
+  isLoading = false,
 }: JustificacionesMobileCardsProps) {
+  if (isLoading) {
+    return (
+      <div className="md:hidden py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60 flex items-center justify-center gap-2">
+        <Loader2 className="w-5 h-5 animate-spin text-[#A855F7]" />
+        <span>Cargando justificaciones...</span>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="md:hidden py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60">

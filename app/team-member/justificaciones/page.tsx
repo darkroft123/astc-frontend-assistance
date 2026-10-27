@@ -101,9 +101,12 @@ export default function TMJustificacionesPage() {
 
   const [activePeriod, setActivePeriod] = useState<Period>("month");
   const [dateRangeModalOpen, setDateRangeModalOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: "01/09/2026",
-    to: "30/09/2026",
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const today = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const fmt = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+    const first = new Date(today.getFullYear(), today.getMonth(), 1);
+    return { from: fmt(first), to: fmt(today) };
   });
 
   const [projectFilter, setProjectFilter] = useState("TODOS");
@@ -191,6 +194,7 @@ export default function TMJustificacionesPage() {
     try {
       const data = await listJustifications(token);
       const rawList = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : []);
+      console.log("[TM Justificaciones] fetchData received items:", rawList.length);
       if (rawList.length > 0) {
         const mapped: TMJustificationRow[] = rawList.map((item: any, idx: number) => ({
           id: item.id || `just-${idx}`,
@@ -453,6 +457,7 @@ export default function TMJustificacionesPage() {
           getStatusBadge={getStatusBadge}
           onSubmit={handleSubmit}
           submittingId={submittingId}
+          isLoading={isLoading}
         />
 
         {/* 7. DESKTOP TABLE VIEW */}
@@ -461,6 +466,7 @@ export default function TMJustificacionesPage() {
           getStatusBadge={getStatusBadge}
           onSubmit={handleSubmit}
           submittingId={submittingId}
+          isLoading={isLoading}
         />
 
         {/* 8. PAGINATION FOOTER */}
