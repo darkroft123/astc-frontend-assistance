@@ -503,33 +503,31 @@ export default function VacationsPage() {
               <p className="text-xs text-text-4 font-mono">
                 {filtered.length} {filtered.length === 1 ? "registro total" : "registros totales"}
               </p>
-              {totalPages > 1 && (
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-text-3 font-medium">
-                    Página <strong className="text-foreground">{page}</strong> de {totalPages}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 w-8 p-0 rounded-lg border-border"
-                      disabled={page <= 1}
-                      onClick={() => setPage(p => Math.max(1, p - 1))}
-                    >
-                      &larr;
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-8 w-8 p-0 rounded-lg border-border"
-                      disabled={page >= totalPages}
-                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    >
-                      &rarr;
-                    </Button>
-                  </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-text-3 font-medium">
+                  Página <strong className="text-foreground">{page}</strong> de {totalPages}
+                </span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-lg border-border"
+                    disabled={page <= 1}
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                  >
+                    &larr;
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-lg border-border"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  >
+                    &rarr;
+                  </Button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>

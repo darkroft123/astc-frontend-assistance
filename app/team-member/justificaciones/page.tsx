@@ -272,6 +272,18 @@ export default function TMJustificacionesPage() {
   }, [items, projectFilter, statusFilter, search]);
 
   const total = filteredItems.length;
+  const PAGE_SIZE = 5;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const currentPage = Math.min(Math.max(1, page), totalPages);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredItems.slice(start, start + PAGE_SIZE);
+  }, [filteredItems, currentPage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [projectFilter, statusFilter, search, activePeriod]);
+
   const pendientes = filteredItems.filter(
     (i) => i.estado === "PENDING" || i.estado === "SUBMITTED"
   ).length;
@@ -453,7 +465,7 @@ export default function TMJustificacionesPage() {
 
         {/* 6. MOBILE CARDS VIEW */}
         <JustificacionesMobileCards
-          items={filteredItems}
+          items={paginatedItems}
           getStatusBadge={getStatusBadge}
           onSubmit={handleSubmit}
           submittingId={submittingId}
@@ -462,7 +474,7 @@ export default function TMJustificacionesPage() {
 
         {/* 7. DESKTOP TABLE VIEW */}
         <JustificacionesDesktopTable
-          items={filteredItems}
+          items={paginatedItems}
           getStatusBadge={getStatusBadge}
           onSubmit={handleSubmit}
           submittingId={submittingId}
@@ -472,9 +484,10 @@ export default function TMJustificacionesPage() {
         {/* 8. PAGINATION FOOTER */}
         <JustificacionesPagination
           total={total}
-          page={page}
+          page={currentPage}
+          totalPages={totalPages}
           onPrevPage={() => setPage((p) => Math.max(1, p - 1))}
-          onNextPage={() => {}}
+          onNextPage={() => setPage((p) => Math.min(totalPages, p + 1))}
         />
       </div>
     </div>

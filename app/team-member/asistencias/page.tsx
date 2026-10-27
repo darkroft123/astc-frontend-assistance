@@ -458,6 +458,10 @@ export default function AttendanceHistoryPage() {
                   ) : (
                     filteredRecords.map((rec, idx) => {
                       const isEven = idx % 2 === 0;
+                      const photos = (rec.photoUrl || "").split(",").map((p) => p.trim()).filter(Boolean);
+                      const checkInPhoto = photos.find((p) => !p.toLowerCase().includes("_checkout") && !p.toLowerCase().includes("checkout")) || null;
+                      const checkOutPhoto = photos.find((p) => p.toLowerCase().includes("_checkout") || p.toLowerCase().includes("checkout")) || null;
+
                       return (
                         <tr
                           key={rec.id || idx}
@@ -469,26 +473,70 @@ export default function AttendanceHistoryPage() {
                             {rec.date}
                           </td>
                           <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                            {formatTimeOnly(rec.checkIn)}
+                            <div className="flex items-center gap-1.5">
+                              <span>{formatTimeOnly(rec.checkIn)}</span>
+                              {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                                  className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                  title="Ver foto de entrada"
+                                >
+                                  <Camera className="w-3.5 h-3.5 text-primary" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                            {formatTimeOnly(rec.checkOut)}
+                            <div className="flex items-center gap-1.5">
+                              <span>{formatTimeOnly(rec.checkOut)}</span>
+                              {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                                  className="p-1 text-muted-foreground hover:text-amber-500 transition-colors cursor-pointer"
+                                  title="Ver foto de salida"
+                                >
+                                  <Camera className="w-3.5 h-3.5 text-amber-500" />
+                                </button>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3.5 px-4">
                             {renderAttendanceStatus(rec.status)}
                           </td>
                           <td className="py-3.5 px-4 text-center">
-                            {rec.photoUrl ? (
-                              <button
-                                onClick={() => setSelectedPhotoUrl(rec.photoUrl!)}
-                                className="w-8 h-8 rounded-lg overflow-hidden border border-border inline-block hover:scale-105 transition-transform cursor-pointer"
-                              >
-                                <img
-                                  src={rec.photoUrl}
-                                  alt="Foto"
-                                  className="w-full h-full object-cover"
-                                />
-                              </button>
+                            {checkInPhoto || checkOutPhoto ? (
+                              <div className="flex items-center justify-center gap-1.5">
+                                {checkInPhoto && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                                    className="w-8 h-8 rounded-lg overflow-hidden border border-primary/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                    title="Foto de entrada"
+                                  >
+                                    <img
+                                      src={formatAvatarUrl(checkInPhoto) || checkInPhoto}
+                                      alt="Foto entrada"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </button>
+                                )}
+                                {checkOutPhoto && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                                    className="w-8 h-8 rounded-lg overflow-hidden border border-amber-500/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                    title="Foto de salida"
+                                  >
+                                    <img
+                                      src={formatAvatarUrl(checkOutPhoto) || checkOutPhoto}
+                                      alt="Foto salida"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </button>
+                                )}
+                              </div>
                             ) : (
                               <div className="w-8 h-8 rounded-lg bg-raised border border-border/80 inline-flex items-center justify-center text-text-4">
                                 <Camera className="w-4 h-4" />
@@ -523,7 +571,12 @@ export default function AttendanceHistoryPage() {
                   No se encontraron registros de asistencia
                 </div>
               ) : (
-                filteredRecords.map((rec, idx) => (
+                filteredRecords.map((rec, idx) => {
+                  const photos = (rec.photoUrl || "").split(",").map((p) => p.trim()).filter(Boolean);
+                  const checkInPhoto = photos.find((p) => !p.toLowerCase().includes("_checkout") && !p.toLowerCase().includes("checkout")) || null;
+                  const checkOutPhoto = photos.find((p) => p.toLowerCase().includes("_checkout") || p.toLowerCase().includes("checkout")) || null;
+
+                  return (
                   <div
                     key={rec.id || idx}
                     className="rounded-2xl border border-border/70 bg-surface/50 p-4 space-y-3"
@@ -543,30 +596,69 @@ export default function AttendanceHistoryPage() {
                         <span className="block font-mono text-[9.5px] uppercase tracking-wider text-violet-400 font-semibold mb-0.5">
                           ENTRADA
                         </span>
-                        <span className="font-mono text-xs font-bold text-foreground">
-                          {formatTimeOnly(rec.checkIn)}
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-xs font-bold text-foreground">
+                            {formatTimeOnly(rec.checkIn)}
+                          </span>
+                          {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                              className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                              title="Ver foto de entrada"
+                            >
+                              <Camera className="w-3.5 h-3.5 text-primary" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="bg-raised/70 border border-border/60 rounded-xl p-2.5">
                         <span className="block font-mono text-[9.5px] uppercase tracking-wider text-violet-400 font-semibold mb-0.5">
                           SALIDA
                         </span>
-                        <span className="font-mono text-xs font-bold text-foreground">
-                          {formatTimeOnly(rec.checkOut)}
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-xs font-bold text-foreground">
+                            {formatTimeOnly(rec.checkOut)}
+                          </span>
+                          {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                              className="p-1 text-muted-foreground hover:text-amber-500 transition-colors cursor-pointer"
+                              title="Ver foto de salida"
+                            >
+                              <Camera className="w-3.5 h-3.5 text-amber-500" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
 
                     {/* Actions row: Foto button & Location */}
                     <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
-                      {rec.photoUrl ? (
-                        <button
-                          onClick={() => setSelectedPhotoUrl(rec.photoUrl!)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/70 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
-                        >
-                          <Camera className="w-3.5 h-3.5 text-text-3" />
-                          <span>Ver foto</span>
-                        </button>
+                      {checkInPhoto || checkOutPhoto ? (
+                        <div className="flex items-center gap-1.5">
+                          {checkInPhoto && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-primary/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                            >
+                              <Camera className="w-3.5 h-3.5 text-primary" />
+                              <span>Foto entrada</span>
+                            </button>
+                          )}
+                          {checkOutPhoto && (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                            >
+                              <Camera className="w-3.5 h-3.5 text-amber-500" />
+                              <span>Foto salida</span>
+                            </button>
+                          )}
+                        </div>
                       ) : (
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/50 bg-raised/50 text-xs text-text-4">
                           <Camera className="w-3.5 h-3.5" />
@@ -580,7 +672,8 @@ export default function AttendanceHistoryPage() {
                       </div>
                     </div>
                   </div>
-                ))
+                );
+                })
               )}
             </div>
 
