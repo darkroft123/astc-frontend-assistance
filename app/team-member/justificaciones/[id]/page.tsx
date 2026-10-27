@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react";
+import { getJustificationDetail, submitJustification } from "@/app/services/assistance.service";
 function formatDate(value?: string | null) {
   if (!value) return "-";
   try {
