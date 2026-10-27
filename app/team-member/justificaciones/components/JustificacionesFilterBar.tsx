@@ -38,7 +38,7 @@ export function JustificacionesFilterBar({
             className="w-full h-10 pl-9 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
           >
             {projects.map((p) => (
-              <option key={p.id} value={p.id} className="bg-card text-foreground">
+              <option key={p.id} value={p.id} className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
                 {p.name}
               </option>
             ))}
@@ -71,11 +71,11 @@ export function JustificacionesFilterBar({
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full h-10 px-3 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
           >
-            <option value="TODOS" className="bg-card text-foreground">Todos los estados</option>
-            <option value="SUBMITTED" className="bg-card text-foreground">Enviada</option>
-            <option value="APPROVED" className="bg-card text-foreground">Aprobada</option>
-            <option value="OBSERVATION" className="bg-card text-foreground">Observación</option>
-            <option value="REJECTED" className="bg-card text-foreground">Rechazada</option>
+            <option value="TODOS" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Todos los estados</option>
+            <option value="SUBMITTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Enviada</option>
+            <option value="APPROVED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Aprobada</option>
+            <option value="OBSERVATION" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Observación</option>
+            <option value="REJECTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Rechazada</option>
           </select>
           <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
         </div>
