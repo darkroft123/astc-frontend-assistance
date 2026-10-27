@@ -28,6 +28,7 @@ export function useCamera() {
   const streamRef = useRef<MediaStream | null>(null);
   const isMountedRef = useRef<boolean>(true);
   const isStartingRef = useRef<boolean>(false);
+  const hasPermissionErrorRef = useRef<boolean>(false);
 
   const [cameraOn, setCameraOn] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null);
@@ -86,6 +87,7 @@ export function useCamera() {
         return;
       }
 
+      if (hasPermissionErrorRef.current) return;
       // Prevent concurrent startCamera calls
       if (isStartingRef.current) return;
       isStartingRef.current = true;
