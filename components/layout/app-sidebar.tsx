@@ -46,28 +46,34 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const [attendanceLabel, setAttendanceLabel] = useState("Registrar asistencia");
 
   useEffect(() => {
-    if (!hydrated || !token || !project?.id) {
+    if (!hydrated || !token) {
       setAttendanceLabel("Registrar asistencia");
       return;
     }
-    const ctrl = new AbortController();
-    const url = getGraphQLUrl();
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        query: `query($p:String){getTodayAttendance(projectId:$p){checkIn checkOut}}`,
-        variables: { p: project.id },
-      }),
-      signal: ctrl.signal,
-    })
-      .then((r) => r.json())
-      .then((j) => {
-        const a = j?.data?.getTodayAttendance;
-        setAttendanceLabel(a?.checkIn && !a?.checkOut ? "Marcar Salida" : "Registrar asistencia");
+    const updateLabel = () => {
+      const url = getGraphQLUrl();
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          query: "query($p:String){ byProj: getTodayAttendance(projectId:$p){checkIn checkOut} anyProj: getTodayAttendance{checkIn checkOut} }",
+          variables: { p: project?.id || null },
+        }),
       })
-      .catch(() => setAttendanceLabel("Registrar asistencia"));
-    return () => ctrl.abort();
+        .then((r) => r.json())
+        .then((j) => {
+          const a = j?.data?.byProj || j?.data?.anyProj;
+          setAttendanceLabel(a?.checkIn && !a?.checkOut ? "Marcar salida" : "Registrar asistencia");
+        })
+        .catch(() => setAttendanceLabel("Registrar asistencia"));
+    };
+    updateLabel();
+    window.addEventListener("astc-attendance-updated", updateLabel);
+    window.addEventListener("focus", updateLabel);
+    return () => {
+      window.removeEventListener("astc-attendance-updated", updateLabel);
+      window.removeEventListener("focus", updateLabel);
+    };
   }, [hydrated, token, project?.id]);
 
   useEffect(() => {
