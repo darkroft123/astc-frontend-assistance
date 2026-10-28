@@ -33,6 +33,7 @@ import { listAttendance } from "@/app/services/assistance.service";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
 import { formatLocalTime, getEffectiveTimezone } from "@/lib/timezone";
 import { formatAvatarUrl } from "@/lib/avatar-url";
+import { formatAttendanceTime } from "@/lib/timezone";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
 
@@ -69,19 +70,8 @@ type AttendanceRecord = {
 
 
 
-function formatTimeOnly(dateStr?: string | null): string {
-  if (!dateStr) return "—";
-  try {
-    const d = new Date(dateStr.endsWith("Z") || dateStr.includes("+") ? dateStr : `${dateStr}Z`);
-    if (isNaN(d.getTime())) return dateStr;
-    const h = d.getHours();
-    const m = String(d.getMinutes()).padStart(2, "0");
-    const ampm = h >= 12 ? "p. m." : "a. m.";
-    const h12 = h % 12 || 12;
-    return `${String(h12).padStart(2, "0")}:${m} ${ampm}`;
-  } catch {
-    return dateStr;
-  }
+function formatTimeOnly(timeStr?: string | null, dateStr?: string | null): string {
+  return formatAttendanceTime(timeStr, dateStr);
 }
 
 function renderAttendanceStatus(rawStatus?: string | null) {
@@ -474,7 +464,7 @@ export default function AttendanceHistoryPage() {
                           </td>
                           <td className="py-3.5 px-4 font-mono text-muted-foreground">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatTimeOnly(rec.checkIn)}</span>
+                              <span>{formatTimeOnly(rec.checkIn, rec.date)}</span>
                               {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
                                 <button
                                   type="button"
@@ -489,7 +479,7 @@ export default function AttendanceHistoryPage() {
                           </td>
                           <td className="py-3.5 px-4 font-mono text-muted-foreground">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatTimeOnly(rec.checkOut)}</span>
+                              <span>{formatTimeOnly(rec.checkOut, rec.date)}</span>
                               {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
                                 <button
                                   type="button"
@@ -546,7 +536,7 @@ export default function AttendanceHistoryPage() {
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-1.5 text-blue text-xs font-medium">
                               <MapPin className="w-3.5 h-3.5 text-blue shrink-0" />
-                              <span>{rec.locationName || "Condevilla Señor"}</span>
+                              <span>{rec.locationName || "Ubicación registrada"}</span>
                             </div>
                           </td>
                         </tr>
@@ -598,7 +588,7 @@ export default function AttendanceHistoryPage() {
                         </span>
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-bold text-foreground">
-                            {formatTimeOnly(rec.checkIn)}
+                            {formatTimeOnly(rec.checkIn, rec.date)}
                           </span>
                           {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
                             <button
@@ -618,7 +608,7 @@ export default function AttendanceHistoryPage() {
                         </span>
                         <div className="flex items-center justify-between">
                           <span className="font-mono text-xs font-bold text-foreground">
-                            {formatTimeOnly(rec.checkOut)}
+                            {formatTimeOnly(rec.checkOut, rec.date)}
                           </span>
                           {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
                             <button
@@ -668,7 +658,7 @@ export default function AttendanceHistoryPage() {
 
                       <div className="flex items-center gap-1.5 text-blue text-xs font-medium truncate">
                         <MapPin className="w-3.5 h-3.5 text-blue shrink-0" />
-                        <span className="truncate">{rec.locationName || "Condevilla Señor"}</span>
+                        <span className="truncate">{rec.locationName || "Ubicación registrada"}</span>
                       </div>
                     </div>
                   </div>
