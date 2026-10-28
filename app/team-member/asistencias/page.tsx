@@ -462,9 +462,9 @@ export default function AttendanceHistoryPage() {
                           <td className="py-3.5 px-4 font-mono font-medium text-foreground">
                             {rec.date}
                           </td>
-                          <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                          <td className="py-3.5 px-4 font-mono text-muted-foreground whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatTimeOnly(rec.checkIn, rec.date)}</span>
+                              <span className="whitespace-nowrap">{formatTimeOnly(rec.checkIn, rec.date)}</span>
                               {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
                                 <button
                                   type="button"
@@ -477,9 +477,9 @@ export default function AttendanceHistoryPage() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                          <td className="py-3.5 px-4 font-mono text-muted-foreground whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatTimeOnly(rec.checkOut, rec.date)}</span>
+                              <span className="whitespace-nowrap">{formatTimeOnly(rec.checkOut, rec.date)}</span>
                               {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
                                 <button
                                   type="button"
