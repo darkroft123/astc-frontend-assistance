@@ -58,7 +58,6 @@ export function useUserProject() {
     }
 
     if (cachedToken !== token) {
-      console.log("[useUserProject Assistance] Token changed, clearing cache");
       cachedToken = token;
       cachedProjects = [];
       cachedPromise = null;
@@ -73,16 +72,13 @@ export function useUserProject() {
 
     if (!cachedPromise) {
       setLoadingProject(true);
-      console.log("[useUserProject Assistance] Fetching projects for user, role:", role);
       cachedPromise = getMyProjects(token)
         .then((data) => {
-          console.log("[useUserProject Assistance] getMyProjects returned:", data?.length, "projects");
           cachedProjects = data || [];
           hasFetched = true;
           return cachedProjects;
         })
-        .catch((err) => {
-          console.error("❌ [useUserProject Assistance] Backend project fetch failed:", err);
+        .catch(() => {
           cachedProjects = [];
           hasFetched = false;
           return [];
@@ -91,7 +87,6 @@ export function useUserProject() {
 
     cachedPromise.then((resolved) => {
       const list = resolved || [];
-      console.log("[useUserProject Assistance] Setting projects list, total:", list.length);
       setProjects(list);
       setLoadingProject(false);
       if (typeof window !== "undefined") {

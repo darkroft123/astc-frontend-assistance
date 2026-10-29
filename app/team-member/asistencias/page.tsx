@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SubMetricCard } from "@/components/dashboard/SubMetricCard";
+import { LocationCell } from "@/components/atoms/LocationCell";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { listAttendance } from "@/app/services/assistance.service";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
@@ -534,10 +535,7 @@ export default function AttendanceHistoryPage() {
                             )}
                           </td>
                           <td className="py-3.5 px-4">
-                            <div className="flex items-center gap-1.5 text-blue text-xs font-medium">
-                              <MapPin className="w-3.5 h-3.5 text-blue shrink-0" />
-                              <span>{rec.locationName || "Ubicación registrada"}</span>
-                            </div>
+                            <LocationCell lat={rec.latitude} lng={rec.longitude} />
                           </td>
                         </tr>
                       );
@@ -656,9 +654,8 @@ export default function AttendanceHistoryPage() {
                         </div>
                       )}
 
-                      <div className="flex items-center gap-1.5 text-blue text-xs font-medium truncate">
-                        <MapPin className="w-3.5 h-3.5 text-blue shrink-0" />
-                        <span className="truncate">{rec.locationName || "Ubicación registrada"}</span>
+                      <div className="flex items-center text-xs font-medium truncate">
+                        <LocationCell lat={rec.latitude} lng={rec.longitude} />
                       </div>
                     </div>
                   </div>

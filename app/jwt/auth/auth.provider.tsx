@@ -125,7 +125,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       (typeof localStorage !== "undefined" && localStorage.getItem("theme")) ||
       (typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light");
     if (typeof document !== "undefined") {
+      const isJoyit = window.location.hostname.includes('joyit.io');
+      if (isJoyit) {
+        document.cookie = `theme=${currentTheme}; domain=.joyit.io; path=/; max-age=31536000; SameSite=Lax`;
+      }
       document.cookie = `theme=${currentTheme}; path=/; max-age=31536000; SameSite=Lax`;
+      localStorage.setItem('theme', currentTheme);
     }
     const targetUrl = getApiBaseUrl(3003);
     const sep = targetUrl.includes("?") ? "&" : "?";
