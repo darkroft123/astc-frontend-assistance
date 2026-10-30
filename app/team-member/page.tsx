@@ -1,29 +1,24 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  User,
   Clock,
   XCircle,
   TrendingUp,
-  AlertTriangle,
-  FolderKanban,
   Loader2,
   CheckCircle2,
   Calendar as CalendarIcon,
-  Bell,
   ArrowRight,
-  LogOut,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
-import { getDashboard, getTodayAttendance } from "@/app/services/assistance.service";
+import { getDashboard, getTodayAttendance, listAttendance } from "@/app/services/assistance.service";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { GeneralSummaryCard } from "@/components/dashboard/GeneralSummaryCard";
 import { QuickActions } from "@/components/dashboard/QuickActions";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
+import { RecentActivityCard, type AttendanceRecordSummary } from "@/components/dashboard/RecentActivityCard";
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
 
@@ -48,6 +43,16 @@ const initialMetrics: Metrics = {
   pendingJustifications: 0,
 };
 
+const WEEKDAYS = [
+  "Domingo",
+  "Lunes",
+  "Martes",
+  "Miércoles",
+  "Jueves",
+  "Viernes",
+  "Sábado",
+];
+
 const getInitialRange = (): DateRange => {
   const today = new Date();
   const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -70,6 +75,25 @@ function formatDateDisplay(dateStr: string): string {
   return dateStr;
 }
 
+function parseMinutes(timeStr?: string | null): number | null {
+  if (!timeStr) return null;
+  const parts = timeStr.split(":");
+  if (parts.length < 2) return null;
+  const h = Number(parts[0]);
+  const m = Number(parts[1]);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+  return h * 60 + m;
+}
+
+function formatDayName(isoDate?: string): string {
+  if (!isoDate) return "";
+  const parts = isoDate.split("-");
+  if (parts.length !== 3) return isoDate;
+  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  if (Number.isNaN(d.getTime())) return isoDate;
+  return `${WEEKDAYS[d.getDay()]} ${parts[2]}/${parts[1]}`;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics);
@@ -77,20 +101,22 @@ export default function DashboardPage() {
   const [dateRange, setDateRange] = useState<DateRange>(getInitialRange());
   const [isEntryDone, setIsEntryDone] = useState(false);
   const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [recentRecords, setRecentRecords] = useState<AttendanceRecordSummary[]>([]);
+  const [accumulatedHoursText, setAccumulatedHoursText] = useState<string>("0 h 00 m");
 
-  const { hydrated, token, user, role, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
-  const { project, projects, selectProject, loadingProject, selectedProjectId } = useUserProject();
+  const { hydrated, token, user, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
+  const { project, selectedProjectId } = useUserProject();
 
   const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : user?.username || user?.email || "Colaborador";
   const projectName = project?.name || "Sin proyecto asignado";
   const startTime = project?.workStartTime?.slice(0, 5) || "08:00";
   const endTime = project?.workEndTime?.slice(0, 5) || "17:00";
 
-  const totalDays = metrics.totalAttendances + metrics.totalAbsences;
+  const totalDays = metrics.totalAttendances + metrics.totalAbsences + metrics.pendingJustifications;
   const attendanceRate =
     totalDays > 0
       ? Math.round((metrics.totalAttendances / totalDays) * 100)
-      : 50;
+      : 0;
 
   useEffect(() => {
     if (!hydrated || checkingAuth || !token || !project?.id) return;
@@ -107,18 +133,79 @@ export default function DashboardPage() {
     const load = async () => {
       try {
         setLoadingMetrics(true);
-        const data = await getDashboard(
-          token,
-          dateRange.fromDate,
-          dateRange.toDate,
-          (!selectedProjectId || selectedProjectId === "all") ? undefined : project?.id
-        );
+        const targetProjectId = (!selectedProjectId || selectedProjectId === "all") ? undefined : project?.id;
+        const [data, attRes] = await Promise.all([
+          getDashboard(
+            token,
+            dateRange.fromDate,
+            dateRange.toDate,
+            targetProjectId
+          ).catch(() => null),
+          listAttendance(token, {
+            page: 0,
+            size: 100,
+            fromDate: dateRange.fromDate,
+            toDate: dateRange.toDate,
+            projectId: targetProjectId,
+          }).catch(() => null),
+        ]);
         if (cancelled) return;
         setMetrics({
           totalAttendances: data?.totalAttendances ?? 0,
           totalAbsences: data?.totalAbsences ?? 0,
           pendingJustifications: data?.pendingJustifications ?? 0,
         });
+
+        const items = Array.isArray(attRes?.items) ? attRes.items : [];
+        let totalMins = 0;
+        for (const item of items) {
+          const inM = parseMinutes(item.checkIn);
+          const outM = parseMinutes(item.checkOut);
+          if (inM !== null && outM !== null) {
+            let diff = outM - inM;
+            if (diff < 0) diff += 24 * 60;
+            totalMins += diff;
+          }
+        }
+        setAccumulatedHoursText(
+          `${Math.floor(totalMins / 60)} h ${String(totalMins % 60).padStart(2, "0")} m`
+        );
+
+        const mappedRecent: AttendanceRecordSummary[] = items.slice(0, 3).map((item: any) => {
+          const statusUpper = String(item.status || "").toUpperCase();
+          const hasCheckOut = Boolean(item.checkOut);
+          const status: "Presente" | "Pendiente" | "Falta" =
+            statusUpper.includes("ABSENT") || statusUpper.includes("FALTA")
+              ? "Falta"
+              : !hasCheckOut
+              ? "Pendiente"
+              : "Presente";
+
+          const inM = parseMinutes(item.checkIn);
+          const outM = parseMinutes(item.checkOut);
+          let durationText = "—";
+          if (inM !== null && outM !== null) {
+            let diff = outM - inM;
+            if (diff < 0) diff += 24 * 60;
+            durationText = `${Math.floor(diff / 60)} h ${String(diff % 60).padStart(2, "0")} m`;
+          }
+
+          const inShort = item.checkIn ? String(item.checkIn).slice(0, 5) : "";
+          const outShort = item.checkOut ? String(item.checkOut).slice(0, 5) : "";
+          const timesText = hasCheckOut
+            ? `Entrada ${inShort} · Salida ${outShort}`
+            : inShort
+            ? `Entrada ${inShort}`
+            : "Sin marcaje registrado";
+
+          return {
+            dayName: formatDayName(item.date),
+            timesText,
+            durationText,
+            status,
+          };
+        });
+        setRecentRecords(mappedRecent);
       } catch (err) {
         console.error("Dashboard load error:", err);
       } finally {
@@ -137,6 +224,7 @@ export default function DashboardPage() {
     token,
     user,
     selectedProjectId,
+    project?.id,
     dateRange.fromDate,
     dateRange.toDate,
   ]);
@@ -304,8 +392,8 @@ export default function DashboardPage() {
             topLabel="Presentes"
             topLabelColor="green"
             color="green"
-            value={metrics.totalAttendances ?? 2}
-            valueSuffix={`de ${totalDays > 0 ? totalDays : 4} días`}
+            value={metrics.totalAttendances ?? 0}
+            valueSuffix={`de ${totalDays} días`}
             bottomContent={
               <p className="font-sans text-xs text-muted-foreground truncate">
                 Asistencias registradas
@@ -319,7 +407,7 @@ export default function DashboardPage() {
             topLabel="Por justificar"
             topLabelColor="amber"
             color="amber"
-            value={metrics.pendingJustifications ?? 1}
+            value={metrics.pendingJustifications ?? 0}
             valueSuffix="pendiente"
             bottomContent={
               <Link
@@ -338,11 +426,11 @@ export default function DashboardPage() {
             topLabel="Ausentes"
             topLabelColor="red"
             color="red"
-            value={metrics.totalAbsences ?? 2}
+            value={metrics.totalAbsences ?? 0}
             valueSuffix="faltas"
             bottomContent={
               <p className="font-sans text-xs text-muted-foreground truncate">
-                1 sin justificación
+                {metrics.totalAbsences > 0 ? `${metrics.totalAbsences} en este periodo` : "Sin faltas registradas"}
               </p>
             }
           />
@@ -353,13 +441,13 @@ export default function DashboardPage() {
             topLabel="Meta 90%"
             topLabelColor="violet"
             color="violet"
-            value={`${attendanceRate || 50}%`}
+            value={`${attendanceRate}%`}
             valueSuffix="cumplimiento"
             bottomContent={
               <div className="w-full bg-raised h-1.5 rounded-full overflow-hidden mt-1.5 border border-line">
                 <div
                   className="bg-brand-gradient h-full rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, attendanceRate || 50)}%` }}
+                  style={{ width: `${Math.min(100, attendanceRate)}%` }}
                 />
               </div>
             }
@@ -374,8 +462,8 @@ export default function DashboardPage() {
               selectedProject={{ name: projectName }}
               attendanceRate={attendanceRate}
               metrics={metrics}
-              dateRangeText={`${totalDays > 0 ? totalDays : 5} registros entre el ${formatDateDisplay(dateRange.fromDate)} y el ${formatDateDisplay(dateRange.toDate)}`}
-              accumulatedHoursText="16 h 20 m"
+              dateRangeText={`${totalDays} registros entre el ${formatDateDisplay(dateRange.fromDate)} y el ${formatDateDisplay(dateRange.toDate)}`}
+              accumulatedHoursText={accumulatedHoursText}
             />
           </div>
 
@@ -384,6 +472,7 @@ export default function DashboardPage() {
             <QuickActions pendingCount={metrics.pendingJustifications} />
             <RecentActivityCard
               shiftText={`Turno ${startTime} - ${endTime}`}
+              records={recentRecords}
             />
           </div>
         </div>

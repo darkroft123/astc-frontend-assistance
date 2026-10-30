@@ -18,33 +18,35 @@ interface GeneralSummaryCardProps {
 
 export function GeneralSummaryCard({
   selectedProject,
-  attendanceRate = 50,
+  attendanceRate,
   metrics,
   teamMembersCount,
   pmsCount,
   adminsCount,
   dateRangeText,
-  accumulatedHoursText = "16 h 20 m",
+  accumulatedHoursText = "0 h 00 m",
 }: GeneralSummaryCardProps) {
-  const att = metrics?.totalAttendances ?? teamMembersCount ?? 2;
-  const abs = metrics?.totalAbsences ?? adminsCount ?? 2;
-  const pend = metrics?.pendingJustifications ?? pmsCount ?? 1;
+  const att = metrics?.totalAttendances ?? teamMembersCount ?? 0;
+  const abs = metrics?.totalAbsences ?? adminsCount ?? 0;
+  const pend = metrics?.pendingJustifications ?? pmsCount ?? 0;
 
   const total = att + abs + pend;
-  const calculatedRate = attendanceRate ?? (total > 0 ? Math.round((att / total) * 100) : 50);
+  const calculatedRate = attendanceRate ?? (total > 0 ? Math.round((att / total) * 100) : 0);
 
-  const attPct = total > 0 ? Math.round((att / total) * 100) : 40;
-  const absPct = total > 0 ? Math.round((abs / total) * 100) : 40;
-  const pendPct = total > 0 ? 100 - attPct - absPct : 20;
+  const attPct = total > 0 ? Math.round((att / total) * 100) : 0;
+  const absPct = total > 0 ? Math.round((abs / total) * 100) : 0;
+  const pendPct = total > 0 ? Math.max(0, 100 - attPct - absPct) : 0;
 
   const R = 38;
   const C = 2 * Math.PI * R;
   const GAP = 5;
-  const totalAvailable = C - 3 * GAP;
+  const nonZeroCount = (att > 0 ? 1 : 0) + (abs > 0 ? 1 : 0) + (pend > 0 ? 1 : 0);
+  const effectiveGap = nonZeroCount > 1 ? GAP : 0;
+  const totalAvailable = C - nonZeroCount * effectiveGap;
 
-  const attLen = total > 0 ? (att / total) * totalAvailable : 0.4 * totalAvailable;
-  const absLen = total > 0 ? (abs / total) * totalAvailable : 0.4 * totalAvailable;
-  const pendLen = total > 0 ? (pend / total) * totalAvailable : 0.2 * totalAvailable;
+  const attLen = total > 0 ? (att / total) * totalAvailable : 0;
+  const absLen = total > 0 ? (abs / total) * totalAvailable : 0;
+  const pendLen = total > 0 ? (pend / total) * totalAvailable : 0;
 
   return (
     <Card className="h-full rounded-2xl shadow-sm overflow-hidden border border-border/70 bg-card flex flex-col justify-between">
@@ -54,7 +56,7 @@ export function GeneralSummaryCard({
           <div>
             <h3 className="font-bold text-lg text-foreground">Resumen del periodo</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {dateRangeText || "5 registros entre el 01 y el 03 de septiembre"}
+              {dateRangeText || "0 registros en el periodo seleccionado"}
             </p>
           </div>
           <span className="font-semibold text-xs bg-violet/10 text-violet px-3 py-1 rounded-full border border-violet/20">
@@ -78,38 +80,44 @@ export function GeneralSummaryCard({
               />
 
               {/* Asistencias (Green) */}
-              <circle
-                cx="50"
-                cy="50"
-                r={R}
-                fill="none"
-                stroke="#34D399"
-                strokeWidth="11"
-                strokeDasharray={`${attLen} ${C}`}
-                strokeDashoffset="0"
-              />
+              {attLen > 0 && (
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={R}
+                  fill="none"
+                  stroke="#34D399"
+                  strokeWidth="11"
+                  strokeDasharray={`${attLen} ${C}`}
+                  strokeDashoffset="0"
+                />
+              )}
               {/* Faltas (Red / Coral) */}
-              <circle
-                cx="50"
-                cy="50"
-                r={R}
-                fill="none"
-                stroke="#F87171"
-                strokeWidth="11"
-                strokeDasharray={`${absLen} ${C}`}
-                strokeDashoffset={-(attLen + GAP)}
-              />
+              {absLen > 0 && (
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={R}
+                  fill="none"
+                  stroke="#F87171"
+                  strokeWidth="11"
+                  strokeDasharray={`${absLen} ${C}`}
+                  strokeDashoffset={-(attLen > 0 ? attLen + effectiveGap : 0)}
+                />
+              )}
               {/* Pendientes (Amber) */}
-              <circle
-                cx="50"
-                cy="50"
-                r={R}
-                fill="none"
-                stroke="#FBBF24"
-                strokeWidth="11"
-                strokeDasharray={`${pendLen} ${C}`}
-                strokeDashoffset={-(attLen + GAP + absLen + GAP)}
-              />
+              {pendLen > 0 && (
+                <circle
+                  cx="50"
+                  cy="50"
+                  r={R}
+                  fill="none"
+                  stroke="#FBBF24"
+                  strokeWidth="11"
+                  strokeDasharray={`${pendLen} ${C}`}
+                  strokeDashoffset={-((attLen > 0 ? attLen + effectiveGap : 0) + (absLen > 0 ? absLen + effectiveGap : 0))}
+                />
+              )}
             </svg>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
