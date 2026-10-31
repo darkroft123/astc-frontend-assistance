@@ -383,56 +383,56 @@ export default function PeriodSelector({
     );
   }
 
-  /* ===================== DESKTOP ===================== */
+  /* ===================== DESKTOP (EXACT SVG FRAME 9) ===================== */
 
   return (
-    <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
-      <div className="flex items-center gap-2">
-        <div className="flex bg-muted/50 dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl shadow-xs items-center gap-0.5">
-          {periodOptions.map((p) => {
-            const isActive = period === p.key;
-            return (
-              <button
-                key={p.key}
-                type="button"
-                onClick={() => selectPreset(p.key)}
-                className={`px-3.5 h-8 text-xs rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
-                  isActive
-                    ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white font-bold shadow-xs border border-slate-200/80 dark:border-white/10"
-                    : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
-                }`}
-              >
-                {p.label}
-              </button>
-            );
-          })}
-        </div>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+      {/* Presets pill */}
+      <div className="flex items-center gap-0.5 bg-card dark:bg-[#12141F] border border-border dark:border-white/10 p-1 rounded-2xl shadow-xs overflow-x-auto">
+        {periodOptions.map((p) => {
+          const isActive = period === p.key;
+          return (
+            <button
+              key={p.key}
+              type="button"
+              onClick={() => selectPreset(p.key)}
+              className={cn(
+                "px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap cursor-pointer text-center",
+                isActive
+                  ? "bg-white dark:bg-[#242938] text-foreground dark:text-white shadow-xs font-bold border border-slate-200/80 dark:border-white/10"
+                  : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+              )}
+            >
+              {p.label}
+            </button>
+          );
+        })}
+      </div>
 
-        {/* Square Calendar Icon Button */}
+      {/* Rango personalizado button + Date Range pill */}
+      <div className="flex items-center gap-2.5">
         <button
           type="button"
           onClick={handleOpenCustomDialog}
-          title="Rango personalizado"
           className={cn(
-            "w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0",
+            "h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0",
             period === "custom"
-              ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
-              : "bg-muted/50 dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+              ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
+              : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
           )}
         >
-          <CalendarIcon className="w-4 h-4" />
+          <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
+          <span>Rango personalizado</span>
         </button>
-      </div>
 
-      {/* Date Range Pill */}
-      {dateRange?.fromDate && dateRange?.toDate && (
-        <div className="hidden lg:flex items-center gap-2 px-3.5 h-9 rounded-2xl bg-muted/40 dark:bg-[#101322] border border-border dark:border-white/[0.08] text-xs font-mono font-medium text-muted-foreground dark:text-slate-300 shadow-xs shrink-0">
-          <CalendarIcon className="w-3.5 h-3.5 text-primary" />
-          <span>
-            {formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}
-          </span>
-        </div>
-      )}
+        {dateRange?.fromDate && dateRange?.toDate && (
+          <div className="h-10 px-4 rounded-2xl bg-card dark:bg-[#12141F] border border-border dark:border-white/10 flex items-center gap-2 text-xs font-mono font-medium text-muted-foreground dark:text-slate-300 shadow-xs shrink-0">
+            <span>
+              {formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}
+            </span>
+          </div>
+        )}
+      </div>
 
       {customModal}
     </div>

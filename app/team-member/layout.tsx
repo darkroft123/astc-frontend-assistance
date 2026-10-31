@@ -38,8 +38,8 @@ export default function TeamMemberLayout({ children }: { children: React.ReactNo
           {!isSubPage && <MobileHeader />}
 
           {/* Ambient light for all screens in dark mode (50px higher, 100px left) */}
-          <div className="absolute top-[-260px] left-0 md:left-[5%] w-[650px] h-[450px] bg-violet/15 dark:bg-violet/25 blur-[140px] rounded-full pointer-events-none hidden md:dark:block z-0" />
-          <div className="absolute top-[-100px] left-[160px] w-[380px] h-[280px] bg-indigo-500/10 dark:bg-indigo-500/20 blur-[110px] rounded-full pointer-events-none hidden md:dark:block z-0" />
+          <div className="absolute top-[-200px] left-[180px] md:left-[220px] w-[440px] h-[300px] bg-violet/15 dark:bg-violet/22 blur-[100px] rounded-full pointer-events-none hidden md:dark:block z-0" />
+          <div className="absolute top-[-80px] left-[260px] w-[260px] h-[190px] bg-indigo-500/10 dark:bg-indigo-500/18 blur-[80px] rounded-full pointer-events-none hidden md:dark:block z-0" />
 
           <main className={`flex-1 p-4 md:px-8 md:pt-5 md:pb-6 bg-transparent relative z-10 ${isSubPage ? "pb-8" : "pb-24 md:pb-6"}`}>
             {children}

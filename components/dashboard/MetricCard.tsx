@@ -94,8 +94,13 @@ export function MetricCard({
   const displayBadge = badge || trend;
   const activeTopLabel = topLabel || (displayBadge ? undefined : title);
 
+  const isVioletCard = normalizedColor === "violet";
   const cardInner = (
-    <div className="bg-card border border-border/70 rounded-[var(--radius-card)] p-4 sm:p-5 flex flex-col justify-between h-full shadow-sm hover:border-line-3 transition-all">
+    <div className={`border rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full shadow-xs transition-all ${
+      isVioletCard
+        ? "bg-card dark:bg-gradient-to-br dark:from-[#2A1B4E]/40 dark:to-[#171A2E]/60 border-border dark:border-[#8B5CF6]/30"
+        : "bg-card dark:bg-[#12141F] border-border dark:border-white/10"
+    }`}>
       {/* Top row */}
       <div className="flex items-center justify-between gap-2">
         <div className={`p-2.5 rounded-xl border shrink-0 ${styles.iconBg}`}>

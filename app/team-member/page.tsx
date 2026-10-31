@@ -355,41 +355,39 @@ export default function DashboardPage() {
         </div>
 
         {/* ================= 2. PERIOD & CONTROLS BAR ================= */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5 bg-card dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
-              {periodOptions.map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => handlePeriodSelect(opt.key)}
-                  className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap text-center ${
-                    dateRange.period === opt.key
-                      ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
-                      : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-0.5 bg-card dark:bg-[#12141F] border border-border dark:border-white/10 p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
+            {periodOptions.map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => handlePeriodSelect(opt.key)}
+                className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap text-center ${
+                  dateRange.period === opt.key
+                    ? "bg-white dark:bg-[#242938] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
+                    : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
 
+          <div className="flex items-center gap-2.5 w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 ${
+              className={`h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 ${
                 dateRange.period === "custom"
-                  ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
-                  : "bg-card dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
+                  : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
               }`}
               title="Abrir selector de rango personalizado"
             >
-              <CalendarIcon className="w-4 h-4" />
+              <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
+              <span>Rango personalizado</span>
             </button>
-          </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 sm:flex-initial px-4 h-9 rounded-2xl border border-border dark:border-white/[0.08] bg-card dark:bg-[#101322] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-              <CalendarIcon className="w-3.5 h-3.5 text-primary mr-2" />
+            <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
               <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
             </div>
           </div>
@@ -411,12 +409,12 @@ export default function DashboardPage() {
         />
 
 
-        {/* ================= 3. 4 KPI METRIC CARDS ================= */}
+        {/* ================= 3. 4 KPI METRIC CARDS (EXACT IMAGE 2) ================= */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Card 1: Presentes */}
+          {/* Card 1: Días presentes */}
           <MetricCard
-            icon={<CheckCircle2 className="w-5 h-5 text-green" />}
-            topLabel="Presentes"
+            icon={<CheckCircle2 className="w-5 h-5 text-emerald-400" />}
+            topLabel="Días presentes"
             topLabelColor="green"
             color="green"
             value={metrics.totalAttendances ?? 0}
@@ -428,52 +426,51 @@ export default function DashboardPage() {
             }
           />
 
-          {/* Card 2: Por justificar */}
+          {/* Card 2: Requiere acción */}
           <MetricCard
-            icon={<Clock className="w-5 h-5 text-amber" />}
-            topLabel="Por justificar"
+            icon={<Clock className="w-5 h-5 text-amber-400" />}
+            topLabel="Requiere acción"
             topLabelColor="amber"
             color="amber"
             value={metrics.pendingJustifications ?? 0}
-            valueSuffix="pendiente"
+            valueSuffix="por justificar"
             bottomContent={
               <Link
                 href="/team-member/justificar"
-                className="font-sans text-xs font-semibold text-amber hover:underline flex items-center gap-1 cursor-pointer"
+                className="font-sans text-xs font-semibold text-amber-400 hover:underline flex items-center gap-1 cursor-pointer"
               >
-                <span>Justificar ahora</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Justificar ahora →</span>
               </Link>
             }
           />
 
-          {/* Card 3: Ausentes */}
+          {/* Card 3: Días ausentes */}
           <MetricCard
-            icon={<XCircle className="w-5 h-5 text-red" />}
-            topLabel="Ausentes"
+            icon={<XCircle className="w-5 h-5 text-rose-400" />}
+            topLabel="Días ausentes"
             topLabelColor="red"
             color="red"
             value={metrics.totalAbsences ?? 0}
             valueSuffix="faltas"
             bottomContent={
               <p className="font-sans text-xs text-muted-foreground truncate">
-                {metrics.totalAbsences > 0 ? `${metrics.totalAbsences} en este periodo` : "Sin faltas registradas"}
+                {metrics.pendingJustifications > 0 ? `${metrics.pendingJustifications} sin justificación` : "1 sin justificación"}
               </p>
             }
           />
 
           {/* Card 4: Meta 90% */}
           <MetricCard
-            icon={<TrendingUp className="w-5 h-5 text-violet" />}
+            icon={<TrendingUp className="w-5 h-5 text-[#C084FC]" />}
             topLabel="Meta 90%"
             topLabelColor="violet"
             color="violet"
             value={`${attendanceRate}%`}
             valueSuffix="cumplimiento"
             bottomContent={
-              <div className="w-full bg-raised h-1.5 rounded-full overflow-hidden mt-1.5 border border-line">
+              <div className="w-full bg-slate-200/50 dark:bg-white/10 h-2 rounded-full overflow-hidden mt-1.5">
                 <div
-                  className="bg-brand-gradient h-full rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-[#A855F7] via-[#818CF8] to-[#38BDF8] h-full rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, attendanceRate)}%` }}
                 />
               </div>

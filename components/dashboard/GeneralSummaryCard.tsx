@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 
 interface GeneralSummaryCardProps {
@@ -49,25 +51,25 @@ export function GeneralSummaryCard({
   const pendLen = total > 0 ? (pend / total) * totalAvailable : 0;
 
   return (
-    <Card className="h-full rounded-2xl shadow-sm overflow-hidden border border-border/70 bg-card flex flex-col justify-between">
+    <Card className="w-full h-full min-h-[295px] rounded-2xl shadow-xs overflow-hidden border border-border dark:border-white/10 bg-card dark:bg-[#12141F] flex flex-col justify-between">
       <CardContent className="p-5 sm:p-6 flex flex-col justify-between h-full">
         {/* Header */}
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start gap-3 mb-2">
           <div>
-            <h3 className="font-bold text-lg text-foreground">Resumen del periodo</h3>
+            <h3 className="font-bold text-lg text-foreground tracking-tight">Resumen del periodo</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               {dateRangeText || "0 registros en el periodo seleccionado"}
             </p>
           </div>
-          <span className="font-semibold text-xs bg-violet/10 text-violet px-3 py-1 rounded-full border border-violet/20">
+          <span className="font-semibold text-xs px-2.5 py-0.5 rounded-full bg-violet/10 dark:bg-[#201A36] text-violet dark:text-[#C084FC] border border-violet/20 dark:border-[#3E2D68] shrink-0">
             {selectedProject?.name || "Sin proyecto asignado"}
           </span>
         </div>
 
-        {/* Center: Donut on Top + Breakdown Underneath */}
-        <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-3 w-full">
-          {/* Donut Chart (Centered) */}
-          <div className="relative w-36 h-36 sm:w-40 sm:h-40 shrink-0 my-2">
+        {/* Content Body: Horizontal side-by-side (Donut on LEFT, Legend on RIGHT) matching Image 2 */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 my-auto pt-1">
+          {/* Donut Chart (LEFT) */}
+          <div className="relative w-36 h-36 sm:w-40 sm:h-40 shrink-0">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle
                 cx="50"
@@ -76,7 +78,7 @@ export function GeneralSummaryCard({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="11"
-                className="text-muted/30"
+                className="text-muted/20 dark:text-white/5"
               />
 
               {/* Asistencias (Green) */}
@@ -105,7 +107,7 @@ export function GeneralSummaryCard({
                   strokeDashoffset={-(attLen > 0 ? attLen + effectiveGap : 0)}
                 />
               )}
-              {/* Pendientes (Amber) */}
+              {/* Pendientes (Amber / Yellow) */}
               {pendLen > 0 && (
                 <circle
                   cx="50"
@@ -121,7 +123,7 @@ export function GeneralSummaryCard({
             </svg>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <p className="text-3xl sm:text-4xl font-extrabold text-foreground leading-none">
+                <p className="text-2xl sm:text-3xl font-extrabold text-foreground leading-none">
                   {calculatedRate}%
                 </p>
                 <p className="text-[9px] tracking-[2px] text-muted-foreground font-bold mt-1 uppercase">
@@ -131,49 +133,52 @@ export function GeneralSummaryCard({
             </div>
           </div>
 
-          {/* Legend / Breakdown (Full width rows matching SVG) */}
-          <div className="w-full space-y-2.5 pt-3 max-w-sm mx-auto">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] shrink-0" />
-                <span className="text-foreground/90 font-medium">Asistencias</span>
+          {/* Legend + Hours Accumulated (RIGHT) */}
+          <div className="flex-1 w-full flex flex-col justify-between space-y-3 max-w-xs">
+            {/* Legend items */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] shrink-0" />
+                  <span className="text-foreground/90 font-medium">Asistencias</span>
+                </div>
+                <div className="flex items-center gap-3 font-mono">
+                  <span className="font-bold text-foreground">{att}</span>
+                  <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{attPct}%</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3 font-mono">
-                <span className="font-bold text-foreground">{att}</span>
-                <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{attPct}%</span>
+
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#F87171] shrink-0" />
+                  <span className="text-foreground/90 font-medium">Faltas</span>
+                </div>
+                <div className="flex items-center gap-3 font-mono">
+                  <span className="font-bold text-foreground">{abs}</span>
+                  <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{absPct}%</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24] shrink-0" />
+                  <span className="text-foreground/90 font-medium">Pendientes</span>
+                </div>
+                <div className="flex items-center gap-3 font-mono">
+                  <span className="font-bold text-foreground">{pend}</span>
+                  <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{pendPct}%</span>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F87171] shrink-0" />
-                <span className="text-foreground/90 font-medium">Faltas</span>
-              </div>
-              <div className="flex items-center gap-3 font-mono">
-                <span className="font-bold text-foreground">{abs}</span>
-                <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{absPct}%</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FBBF24] shrink-0" />
-                <span className="text-foreground/90 font-medium">Pendientes</span>
-              </div>
-              <div className="flex items-center gap-3 font-mono">
-                <span className="font-bold text-foreground">{pend}</span>
-                <span className="text-muted-foreground text-[11px] min-w-[32px] text-right">{pendPct}%</span>
-              </div>
+            {/* Divider + Horas acumuladas */}
+            <div className="border-t border-border/80 dark:border-white/10 pt-3 flex items-center justify-between text-xs">
+              <span className="text-muted-foreground font-medium">Horas acumuladas</span>
+              <span className="font-mono font-bold text-foreground text-sm tracking-wide">
+                {accumulatedHoursText}
+              </span>
             </div>
           </div>
-        </div>
-
-        {/* Footer: Horas acumuladas */}
-        <div className="border-t border-border/60 pt-3 mt-2 flex items-center justify-between text-xs">
-          <span className="text-muted-foreground font-medium">Horas acumuladas</span>
-          <span className="font-mono font-bold text-foreground text-sm tracking-wide">
-            {accumulatedHoursText}
-          </span>
         </div>
       </CardContent>
     </Card>

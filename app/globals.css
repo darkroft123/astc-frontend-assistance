@@ -233,7 +233,7 @@
   .dark main {
     background-color: transparent;
     background-image: 
-      radial-gradient(circle 800px at 25% 0%, rgba(168, 85, 247, 0.25) 0%, rgba(99, 102, 241, 0.14) 35%, rgba(56, 189, 248, 0.04) 55%, transparent 75%);
+      radial-gradient(circle 500px at 40% 0%, rgba(168, 85, 247, 0.25) 0%, rgba(99, 102, 241, 0.14) 35%, rgba(56, 189, 248, 0.04) 55%, transparent 75%);
     background-attachment: fixed;
     background-repeat: no-repeat;
   }

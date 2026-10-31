@@ -334,46 +334,44 @@ export default function TMJustificacionesPage() {
         </div>
       </div>
 
-      {/* 1. PERIOD SELECTOR BAR (EXACT DESIGN IMAGE 2) */}
+      {/* 1. PERIOD SELECTOR BAR (EXACT SVG DESIGN) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-0.5 bg-card dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
-            {PERIOD_TABS.map((tab) => {
-              const isActive = activePeriod === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActivePeriod(tab.id)}
-                  className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer text-center ${
-                    isActive
-                      ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
-                      : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+        <div className="flex items-center gap-0.5 bg-card dark:bg-[#12141F] border border-border dark:border-white/10 p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
+          {PERIOD_TABS.map((tab) => {
+            const isActive = activePeriod === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActivePeriod(tab.id)}
+                className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer text-center ${
+                  isActive
+                    ? "bg-white dark:bg-[#242938] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
+                    : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
+        <div className="flex items-center gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setDateRangeModalOpen(true)}
-            className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 ${
+            className={`h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 ${
               activePeriod === "custom"
-                ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
-                : "bg-card dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+                ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
+                : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
             }`}
             title="Seleccionar rango personalizado"
           >
-            <CalendarIcon className="w-4 h-4" />
+            <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
+            <span>Rango personalizado</span>
           </button>
-        </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="flex-1 sm:flex-initial px-4 h-9 rounded-2xl border border-border dark:border-white/[0.08] bg-card dark:bg-[#101322] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-            <CalendarIcon className="w-3.5 h-3.5 text-primary mr-2" />
+          <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
             <span>{dateRange.from} → {dateRange.to}</span>
           </div>
         </div>
