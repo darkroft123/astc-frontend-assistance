@@ -1,4 +1,5 @@
 "use client";
+import { NotificationBell } from "@/components/layout/notification-bell";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -193,8 +194,9 @@ export default function AbsencesPage() {
     <div className="w-full min-h-screen pb-12">
       <div className="w-full max-w-[1400px] mx-auto px-0 md:px-0 space-y-4 md:space-y-6">
         {/* ================= 1. HEADER (EXACT SVG DESIGN) ================= */}
-        <div>
-          <p className="flex items-center gap-1.5 text-xs mb-1">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-1.5 text-xs mb-1">
             <span className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase">COLABORADOR</span>
             <span className="text-muted-foreground font-light text-[16px] leading-[24px] font-['Navigo',sans-serif]">· Panel de asistencia</span>
           </p>
@@ -204,6 +206,10 @@ export default function AbsencesPage() {
           <p className="text-xs sm:text-sm text-text-4 mt-1">
             Listado de ausencias registradas y gestión de procesos de justificación.
           </p>
+        </div>
+          <div className="hidden sm:flex items-center gap-2 shrink-0 pt-1">
+            <NotificationBell />
+          </div>
         </div>
 
         {/* ================= 2. PERIOD BAR ================= */}

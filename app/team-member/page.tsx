@@ -105,10 +105,10 @@ export default function DashboardPage() {
   const [accumulatedHoursText, setAccumulatedHoursText] = useState<string>("0 h 00 m");
 
   const { hydrated, token, user, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
-  const { project, selectedProjectId } = useUserProject();
+  const { project, projects, selectedProjectId } = useUserProject();
 
   const displayName = user?.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : user?.username || user?.email || "Colaborador";
-  const projectName = project?.name || "Sin proyecto asignado";
+  const projectName = project?.name || (projects.length > 0 ? (projects.length === 1 ? projects[0].name : "Todos los proyectos") : "");
   const startTime = project?.workStartTime?.slice(0, 5) || "08:00";
   const endTime = project?.workEndTime?.slice(0, 5) || "17:00";
 

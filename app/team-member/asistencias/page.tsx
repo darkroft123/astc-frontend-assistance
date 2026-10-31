@@ -105,9 +105,24 @@ function renderAttendanceStatus(rawStatus?: string | null) {
       </span>
     );
   }
+  if (s === "CHECKED_OUT" || s.includes("CHECKED_OUT") || s.includes("CHECKOUT")) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/15 text-blue-400 border border-blue-500/30">
+        • Salida registrada
+      </span>
+    );
+  }
+  if (s === "CHECKED_IN" || s.includes("CHECKED_IN") || s.includes("CHECKIN")) {
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+        • Entrada registrada
+      </span>
+    );
+  }
+  const cleanLabel = s ? s.replace(/_/g, ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase()) : 'Registrado';
   return (
     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-500/15 text-slate-400 border border-slate-500/30">
-      • {rawStatus || "Registrado"}
+      • {cleanLabel}
     </span>
   );
 }

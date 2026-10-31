@@ -61,9 +61,11 @@ export function GeneralSummaryCard({
               {dateRangeText || "0 registros en el periodo seleccionado"}
             </p>
           </div>
-          <span className="font-semibold text-xs px-2.5 py-0.5 rounded-full bg-violet/10 dark:bg-[#201A36] text-violet dark:text-[#C084FC] border border-violet/20 dark:border-[#3E2D68] shrink-0">
-            {selectedProject?.name || "Sin proyecto asignado"}
-          </span>
+          {selectedProject?.name && (
+            <span className="font-semibold text-xs px-2.5 py-0.5 rounded-full bg-violet/10 dark:bg-[#201A36] text-violet dark:text-[#C084FC] border border-violet/20 dark:border-[#3E2D68] shrink-0">
+              {selectedProject.name}
+            </span>
+          )}
         </div>
 
         {/* Content Body: Horizontal side-by-side (Donut on LEFT, Legend on RIGHT) matching Image 2 */}

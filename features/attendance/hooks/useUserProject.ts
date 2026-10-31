@@ -97,13 +97,17 @@ export function useUserProject() {
       if (typeof window !== "undefined") {
         const curr = localStorage.getItem("selected_project_id");
         if (!curr) {
-          localStorage.setItem("selected_project_id", "all");
-          localStorage.setItem("selected_project_name", "Todos los proyectos");
-          setSelectedProjectId("all");
+          const defaultId = list.length === 1 ? list[0].id : "all";
+          const defaultName = list.length === 1 ? list[0].name : "Todos los proyectos";
+          localStorage.setItem("selected_project_id", defaultId);
+          localStorage.setItem("selected_project_name", defaultName);
+          setSelectedProjectId(defaultId);
         } else if (curr !== "all" && list.length > 0 && !list.some((p: any) => p.id === curr)) {
-          localStorage.setItem("selected_project_id", "all");
-          localStorage.setItem("selected_project_name", "Todos los proyectos");
-          setSelectedProjectId("all");
+          const defaultId = list.length === 1 ? list[0].id : "all";
+          const defaultName = list.length === 1 ? list[0].name : "Todos los proyectos";
+          localStorage.setItem("selected_project_id", defaultId);
+          localStorage.setItem("selected_project_name", defaultName);
+          setSelectedProjectId(defaultId);
         }
       }
     });
@@ -119,8 +123,8 @@ export function useUserProject() {
 
   const project =
     selectedProjectId === "all" || !selectedProjectId
-      ? null
-      : projects.find((p) => p.id === selectedProjectId) || null;
+      ? (projects.length === 1 ? projects[0] : null)
+      : projects.find((p) => p.id === selectedProjectId) || (projects.length === 1 ? projects[0] : null);
 
   return {
     project,
