@@ -67,7 +67,7 @@ export default function AbsencesPage() {
   const [customModalOpen, setCustomModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "justified">("all");
   const [absenceRecords, setAbsenceRecords] = useState<AbsenceItem[]>([]);
@@ -84,7 +84,11 @@ export default function AbsencesPage() {
   const totalPages = Math.max(1, Math.ceil(totalCount / 5));
 
   const loadData = async () => {
-    if (!token || checkingAuth) return;
+    if (!hydrated || checkingAuth) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const result = await listAbsences(token, {

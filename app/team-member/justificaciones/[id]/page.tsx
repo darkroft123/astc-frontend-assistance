@@ -63,7 +63,7 @@ export default function JustificationDetailPage() {
   const id = (params?.id as string) || "";
   const { hydrated, token, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const [detail, setDetail] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -72,6 +72,7 @@ export default function JustificationDetailPage() {
     if (!hydrated || checkingAuth) return;
     if (!token || !id) {
       setDetail(null);
+      setLoading(false);
       return;
     }
     let isCurrent = true;

@@ -136,7 +136,7 @@ export default function TMJustificacionesPage() {
   }, [userProjects]);
 
   const [items, setItems] = useState<TMJustificationRow[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
@@ -221,8 +221,10 @@ export default function TMJustificacionesPage() {
   }, [token]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!hydrated || checkingAuth) return;
+    if (token) fetchData();
+    else setIsLoading(false);
+  }, [hydrated, checkingAuth, token, fetchData]);
 
   const handleSubmit = async (id: string) => {
     if (!token) return;

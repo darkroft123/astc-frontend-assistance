@@ -148,10 +148,10 @@ export default function AttendanceHistoryPage() {
   const [searchDate, setSearchDate] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [selectedPhotoUrl, setSelectedPhotoUrl] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(2);
+  const [totalCount, setTotalCount] = useState(0);
 
   const handlePeriodSelect = (p: Period) => {
     setPeriod(p);
@@ -187,7 +187,11 @@ export default function AttendanceHistoryPage() {
   };
 
   useEffect(() => {
-    if (!hydrated || checkingAuth || !token) return;
+    if (!hydrated || checkingAuth) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
     const load = async () => {

@@ -51,7 +51,7 @@ export default function VacationsPage() {
 
   const [vacations, setVacations] = useState<any[]>([]);
   const [balance, setBalance] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [eligibility, setEligibility] = useState<VacationEligibility | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
 
@@ -91,7 +91,10 @@ export default function VacationsPage() {
 
   const fetchData = useCallback(async () => {
     const uid = userIdFromToken;
-    if (!token || !uid) return;
+    if (!token || !uid) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [vacList, bal, projectsRes] = await Promise.all([

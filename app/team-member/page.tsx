@@ -97,7 +97,7 @@ function formatDayName(isoDate?: string): string {
 export default function DashboardPage() {
   const router = useRouter();
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics);
-  const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [loadingMetrics, setLoadingMetrics] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>(getInitialRange());
   const [isEntryDone, setIsEntryDone] = useState(false);
   const [customModalOpen, setCustomModalOpen] = useState(false);
