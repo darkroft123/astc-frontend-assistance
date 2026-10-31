@@ -158,10 +158,6 @@ export function NotificationBell() {
     router.push(target);
   };
 
-  if (pathname?.includes("/notificaciones")) {
-    return null;
-  }
-
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
