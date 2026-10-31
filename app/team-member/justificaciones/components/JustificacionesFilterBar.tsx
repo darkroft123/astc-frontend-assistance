@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder, Search, ChevronRight, RotateCw } from "lucide-react";
+import { Search, ChevronDown, RotateCw } from "lucide-react";
 
 interface JustificacionesFilterBarProps {
   projectFilter: string;
@@ -15,9 +15,6 @@ interface JustificacionesFilterBarProps {
 }
 
 export function JustificacionesFilterBar({
-  projectFilter,
-  setProjectFilter,
-  projects,
   search,
   setSearch,
   statusFilter,
@@ -26,68 +23,64 @@ export function JustificacionesFilterBar({
   onRefresh,
 }: JustificacionesFilterBarProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end pt-1">
-      {/* Proyecto */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-foreground">Proyecto</label>
-        <div className="relative">
-          <Folder className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
-          <select
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            className="w-full h-10 pl-9 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-          >
-            {projects.map((p) => (
-              <option key={p.id} value={p.id} className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
-                {p.name}
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-3 p-4 sm:p-5 border-b border-border/80 bg-card">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 flex-1">
+        {/* Buscar motivo */}
+        <div className="space-y-1.5 flex-1 max-w-sm">
+          <label className="text-[11px] font-mono uppercase tracking-wider font-semibold text-muted-foreground">
+            BUSCAR MOTIVO
+          </label>
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Ej: Médico, Personal..."
+              className="w-full h-10 pl-9 pr-3 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground shadow-2xs"
+            />
+          </div>
+        </div>
+
+        {/* Filtrar estado */}
+        <div className="space-y-1.5 w-full sm:w-48">
+          <label className="text-[11px] font-mono uppercase tracking-wider font-semibold text-muted-foreground">
+            FILTRAR ESTADO
+          </label>
+          <div className="relative">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full h-10 px-3 pr-8 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer shadow-2xs"
+            >
+              <option value="TODOS" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
+                Todos los estados
               </option>
-            ))}
-          </select>
-          <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
-        </div>
-      </div>
-
-      {/* Buscar motivo */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-foreground">Buscar motivo</label>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-3 text-muted-foreground pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Ej: Cita médica, Notaría..."
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
-          />
-        </div>
-      </div>
-
-      {/* Estado */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-semibold text-foreground">Estado</label>
-        <div className="relative">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full h-10 px-3 pr-8 rounded-xl border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
-          >
-            <option value="TODOS" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Todos los estados</option>
-            <option value="SUBMITTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Enviada</option>
-            <option value="APPROVED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Aprobada</option>
-            <option value="OBSERVATION" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Observación</option>
-            <option value="REJECTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">Rechazada</option>
-          </select>
-          <ChevronRight className="w-4 h-4 rotate-90 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
+              <option value="APPROVED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
+                Aprobadas
+              </option>
+              <option value="SUBMITTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
+                Pendientes
+              </option>
+              <option value="OBSERVATION" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
+                Observadas
+              </option>
+              <option value="REJECTED" className="bg-white dark:bg-[#12141F] text-neutral-900 dark:text-neutral-100">
+                Rechazadas
+              </option>
+            </select>
+            <ChevronDown className="w-4 h-4 absolute right-3 top-3 text-muted-foreground pointer-events-none" />
+          </div>
         </div>
       </div>
 
       {/* Action: Actualizar button */}
-      <div>
+      <div className="sm:self-end">
         <button
           type="button"
           onClick={onRefresh}
           disabled={isLoading}
-          className="w-full h-10 rounded-xl border border-border bg-background/50 hover:bg-background text-xs font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          className="h-10 px-4 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs shrink-0"
         >
           <RotateCw
             className={`w-3.5 h-3.5 ${

@@ -51,6 +51,15 @@ interface PeriodSelectorProps {
   onPeriodChange: (newRange: DateRange) => void;
 }
 
+function formatDateDisplay(dateStr: string): string {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
 export default function PeriodSelector({
   period,
   dateRange,
@@ -377,34 +386,54 @@ export default function PeriodSelector({
   /* ===================== DESKTOP ===================== */
 
   return (
-    <div className="flex items-center">
-      <div className="flex bg-surface border border-border p-1 rounded-2xl shadow-sm items-center gap-1">
-        {periodOptions.map((p) => (
-          <button
-            key={p.key}
-            onClick={() => selectPreset(p.key)}
-            className={`px-3.5 h-8 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
-              period === p.key
-                ? "bg-brand-gradient text-primary-foreground shadow-sm"
-                : "text-text-3 hover:text-text hover:bg-raised"
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
+    <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
+      <div className="flex items-center gap-2">
+        <div className="flex bg-muted/50 dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl shadow-xs items-center gap-0.5">
+          {periodOptions.map((p) => {
+            const isActive = period === p.key;
+            return (
+              <button
+                key={p.key}
+                type="button"
+                onClick={() => selectPreset(p.key)}
+                className={`px-3.5 h-8 text-xs rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+                  isActive
+                    ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white font-bold shadow-xs border border-slate-200/80 dark:border-white/10"
+                    : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
 
+        {/* Square Calendar Icon Button */}
         <button
+          type="button"
           onClick={handleOpenCustomDialog}
-          className={`px-3.5 h-8 text-xs font-semibold rounded-xl transition-all whitespace-nowrap flex items-center shrink-0 cursor-pointer ${
+          title="Rango personalizado"
+          className={cn(
+            "w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0",
             period === "custom"
-              ? "bg-brand-gradient text-primary-foreground shadow-sm"
-              : "text-text-4 hover:text-foreground hover:bg-raised"
-          }`}
+              ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
+              : "bg-muted/50 dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+          )}
         >
-          <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
-          Personalizado
+          <CalendarIcon className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Date Range Pill */}
+      {dateRange?.fromDate && dateRange?.toDate && (
+        <div className="hidden lg:flex items-center gap-2 px-3.5 h-9 rounded-2xl bg-muted/40 dark:bg-[#101322] border border-border dark:border-white/[0.08] text-xs font-mono font-medium text-muted-foreground dark:text-slate-300 shadow-xs shrink-0">
+          <CalendarIcon className="w-3.5 h-3.5 text-primary" />
+          <span>
+            {formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}
+          </span>
+        </div>
+      )}
+
       {customModal}
     </div>
   );

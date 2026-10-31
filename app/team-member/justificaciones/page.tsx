@@ -17,6 +17,7 @@ import { JustificacionesFilterBar } from "./components/JustificacionesFilterBar"
 import { JustificacionesMobileCards } from "./components/JustificacionesMobileCards";
 import { JustificacionesDesktopTable } from "./components/JustificacionesDesktopTable";
 import { JustificacionesPagination } from "./components/JustificacionesPagination";
+import { NotificationBell } from "@/components/layout/notification-bell";
 
 type DateRange = { from: string; to: string };
 
@@ -301,130 +302,80 @@ export default function TMJustificacionesPage() {
   }
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* 0. HEADER */}
+    <div className="w-full min-h-screen pb-12 space-y-4 md:space-y-6">
+      {/* HEADER SECTION (EXACT DESIGN IMAGE 1) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.05em] bg-primary/10 text-primary border border-primary/20 dark:bg-violet/10 dark:text-[#7c9aff] dark:border-violet/20 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
-            MÓDULO DE JUSTIFICACIONES
-          </span>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+          <p className="flex items-center gap-1.5 text-xs mb-1">
+            <span className="font-mono text-[11px] font-semibold tracking-wider text-[#8B5CF6] uppercase">COLABORADOR</span>
+            <span className="text-muted-foreground font-light text-[16px] leading-[24px] font-['Navigo',sans-serif]">· Panel de asistencia</span>
+          </p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
             Mis justificaciones
           </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Registro, control y seguimiento de ausencias, tardanzas y permisos solicitados.
+          <p className="text-xs sm:text-sm text-text-4 mt-1">
+            Gestión y seguimiento de tus solicitudes de justificación y documentos adjuntos.
           </p>
         </div>
 
-        <Link href="/team-member/justificar" className="self-start sm:self-auto">
-          <button
-            type="button"
-            className="h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition-all cursor-pointer whitespace-nowrap"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Nueva justificación</span>
-          </button>
-        </Link>
-      </div>
-
-      {/* 1. PERIOD SELECTOR TABS (Desktop only) */}
-      <div className="hidden md:flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-1 p-1 rounded-2xl bg-card border border-border">
-          {PERIOD_TABS.map((tab) => {
-            const isActive = activePeriod === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActivePeriod(tab.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
-                  isActive
-                    ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setDateRangeModalOpen(true)}
-          className="h-10 px-4 rounded-2xl bg-card border border-border text-xs font-medium text-foreground hover:text-primary hover:text-foreground flex items-center gap-2 transition-colors cursor-pointer shrink-0 shadow-xs"
-          title="Seleccionar rango personalizado"
-        >
-          <CalendarIcon className="w-4 h-4 text-[#A855F7]" />
-          <span>Rango personalizado</span>
-        </button>
-
-        <div className="h-10 px-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/40 flex items-center gap-2 text-xs font-mono shrink-0 shadow-xs">
-          <span className="text-muted-foreground">Período:</span>
-          <span className="text-blue-600 dark:text-blue-400 font-semibold">
-            {dateRange.from} → {dateRange.to}
-          </span>
+        <div className="flex items-center gap-3 self-start sm:self-auto">
+          <Link href="/team-member/justificar">
+            <button
+              type="button"
+              className="h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Nueva justificación</span>
+            </button>
+          </Link>
+          <div className="hidden md:flex items-center">
+            <NotificationBell />
+          </div>
         </div>
       </div>
 
-      {/* 2. PERIOD SELECTOR TABS (Mobile only) */}
-      <div className="md:hidden space-y-2.5">
-        <div className="p-2 sm:p-2.5 rounded-2xl bg-card dark:bg-[#0C0E18] border border-border dark:border-[#1E2335]">
-          <div className="grid grid-cols-4 gap-1 text-center">
-            {PERIOD_TABS.slice(0, 4).map((tab) => {
-              const isActive = activePeriod === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActivePeriod(tab.id)}
-                  className={`py-1.5 px-1 rounded-xl text-xs transition-all cursor-pointer truncate ${
-                    isActive
-                      ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground font-medium"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="grid grid-cols-3 gap-1 text-center mt-1.5 max-w-[280px]">
-            {PERIOD_TABS.slice(4).map((tab) => {
-              const isActive = activePeriod === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActivePeriod(tab.id)}
-                  className={`py-1.5 px-1 rounded-xl text-xs transition-all cursor-pointer truncate ${
-                    isActive
-                      ? "bg-white dark:bg-accent text-foreground border border-border font-semibold shadow-xs"
-                      : "text-muted-foreground hover:text-foreground font-medium"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 3. DATE RANGE SELECTOR BAR (Mobile only) */}
+      {/* 1. PERIOD SELECTOR BAR (EXACT DESIGN IMAGE 2) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-11 px-3.5 rounded-2xl bg-card dark:bg-[#0C0E18] border border-border dark:border-[#1E2335] flex items-center justify-center gap-2 text-xs font-mono text-muted-foreground">
-            <CalendarIcon className="w-3.5 h-3.5 text-[#A855F7]" />
-            <span className="text-foreground font-semibold">{dateRange.from} → {dateRange.to}</span>
+          <div className="flex items-center gap-0.5 bg-card dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
+            {PERIOD_TABS.map((tab) => {
+              const isActive = activePeriod === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActivePeriod(tab.id)}
+                  className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer text-center ${
+                    isActive
+                      ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
+                      : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
+
           <button
             type="button"
             onClick={() => setDateRangeModalOpen(true)}
-            className="w-11 h-11 rounded-2xl bg-card border border-border text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-xs"
-            title="Seleccionar rango"
+            className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 ${
+              activePeriod === "custom"
+                ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
+                : "bg-card dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+            }`}
+            title="Seleccionar rango personalizado"
           >
             <CalendarIcon className="w-4 h-4" />
           </button>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex-1 sm:flex-initial px-4 h-9 rounded-2xl border border-border dark:border-white/[0.08] bg-card dark:bg-[#101322] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
+            <CalendarIcon className="w-3.5 h-3.5 text-primary mr-2" />
+            <span>{dateRange.from} → {dateRange.to}</span>
+          </div>
         </div>
       </div>
 
@@ -439,20 +390,17 @@ export default function TMJustificacionesPage() {
         }}
       />
 
-      {/* UNIFIED MAIN CONTAINER */}
-      <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
-        {/* 4. 4 KPI CARDS */}
-        <JustificacionesKPIs
-          total={total}
-          pendientes={pendientes}
-          aprobadas={aprobadas}
-          porcentaje={porcentaje}
-        />
+      {/* 2. 4 KPI CARDS (OUTSIDE TABLE, AS IN IMAGE 1) */}
+      <JustificacionesKPIs
+        total={total}
+        pendientes={pendientes}
+        aprobadas={aprobadas}
+        porcentaje={porcentaje}
+      />
 
-        {/* Divider Line */}
-        <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
-
-        {/* 5. FILTERS CONTAINER */}
+      {/* 3. UNIFIED CARD CONTAINER: FILTERS + TABLE + PAGINATION */}
+      <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
+        {/* Filters */}
         <JustificacionesFilterBar
           projectFilter={projectFilter}
           setProjectFilter={setProjectFilter}
@@ -465,7 +413,7 @@ export default function TMJustificacionesPage() {
           onRefresh={fetchData}
         />
 
-        {/* 6. MOBILE CARDS VIEW */}
+        {/* Mobile View */}
         <JustificacionesMobileCards
           items={paginatedItems}
           getStatusBadge={getStatusBadge}
@@ -474,7 +422,7 @@ export default function TMJustificacionesPage() {
           isLoading={isLoading}
         />
 
-        {/* 7. DESKTOP TABLE VIEW */}
+        {/* Desktop View */}
         <JustificacionesDesktopTable
           items={paginatedItems}
           getStatusBadge={getStatusBadge}
@@ -483,7 +431,7 @@ export default function TMJustificacionesPage() {
           isLoading={isLoading}
         />
 
-        {/* 8. PAGINATION FOOTER */}
+        {/* Pagination Footer */}
         <JustificacionesPagination
           total={total}
           page={currentPage}

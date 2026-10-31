@@ -129,7 +129,6 @@ const periodOptions: { key: Period; label: string }[] = [
   { key: "6months", label: "6 meses" },
   { key: "9months", label: "9 meses" },
   { key: "total", label: "Total" },
-  { key: "custom", label: "Personalizado" },
 ];
 
 export default function AttendanceHistoryPage() {
@@ -258,8 +257,9 @@ export default function AttendanceHistoryPage() {
         {/* ================= 1. HEADER (EXACT SVG CLEAN DESIGN) ================= */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-              TRABAJADOR <span className="text-text-4 font-normal">· Panel de asistencia</span>
+            <p className="flex items-center gap-1.5 text-xs mb-1">
+              <span className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase">COLABORADOR</span>
+              <span className="text-muted-foreground font-light text-[16px] leading-[24px] font-['Navigo',sans-serif]">· Panel de asistencia</span>
             </p>
             <h1 className="text-3xl md:text-4xl font-extrabold text-foreground tracking-tight">
               Historial de asistencia
@@ -275,40 +275,42 @@ export default function AttendanceHistoryPage() {
 
         {/* ================= 2. PERIOD & DATE BAR ================= */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-1 bg-raised border border-border/80 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
-            {periodOptions.map((opt) => (
-              <button
-                key={opt.key}
-                onClick={() => {
-                  if (opt.key === "custom") {
-                    setCustomModalOpen(true);
-                  } else {
-                    handlePeriodSelect(opt.key);
-                  }
-                }}
-                className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-center ${
-                  period === opt.key
-                    ? "bg-surface text-foreground shadow-sm border border-line-2 font-bold"
-                    : "text-text-4 hover:text-foreground hover:bg-surface/50"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 sm:flex-initial px-4 py-2.5 rounded-2xl border border-border/80 bg-raised/80 font-mono text-xs text-text-3 font-semibold flex items-center justify-center shadow-2xs">
-              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5 bg-card dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
+              {periodOptions.map((opt) => (
+                <button
+                  key={opt.key}
+                  onClick={() => handlePeriodSelect(opt.key)}
+                  className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap text-center ${
+                    period === opt.key
+                      ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
+                      : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
+
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className="w-11 h-11 rounded-2xl border border-border/80 bg-raised/80 hover:bg-surface text-text-3 hover:text-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center shadow-2xs"
+              className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 ${
+                period === "custom"
+                  ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
+                  : "bg-card dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
               title="Abrir selector de rango personalizado"
             >
               <CalendarIcon className="w-4 h-4" />
             </button>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex-1 sm:flex-initial px-4 h-9 rounded-2xl border border-border dark:border-white/[0.08] bg-card dark:bg-[#101322] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
+              <CalendarIcon className="w-3.5 h-3.5 text-primary mr-2" />
+              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+            </div>
           </div>
         </div>
 

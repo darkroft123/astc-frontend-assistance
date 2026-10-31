@@ -22,7 +22,7 @@ import { RecentActivityCard, type AttendanceRecordSummary } from "@/components/d
 import { NotificationBell } from "@/components/layout/notification-bell";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
 
-type Period = "today" | "thisweek" | "month" | "total" | "custom";
+type Period = "today" | "thisweek" | "month" | "3months" | "6months" | "9months" | "total" | "custom";
 
 interface DateRange {
   fromDate: string;
@@ -241,8 +241,10 @@ export default function DashboardPage() {
     { key: "today", label: "Hoy" },
     { key: "thisweek", label: "Esta semana" },
     { key: "month", label: "Este mes" },
+    { key: "3months", label: "3 meses" },
+    { key: "6months", label: "6 meses" },
+    { key: "9months", label: "9 meses" },
     { key: "total", label: "Total" },
-    { key: "custom", label: "Personalizado" },
   ];
 
   const handlePeriodSelect = (p: Period) => {
@@ -270,6 +272,30 @@ export default function DashboardPage() {
         label: "Este mes",
         period: p,
       });
+    } else if (p === "3months") {
+      const from = new Date(today.getFullYear(), today.getMonth() - 2, 1);
+      setDateRange({
+        fromDate: formatDate(from),
+        toDate: formatDate(today),
+        label: "3 meses",
+        period: p,
+      });
+    } else if (p === "6months") {
+      const from = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+      setDateRange({
+        fromDate: formatDate(from),
+        toDate: formatDate(today),
+        label: "6 meses",
+        period: p,
+      });
+    } else if (p === "9months") {
+      const from = new Date(today.getFullYear(), today.getMonth() - 8, 1);
+      setDateRange({
+        fromDate: formatDate(from),
+        toDate: formatDate(today),
+        label: "9 meses",
+        period: p,
+      });
     } else {
       setDateRange({
         fromDate: "2024-01-01",
@@ -287,8 +313,9 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 pt-1">
           <div>
             {/* Breadcrumb / Category Tag */}
-            <p className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase mb-1">
-              PANEL DE ASISTENCIA <span className="text-text-4 font-normal">· Proyecto {projectName}</span>
+            <p className="flex items-center gap-1.5 text-xs mb-1">
+              <span className="font-mono text-[11px] font-semibold tracking-wider text-violet uppercase">COLABORADOR</span>
+              <span className="text-muted-foreground font-light text-[16px] leading-[24px] font-['Navigo',sans-serif]">· Panel de asistencia</span>
             </p>
 
             {/* Title */}
@@ -329,42 +356,42 @@ export default function DashboardPage() {
 
         {/* ================= 2. PERIOD & CONTROLS BAR ================= */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-1">
-          {/* Tabs */}
-          <div className="flex items-center gap-1 bg-raised border border-border/80 p-1 rounded-xl w-full sm:w-fit overflow-x-auto">
-            {periodOptions.map((opt) => (
-              <button
-                key={opt.key}
-                onClick={() => {
-                  if (opt.key === "custom") {
-                    setCustomModalOpen(true);
-                  } else {
-                    handlePeriodSelect(opt.key);
-                  }
-                }}
-                className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center ${
-                  dateRange.period === opt.key
-                    ? "bg-surface text-foreground shadow-sm border border-line-2 font-bold"
-                    : "text-text-4 hover:text-foreground hover:bg-surface/50"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Right: Rango personalizado & Date Badge */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <div className="flex-1 sm:flex-initial px-4 py-2.5 rounded-2xl border border-border/80 bg-raised/80 font-mono text-xs text-text-3 font-semibold flex items-center justify-center shadow-2xs">
-              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5 bg-card dark:bg-[#101322] border border-border dark:border-white/[0.08] p-1 rounded-2xl w-full sm:w-fit overflow-x-auto shadow-xs">
+              {periodOptions.map((opt) => (
+                <button
+                  key={opt.key}
+                  onClick={() => handlePeriodSelect(opt.key)}
+                  className={`flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap text-center ${
+                    dateRange.period === opt.key
+                      ? "bg-white dark:bg-[#1E2336] text-foreground dark:text-white shadow-xs border border-slate-200/80 dark:border-white/10 font-bold"
+                      : "text-muted-foreground hover:text-foreground font-medium hover:bg-black/5 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
+
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className="w-11 h-11 rounded-2xl border border-border/80 bg-raised/80 hover:bg-surface text-text-3 hover:text-primary transition-colors cursor-pointer shrink-0 flex items-center justify-center shadow-2xs"
+              className={`w-9 h-9 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 ${
+                dateRange.period === "custom"
+                  ? "bg-white dark:bg-[#1E2336] text-primary border-primary/40 shadow-xs"
+                  : "bg-card dark:bg-[#101322] border-border dark:border-white/[0.08] text-muted-foreground hover:text-foreground hover:bg-muted"
+              }`}
               title="Abrir selector de rango personalizado"
             >
               <CalendarIcon className="w-4 h-4" />
             </button>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex-1 sm:flex-initial px-4 h-9 rounded-2xl border border-border dark:border-white/[0.08] bg-card dark:bg-[#101322] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
+              <CalendarIcon className="w-3.5 h-3.5 text-primary mr-2" />
+              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+            </div>
           </div>
         </div>
 
@@ -454,10 +481,10 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* ================= 4. MAIN CONTENT (50/50 COLUMNS) ================= */}
+        {/* ================= 4. MAIN CONTENT (50/50 COLUMNS EXACT SVG) ================= */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* Left Column (50%): Resumen del periodo (Donut chart & hours) */}
-          <div className="w-full h-full flex flex-col">
+          <div className="w-full flex flex-col">
             <GeneralSummaryCard
               selectedProject={{ name: projectName }}
               attendanceRate={attendanceRate}
@@ -467,14 +494,18 @@ export default function DashboardPage() {
             />
           </div>
 
-          {/* Right Column (50%): Acciones rápidas + Últimos registros */}
-          <div className="w-full space-y-5 flex flex-col justify-between">
+          {/* Right Column (50%): Acciones rápidas */}
+          <div className="w-full flex flex-col">
             <QuickActions pendingCount={metrics.pendingJustifications} />
-            <RecentActivityCard
-              shiftText={`Turno ${startTime} - ${endTime}`}
-              records={recentRecords}
-            />
           </div>
+        </div>
+
+        {/* ================= 5. ÚLTIMOS REGISTROS (FULL WIDTH AS IN SVG) ================= */}
+        <div className="w-full">
+          <RecentActivityCard
+            shiftText={`Turno ${startTime} - ${endTime}`}
+            records={recentRecords}
+          />
         </div>
       </div>
     </div>

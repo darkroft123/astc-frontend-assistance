@@ -3,7 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  LayoutDashboard,
+  Home,
+  Calendar,
   Clock,
   AlertTriangle,
   FileText,
@@ -30,9 +31,9 @@ import { getGraphQLUrl } from "@/lib/api-host";
 import { notificationService } from "@/lib/notification.service";
 
 const navigation = [
-  { name: "Panel", href: "/team-member", icon: LayoutDashboard },
+  { name: "Panel", href: "/team-member", icon: Home },
   { name: "Registrar asistencia", href: "/team-member/registrar", icon: CheckCircle2 },
-  { name: "Asistencias", href: "/team-member/asistencias", icon: Clock },
+  { name: "Asistencias", href: "/team-member/asistencias", icon: Calendar },
   { name: "Faltas", href: "/team-member/faltas", icon: AlertTriangle },
   { name: "Justificaciones", href: "/team-member/justificaciones", icon: FileText },
   { name: "Vacaciones", href: "/team-member/vacaciones", icon: Sun },
@@ -168,7 +169,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         {/* Turno / Horario */}
         <div className="mt-1.5 flex items-center gap-2 text-[13px] leading-[18px] text-text-2 font-normal">
           <Clock className="h-[15px] w-[15px] text-cyan shrink-0" strokeWidth={2} />
-          <span className="truncate font-mono">
+          <span className="truncate font-['Navigo',sans-serif] tracking-normal font-medium text-[13px]">
             {project?.workStartTime && project?.workEndTime
               ? `${project.workStartTime} - ${project.workEndTime}`
               : "08:00 - 17:00"}
