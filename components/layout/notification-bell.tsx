@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Bell, AlertTriangle, FileText, Clock, UserPlus, Check, ChevronRight, X, CheckCircle2, FolderHeart, UserCog } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,12 +31,20 @@ const ICON_MAP = {
 };
 
 export function NotificationBell() {
-  const { user, hydrated } = useAuth();
-  const effectiveUserId = user?.id || "";
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user, token, hydrated } = useAuth();
+  const effectiveUserId = user?.id || user?.sub || "";
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<InAppNotification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (token) {
+      notificationService.setToken(token);
+    }
+  }, [token]);
 
   const fetchUnreadCount = useCallback(async () => {
     if (!effectiveUserId) return;
@@ -50,7 +59,10 @@ export function NotificationBell() {
   }, [effectiveUserId]);
 
   const fetchNotifications = useCallback(async (silent = false) => {
-    if (!effectiveUserId) return;
+    if (!effectiveUserId) {
+      setLoading(false);
+      return;
+    }
     if (!silent) setLoading(true);
     try {
       const res = await notificationService.getNotifications(effectiveUserId, 1, 10);
@@ -119,6 +131,36 @@ export function NotificationBell() {
     setUnreadCount(0);
     notifyUnreadCountChanged();
   };
+
+  const handleNotificationClick = (n: InAppNotification) => {
+    void handleMarkAsRead(n);
+    setOpen(false);
+    let target = n.actionLink || `/team-member/notificaciones?id=${n.id}`;
+    if (!n.actionLink) {
+      const code = (n.notificationCode || "").toUpperCase();
+      if (code.startsWith("AST00001") || code.startsWith("AST00002") || code.startsWith("AST00009") || code.startsWith("AST00010")) {
+        target = "/team-member/asistencias";
+      } else if (code.startsWith("AST00003") || code.startsWith("AST00004")) {
+        target = "/team-member/faltas";
+      } else if (
+        code.startsWith("AST00005") ||
+        code.startsWith("AST00006") ||
+        code.startsWith("AST00007") ||
+        code.startsWith("AST00008") ||
+        code.startsWith("AST00011") ||
+        code.startsWith("AST00012") ||
+        code.startsWith("AST00013") ||
+        code.startsWith("AST00014")
+      ) {
+        target = "/team-member/justificaciones";
+      }
+    }
+    router.push(target);
+  };
+
+  if (pathname?.includes("/notificaciones")) {
+    return null;
+  }
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -192,8 +234,7 @@ export function NotificationBell() {
                       "flex items-start gap-3 p-3 transition-all relative overflow-hidden group cursor-pointer",
                       n.read ? "bg-card hover:bg-raised" : "bg-primary/10 hover:bg-primary/15"
                     )}
-                    onClick={() => handleMarkAsRead(n)}
-                    onSelect={(e) => e.preventDefault()}
+                    onSelect={() => handleNotificationClick(n)}
                     inset
                   >
                     {/* Semantic side border indicator */}
@@ -234,7 +275,7 @@ export function NotificationBell() {
             className="w-full text-sm text-primary hover:bg-primary/10 justify-center font-medium"
             onClick={() => {
               setOpen(false);
-              window.location.href = "/team-member/notificaciones";
+              router.push("/team-member/notificaciones");
             }}
           >
             Ver todas las notificaciones

@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatAvatarUrl } from "@/lib/avatar-url";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { useMobileSidebar } from "@/components/layout/MobileSidebar";
 import {
   Select,
   SelectTrigger,
@@ -41,6 +42,7 @@ const navigation = [
 export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user, token, role, logout, hydrated } = useAuth();
+  const { setOpen } = useMobileSidebar();
   const { project, projects, selectProject, loadingProject, selectedProjectId } = useUserProject();
   const [unreadCount, setUnreadCount] = useState(0);
   const [attendanceLabel, setAttendanceLabel] = useState("Registrar asistencia");
@@ -69,31 +71,33 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
     };
     updateLabel();
     window.addEventListener("astc-attendance-updated", updateLabel);
-    window.addEventListener("focus", updateLabel);
     return () => {
       window.removeEventListener("astc-attendance-updated", updateLabel);
-      window.removeEventListener("focus", updateLabel);
     };
   }, [hydrated, token, project?.id]);
 
   useEffect(() => {
-    if (hydrated && user?.id) {
+    if (hydrated && user?.id && token) {
+      notificationService.setToken(token);
       const uid = String(user.id);
-      notificationService
-        .getUnreadCount(uid)
-        .then(setUnreadCount)
-        .catch((err) => console.error("Failed to fetch unread count", err));
-
-      const interval = setInterval(() => {
+      const refreshUnread = () => {
         notificationService
           .getUnreadCount(uid)
-          .then(setUnreadCount)
+          .then((count) => setUnreadCount(count || 0))
           .catch((err) => console.error("Failed to fetch unread count", err));
-      }, 60000);
+      };
 
-      return () => clearInterval(interval);
+      refreshUnread();
+      window.addEventListener("astc-notification-updated", refreshUnread);
+
+      const interval = setInterval(refreshUnread, 60000);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener("astc-notification-updated", refreshUnread);
+      };
     }
-  }, [hydrated, user?.id]);
+  }, [hydrated, user?.id, token]);
 
   const getInitials = (name: string) => {
     if (!name) return "CM";
@@ -224,7 +228,10 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             <Link
               key={item.name}
               href={item.href}
-              onClick={onNavigate}
+              onClick={() => {
+                setOpen(false);
+                onNavigate?.();
+              }}
               className={cn(
                 "flex items-center justify-between rounded-[var(--radius-nav)] px-3.5 py-2.5 text-[15px] leading-[22.5px] font-normal transition-all group",
                 isActive
@@ -242,9 +249,9 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
                 />
                 <span className="truncate">{displayName}</span>
               </div>
-              {item.name === "Notificaciones" && (
+              {item.name === "Notificaciones" && unreadCount > 0 && (
                 <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red text-primary-foreground font-bold text-[10px] px-1.5 shrink-0">
-                  {unreadCount > 9 ? "9+" : unreadCount > 0 ? unreadCount : "9+"}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </Link>

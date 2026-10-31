@@ -131,20 +131,25 @@ export class ASTCNotificationSDK {
     }
 
     const fetchPromise = (async () => {
-      const cat = category !== undefined ? category : this.category;
-      const query = `
-        query getUnreadCount($userId: String!, $category: String) {
-          getUnreadCount(userId: $userId, category: $category)
-        }
-      `;
-      const data = await this.graphqlRequest<any>(query, { userId, category: cat ? cat : null });
-      const count = data.getUnreadCount || 0;
+      try {
+        const cat = category !== undefined ? category : this.category;
+        const query = `
+          query getUnreadCount($userId: String!, $category: String) {
+            getUnreadCount(userId: $userId, category: $category)
+          }
+        `;
+        const data = await this.graphqlRequest<any>(query, { userId, category: cat ? cat : null });
+        const count = data.getUnreadCount || 0;
 
-      if (!category) {
-        this.unreadCache = { count, timestamp: Date.now() };
-        this.unreadPromise = null;
+        if (!category) {
+          this.unreadCache = { count, timestamp: Date.now() };
+        }
+        return count;
+      } finally {
+        if (!category) {
+          this.unreadPromise = null;
+        }
       }
-      return count;
     })();
 
     if (!category) {

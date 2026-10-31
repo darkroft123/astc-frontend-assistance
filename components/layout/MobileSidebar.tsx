@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, createContext, useContext, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,12 @@ export function useMobileSidebar() {
 
 export function MobileSidebarProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
     <MobileSidebarContext.Provider value={{ open, setOpen }}>
       {children}
@@ -55,7 +62,7 @@ export function MobileSidebar({
       {/* Overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-[60] bg-foreground/40 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+          "fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={() => setOpen(false)}
@@ -64,7 +71,7 @@ export function MobileSidebar({
       {/* Panel */}
       <div
         className={cn(
-          "fixed top-0 right-0 z-[70] h-full w-80 bg-sidebar border-l border-line shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col p-4",
+          "fixed top-0 right-0 z-[70] h-full w-80 bg-white dark:bg-[#0C0E18] border-l border-border dark:border-[#1E2335] shadow-2xl transition-transform duration-300 ease-in-out md:hidden flex flex-col p-4",
           open ? "translate-x-0" : "translate-x-full",
           className
         )}
@@ -73,7 +80,7 @@ export function MobileSidebar({
         <div className="flex justify-end pb-2">
           <button
             onClick={() => setOpen(false)}
-            className="p-2 rounded-[var(--radius-nav)] hover:bg-raised text-text-3 hover:text-foreground transition-colors"
+            className="p-2 rounded-[var(--radius-nav)] hover:bg-muted dark:hover:bg-raised text-muted-foreground hover:text-foreground dark:text-text-3 dark:hover:text-white transition-colors cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -81,7 +88,7 @@ export function MobileSidebar({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          {children}
+          {open ? children : null}
         </div>
       </div>
     </>

@@ -115,7 +115,7 @@ export default function AbsencesPage() {
 
   useEffect(() => {
     loadData();
-  }, [currentPage, dateRange, token, selectedProjectId, checkingAuth, statusFilter]);
+  }, [hydrated, currentPage, dateRange, token, selectedProjectId, checkingAuth, statusFilter]);
 
   useEffect(() => {
     if (!token || checkingAuth) return;
