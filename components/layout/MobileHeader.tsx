@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatAvatarUrl } from "@/lib/avatar-url";
 import { Menu } from "lucide-react";
@@ -13,6 +13,16 @@ interface MobileHeaderProps {
 }
 
 export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
+  const [hiddenByPage, setHiddenByPage] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<{ hide?: boolean }>;
+      setHiddenByPage(!!customEvent.detail?.hide);
+    };
+    window.addEventListener("astc-hide-mobile-header", handler);
+    return () => window.removeEventListener("astc-hide-mobile-header", handler);
+  }, []);
   const { setOpen } = useMobileSidebar();
   const { user, role } = useAuth();
 
@@ -42,6 +52,8 @@ export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
     }
     return "Colaborador · Asistencia";
   }, [role, customSubtitle]);
+
+  if (hiddenByPage) return null;
 
   return (
     <header className="md:hidden sticky top-0 z-30 w-full bg-white/95 dark:bg-[#080A12]/90 backdrop-blur-md border-b border-gray-200/80 dark:border-border/60 px-3.5 py-2.5 flex items-center justify-between gap-3 shadow-xs">
