@@ -5,7 +5,7 @@ import { loginApi } from "./auth.api";
 
 import { useAuth } from "./auth.provider";
 
-const TAG = "🚀 useLogin";
+const TAG = "[LOGIN] useLogin";
 
 const scheme = typeof window !== 'undefined' && (window.location.protocol === 'https:' || window.location.port === '443' || window.location.hostname.includes('joyit.io')) ? 'https' : 'http';
 const ROLE_ROUTES: Record<string, string> = {

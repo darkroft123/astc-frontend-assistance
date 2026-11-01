@@ -1,4 +1,4 @@
-const TAG = "📡 AUTH_API";
+const TAG = "[AUTH] AUTH_API";
 
 export interface LoginInput {
   email: string;

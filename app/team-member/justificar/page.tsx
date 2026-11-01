@@ -99,7 +99,7 @@ function JustifyAbsencePageContent() {
     return (
       <div className="h-screen bg-transparent flex items-center justify-center p-6">
         <div className="max-w-md text-center">
-          <div className="text-5xl mb-4">📋</div>
+          <div className="flex justify-center mb-4"><div className="w-16 h-16 rounded-2xl bg-muted/50 dark:bg-white/5 border border-border flex items-center justify-center"><FileText className="w-8 h-8 text-muted-foreground" /></div></div>
           <h2 className="text-xl font-bold text-foreground mb-2">No se puede editar</h2>
           <p className="text-text-2 mb-6">Solo puedes editar justificaciones en estado de Observación.</p>
           <Button onClick={() => router.push("/team-member/justificaciones")} className="bg-primary hover:bg-primary/90 text-primary-foreground">Volver</Button>
