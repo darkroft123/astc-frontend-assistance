@@ -42,7 +42,6 @@ export function useAuthGuard(allowedRoles: string[]) {
       role,
 
       checkingAuth: checking || !hydrated || !token || !user,
- (fix: responsive padding, auth guard flash check, and default project mock export)
     }),
     [hydrated, token, user, role, checking]
   );

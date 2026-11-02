@@ -24,7 +24,6 @@ export const DEFAULT_MOCK_PROJECT: Project = {
   holidays: [],
 };
 
- (fix: responsive padding, auth guard flash check, and default project mock export)
 let cachedProjects: Project[] = [];
 let cachedPromise: Promise<Project[]> | null = null;
 let hasFetched = false;
