@@ -57,12 +57,18 @@ export default function AbsencesPage() {
   const { token, hydrated, checkingAuth } = useAuthGuard(["TEAM_MEMBER"]);
   const { project, selectedProjectId } = useUserProject();
 
-  const [period, setPeriod] = useState<Period>("total");
-  const [dateRange, setDateRange] = useState<DateRange>({
-    fromDate: "2024-01-01",
-    toDate: new Date().toISOString().split("T")[0],
-    label: "Total general",
-    period: "total",
+  const [period, setPeriod] = useState<Period>("month");
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const lastDay = new Date(y, now.getMonth() + 1, 0).getDate();
+    return {
+      fromDate: `${y}-${m}-01`,
+      toDate: `${y}-${m}-${String(lastDay).padStart(2, "0")}`,
+      label: "Este mes",
+      period: "month",
+    };
   });
   const [customModalOpen, setCustomModalOpen] = useState(false);
 
