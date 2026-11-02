@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DataTable, Column } from "@/components/DataTable";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +35,7 @@ import {
   TrendingUp,
   ShieldAlert,
   Hourglass,
-  PlaneTakeoff,
+  PlaneTakeoff, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { jwtDecode } from "jwt-decode";
@@ -491,12 +490,71 @@ export default function VacationsPage() {
                 </div>
 
                 {/* Desktop Table (hidden md:block) */}
-                <div className="hidden md:block border border-border/60 rounded-xl overflow-hidden bg-background/30">
-                  <DataTable
-                    columns={columns}
-                    data={paginated}
-                    emptyText="No se encontraron solicitudes de vacaciones"
-                  />
+                <div className="hidden md:block overflow-x-auto border border-border/60 rounded-xl">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-raised/60 border-b border-border/60 text-muted-foreground font-mono text-[10.5px] uppercase tracking-wider">
+                      <tr>
+                        <th className="py-3 px-4 font-semibold">INICIO</th>
+                        <th className="py-3 px-4 font-semibold">FIN</th>
+                        <th className="py-3 px-4 font-semibold">DÍAS HÁBILES</th>
+                        <th className="py-3 px-4 font-semibold">ESTADO</th>
+                        <th className="py-3 px-4 font-semibold">FECHA SOLICITUD</th>
+                        <th className="py-3 px-4 font-semibold text-center">ACCIONES</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40">
+                      {paginated.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                            No se encontraron solicitudes de vacaciones
+                          </td>
+                        </tr>
+                      ) : (
+                        paginated.map((r, idx) => {
+                          const isEven = idx % 2 === 0;
+                          return (
+                            <tr
+                              key={r.id || idx}
+                              className={`hover:bg-raised/40 transition-colors ${
+                                isEven ? "bg-surface/30" : "bg-transparent"
+                              }`}
+                            >
+                              <td className="py-3.5 px-4 font-mono font-medium text-foreground">
+                                {formatDateCell(r.startDate)}
+                              </td>
+                              <td className="py-3.5 px-4 font-mono font-medium text-foreground">
+                                {formatDateCell(r.endDate)}
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <span className="px-2.5 py-0.5 rounded-lg bg-blue-500/10 text-blue-400 font-semibold text-xs inline-block">
+                                  {r.businessDays}
+                                </span>
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <StatusBadge status={r.status as any} />
+                              </td>
+                              <td className="py-3.5 px-4 font-mono text-xs text-text-4">
+                                {formatDateCell(r.createdAt)}
+                              </td>
+                              <td className="py-3.5 px-4 text-center">
+                                {r.status === "PENDING" ? (
+                                  <button
+                                    onClick={() => handleCancel(r.id)}
+                                    className="text-xs text-rose-400 hover:text-rose-300 inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                                  >
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    Cancelar
+                                  </button>
+                                ) : (
+                                  <span className="text-muted-foreground text-xs">—</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </>
             )}
@@ -510,25 +568,23 @@ export default function VacationsPage() {
                 <span className="text-xs text-text-3 font-medium">
                   Página <strong className="text-foreground">{page}</strong> de {totalPages}
                 </span>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0 rounded-lg border-border"
+                <div className="flex items-center gap-1.5">
+                  <button
                     disabled={page <= 1}
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="w-8 h-8 rounded-xl border border-border/80 bg-card flex items-center justify-center text-muted-foreground disabled:opacity-30 cursor-pointer hover:bg-muted/50 transition-colors shadow-2xs"
+                    title="Página anterior"
                   >
-                    &larr;
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0 rounded-lg border-border"
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
                     disabled={page >= totalPages}
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="w-8 h-8 rounded-xl border border-border/80 bg-card flex items-center justify-center text-muted-foreground disabled:opacity-30 cursor-pointer hover:bg-muted/50 transition-colors shadow-2xs"
+                    title="Página siguiente"
                   >
-                    &rarr;
-                  </Button>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>

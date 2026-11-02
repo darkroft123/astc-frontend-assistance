@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Eye, Pencil, Send, Loader2 } from "lucide-react";
+import { Calendar as CalendarIcon, Eye, Pencil, Send, Loader2 } from "lucide-react";
 import type { TMJustificationRow } from "../page";
 
 interface JustificacionesMobileCardsProps {
@@ -21,8 +21,8 @@ export function JustificacionesMobileCards({
 }: JustificacionesMobileCardsProps) {
   if (isLoading) {
     return (
-      <div className="md:hidden py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60 flex items-center justify-center gap-2">
-        <Loader2 className="w-5 h-5 animate-spin text-[#A855F7]" />
+      <div className="md:hidden py-12 text-center text-muted-foreground text-xs flex items-center justify-center gap-2">
+        <Loader2 className="w-5 h-5 animate-spin text-primary" />
         <span>Cargando justificaciones...</span>
       </div>
     );
@@ -30,14 +30,14 @@ export function JustificacionesMobileCards({
 
   if (items.length === 0) {
     return (
-      <div className="md:hidden py-12 text-center text-muted-foreground text-xs rounded-2xl border border-border bg-card/60">
-        No se encontraron justificaciones.
+      <div className="md:hidden py-12 text-center text-muted-foreground text-xs p-4">
+        No se encontraron justificaciones en el periodo seleccionado.
       </div>
     );
   }
 
   return (
-    <div className="md:hidden space-y-3">
+    <div className="md:hidden p-4 space-y-3">
       {items.map((row) => {
         const badge = getStatusBadge(row.estado);
         const isObservation = row.estado === "OBSERVATION";
@@ -45,22 +45,13 @@ export function JustificacionesMobileCards({
         return (
           <div
             key={row.id}
-            className="rounded-2xl border border-border dark:border-[#1E2335] bg-card dark:bg-[#0E111C] p-4 space-y-3 shadow-sm"
+            className="rounded-2xl border border-border/80 dark:border-white/10 bg-card dark:bg-[#0C0E18] p-4 space-y-3.5 shadow-xs"
           >
-            {/* Header: User Avatar + Name + Status Pill */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shrink-0">
-                  CM
-                </div>
-                <div className="min-w-0">
-                  <p className="font-semibold text-foreground text-xs truncate">
-                    {row.userName}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground truncate">
-                    {row.userEmail}
-                  </p>
-                </div>
+            {/* Top row: [ 📅 ] Date · Time on left, Status pill on right */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
+                <CalendarIcon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <span className="font-medium text-foreground">{row.fecha}</span>
               </div>
 
               <span
@@ -71,25 +62,20 @@ export function JustificacionesMobileCards({
               </span>
             </div>
 
-            {/* Motivo Card Box */}
-            <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
+            {/* MOTIVO section */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-wider uppercase text-purple-400 font-semibold block">
                 MOTIVO
               </span>
-              <p className="text-xs text-foreground/90 font-medium leading-relaxed">
+              <p className="text-sm font-bold text-foreground">
                 {row.motivo}
               </p>
-              {row.comment && (
-                <p className="text-[11px] text-amber-400/90 italic mt-1.5 pt-1.5 border-t border-border/40">
-                  Nota: {row.comment}
-                </p>
-              )}
             </div>
 
-            {/* 2-box row: Documento & Fecha */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-                <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
+            {/* 2 boxes side-by-side: DOCUMENTO & OBSERVACIÓN */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="rounded-xl border border-border/60 bg-muted/30 dark:bg-white/[0.03] p-3 space-y-1">
+                <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground font-semibold block">
                   DOCUMENTO
                 </span>
                 {row.documentUrl ? (
@@ -97,48 +83,45 @@ export function JustificacionesMobileCards({
                     href={row.documentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-purple-400 hover:underline"
+                    className="text-xs text-primary hover:underline font-medium truncate block"
                   >
-                    <FileText className="w-3.5 h-3.5" />
-                    Ver adjunto
+                    Ver archivo
                   </a>
                 ) : (
-                  <span className="text-xs text-muted-foreground">Sin documento</span>
+                  <span className="text-xs text-muted-foreground block">Sin documento</span>
                 )}
               </div>
-              <div className="bg-background/60 border border-border/60 rounded-xl p-3">
-                <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground block mb-1">
-                  FECHA
+
+              <div className="rounded-xl border border-border/60 bg-muted/30 dark:bg-white/[0.03] p-3 space-y-1">
+                <span className="text-[10px] font-mono tracking-wider uppercase text-muted-foreground font-semibold block">
+                  OBSERVACIÓN
                 </span>
-                <span className="text-xs font-mono font-medium text-foreground">
-                  {row.fecha}
+                <span className="text-xs text-muted-foreground truncate block">
+                  {row.comment || "Sin observación"}
                 </span>
               </div>
             </div>
 
-            {/* Actions Row */}
-            <div className="flex items-center gap-2 pt-1">
-              <Link href={`/team-member/justificaciones/${row.id}`} className="flex-1">
+            {/* Full-width action button: Ver detalle */}
+            <div className="pt-0.5 space-y-2">
+              <Link href={`/team-member/justificaciones/${row.id}`} className="block w-full">
                 <button
                   type="button"
-                  className="w-full h-11 rounded-xl border border-border bg-background/50 hover:bg-background text-sm font-medium text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="w-full h-10 rounded-xl border border-border/80 bg-card dark:bg-[#141829] hover:bg-muted text-xs font-semibold text-foreground flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <Eye className="w-4 h-4 text-muted-foreground" />
-                  <span>Ver</span>
+                  <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>Ver detalle</span>
                 </button>
               </Link>
 
               {isObservation && (
-                <Link
-                  href={`/team-member/justificar?justificationId=${row.id}`}
-                  className="flex-1"
-                >
+                <Link href={`/team-member/justificar?justificationId=${row.id}`} className="block w-full">
                   <button
                     type="button"
-                    className="w-full h-11 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    className="w-full h-10 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-semibold text-amber-500 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
                   >
                     <Pencil className="w-3.5 h-3.5" />
-                    <span>Editar</span>
+                    <span>Editar correcciones</span>
                   </button>
                 </Link>
               )}
@@ -148,10 +131,10 @@ export function JustificacionesMobileCards({
                   type="button"
                   onClick={() => onSubmit(row.id)}
                   disabled={submittingId === row.id}
-                  className="h-11 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  className="w-full h-10 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-xs font-semibold text-purple-400 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>{submittingId === row.id ? "Enviando..." : "Enviar"}</span>
+                  <span>Enviar para revisión</span>
                 </button>
               )}
             </div>

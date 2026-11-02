@@ -56,6 +56,13 @@ export type TMJustificationRow = {
 };
 
 
+function formatDateDisplay(iso: string): string {
+  if (!iso) return "";
+  const parts = iso.split("-");
+  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  return iso;
+}
+
 function getStatusBadge(estado: string) {
   switch (estado) {
     case "APPROVED":
@@ -318,19 +325,8 @@ export default function TMJustificacionesPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 self-start sm:self-auto">
-          <Link href="/team-member/justificar">
-            <button
-              type="button"
-              className="h-10 px-4 rounded-xl bg-brand-gradient hover:opacity-95 text-white text-xs font-semibold flex items-center gap-2 shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
-            >
-              <FileText className="w-4 h-4" />
-              <span>Nueva justificación</span>
-            </button>
-          </Link>
-          <div className="hidden md:flex items-center">
-            <NotificationBell />
-          </div>
+        <div className="flex items-center">
+          <NotificationBell />
         </div>
       </div>
 
@@ -357,10 +353,14 @@ export default function TMJustificacionesPage() {
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
+            <span>{formatDateDisplay(dateRange.from)} → {formatDateDisplay(dateRange.to)}</span>
+          </div>
+
           <button
             type="button"
             onClick={() => setDateRangeModalOpen(true)}
-            className={`h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 ${
+            className={`w-10 h-10 rounded-2xl border transition-all cursor-pointer flex items-center justify-center text-xs font-semibold shadow-xs shrink-0 ${
               activePeriod === "custom"
                 ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
                 : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
@@ -368,12 +368,7 @@ export default function TMJustificacionesPage() {
             title="Seleccionar rango personalizado"
           >
             <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
-            <span>Rango personalizado</span>
           </button>
-
-          <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-            <span>{dateRange.from} → {dateRange.to}</span>
-          </div>
         </div>
       </div>
 
@@ -400,9 +395,6 @@ export default function TMJustificacionesPage() {
       <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
         {/* Filters */}
         <JustificacionesFilterBar
-          projectFilter={projectFilter}
-          setProjectFilter={setProjectFilter}
-          projects={projects}
           search={search}
           setSearch={setSearch}
           statusFilter={statusFilter}

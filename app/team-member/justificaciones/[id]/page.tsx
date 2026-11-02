@@ -180,7 +180,7 @@ export default function JustificationDetailPage() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">
+    <div className="w-full min-h-screen pb-12 space-y-4 md:space-y-6">
       {/* Top Navigation & Bell */}
       <div className="flex items-center justify-end md:justify-between gap-3">
         <Link
