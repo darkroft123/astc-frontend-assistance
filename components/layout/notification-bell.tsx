@@ -30,7 +30,7 @@ const ICON_MAP = {
   UserCog,
 };
 
-export function NotificationBell() {
+export function NotificationBell({ iconOnly }: { iconOnly?: boolean } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, token, hydrated } = useAuth();
