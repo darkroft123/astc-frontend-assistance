@@ -13,6 +13,18 @@ export interface Project {
   holidays?: string[];
 }
 
+
+export const DEFAULT_MOCK_PROJECT: Project = {
+  id: "proj-general",
+  name: "Proyecto General",
+  workStartTime: "08:00",
+  workEndTime: "17:00",
+  graceMinutes: 15,
+  timezone: "America/Lima",
+  holidays: [],
+};
+
+ (fix: responsive padding, auth guard flash check, and default project mock export)
 let cachedProjects: Project[] = [];
 let cachedPromise: Promise<Project[]> | null = null;
 let hasFetched = false;

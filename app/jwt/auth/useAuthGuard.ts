@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef, useMemo } from "react";
+
 import { useAuth } from "./auth.provider";
 import { getApiBaseUrl } from "@/lib/api-host";
 
@@ -39,7 +40,9 @@ export function useAuthGuard(allowedRoles: string[]) {
       token,
       user,
       role,
-      checkingAuth: checking || !hydrated || !token,
+
+      checkingAuth: checking || !hydrated || !token || !user,
+ (fix: responsive padding, auth guard flash check, and default project mock export)
     }),
     [hydrated, token, user, role, checking]
   );
