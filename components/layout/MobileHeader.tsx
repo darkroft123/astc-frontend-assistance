@@ -64,22 +64,26 @@ export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
           className="p-1.5 -ml-1 rounded-xl text-gray-700 dark:text-text-3 hover:text-gray-900 dark:hover:text-foreground hover:bg-gray-100 dark:hover:bg-surface/60 transition-colors shrink-0"
           aria-label="Abrir menú"
         >
-          <Menu className="w-5 h-5 text-gray-800 dark:text-foreground" />
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <line x1="4" y1="6.5" x2="19" y2="6.5" />
+            <line x1="4" y1="12" x2="19" y2="12" />
+            <line x1="4" y1="17.5" x2="13" y2="17.5" />
+          </svg>
         </button>
 
         {/* User Avatar */}
-        <Avatar className="w-9 h-9 rounded-xl shrink-0 shadow-sm">
+        <Avatar className="w-8 h-8 rounded-xl shrink-0 shadow-sm">
           {formatAvatarUrl(user?.avatarUrl) && (
             <AvatarImage src={formatAvatarUrl(user?.avatarUrl)!} alt={displayName} className="object-cover rounded-xl" />
           )}
-          <AvatarFallback className="rounded-xl bg-gradient-to-tr from-[#6366f1] via-[#8b5cf6] to-[#06b6d4] font-bold text-white text-xs">
+          <AvatarFallback className="rounded-xl bg-gradient-to-tr from-[#5B8CFF] via-[#A855F7] to-[#22C3E6] font-bold text-white text-xs">
             {initials}
           </AvatarFallback>
         </Avatar>
 
         {/* Name and Turno */}
         <div className="min-w-0 flex-1 overflow-hidden">
-          <p className="font-bold text-[13.5px] leading-tight text-gray-900 dark:text-foreground truncate">
+          <p className="text-sm font-bold leading-tight text-gray-900 dark:text-foreground truncate">
             {displayName}
           </p>
 
@@ -95,7 +99,7 @@ export function MobileHeader({ customSubtitle }: MobileHeaderProps) {
       </div>
 
       {/* Right: Notification Bell */}
-      <div className="shrink-0 flex items-center">
+      <div className="shrink-0 flex items-center pr-0.5">
         <NotificationBell />
       </div>
     </header>
