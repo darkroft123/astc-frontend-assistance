@@ -229,8 +229,23 @@ export default function NotificationsPage() {
 
     return (
       <div className="relative min-h-screen bg-transparent pb-12">
+        {/* Mobile Edge-to-Edge Subpage Topbar (Image 5) */}
+        <div className="md:hidden sticky top-0 z-40 -mx-4 -mt-4 mb-4 w-[calc(100%+2rem)] bg-white dark:bg-[#0C0E18] border-b border-border dark:border-[#1E2335] px-4 h-14 flex items-center justify-between shadow-xs">
+          <button
+            type="button"
+            onClick={() => setSelected(null)}
+            className="flex items-center gap-2.5 text-[#6D28D9] dark:text-[#C4B5FD] font-semibold text-[17px] tracking-tight hover:opacity-80 transition-opacity cursor-pointer"
+          >
+            <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+            <span>Notificaciones</span>
+          </button>
+          <div className="shrink-0 flex items-center pr-0.5">
+            <Bell className="w-5 h-5 text-muted-foreground" />
+          </div>
+        </div>
+
         <div className="w-full py-1 md:py-2 relative z-10 animate-in slide-in-from-bottom-3 duration-200">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="hidden md:flex items-center gap-3 mb-6">
             <button
               onClick={() => setSelected(null)}
               className="p-2 rounded-xl border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

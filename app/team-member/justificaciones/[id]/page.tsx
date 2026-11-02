@@ -182,10 +182,10 @@ export default function JustificationDetailPage() {
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">
       {/* Top Navigation & Bell */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-end md:justify-between gap-3">
         <Link
           href="/team-member/justificaciones"
-          className="inline-flex items-center gap-1.5 text-base font-bold text-[#C084FC] hover:text-purple-300 transition-colors cursor-pointer"
+          className="hidden md:inline-flex items-center gap-1.5 text-base font-bold text-[#6D28D9] dark:text-[#C4B5FD] hover:opacity-80 transition-opacity cursor-pointer"
         >
           <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
           <span>Justificaciones</span>

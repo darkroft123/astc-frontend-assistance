@@ -113,7 +113,7 @@ function JustifyAbsencePageContent() {
   return (
     <div className="w-full max-w-[560px] mx-auto px-0 md:px-4  space-y-4 pb-20">
       {/* Top back navigation */}
-      <div className="flex items-center justify-between">
+      <div className="hidden md:flex items-center justify-between">
         <button
           onClick={() => router.push(backHref)}
           className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors cursor-pointer"
