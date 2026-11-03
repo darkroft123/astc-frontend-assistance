@@ -436,13 +436,23 @@ export default function AttendanceHistoryPage() {
                   Buscar fecha
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <CalendarIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
                   <Input
-                    placeholder="AAAA-MM-DD..."
+                    type="date"
                     value={searchDate}
                     onChange={(e) => setSearchDate(e.target.value)}
-                    className="pl-10 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground"
+                    className="pl-10 pr-9 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground cursor-pointer"
                   />
+                  {searchDate && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchDate("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 cursor-pointer"
+                      title="Limpiar fecha"
+                    >
+                      <XIcon className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -706,28 +716,33 @@ export default function AttendanceHistoryPage() {
                           {checkInPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-primary/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                              onClick={() => setSelectedPhotoUrl(typeof getAttendanceImageUrl === 'function' ? getAttendanceImageUrl(checkInPhoto) : formatAvatarUrl(checkInPhoto))}
+                              className="w-8 h-8 rounded-xl border border-primary/40 bg-raised hover:bg-surface flex items-center justify-center transition-colors cursor-pointer"
+                              title="Ver foto de entrada"
+                              aria-label="Ver foto de entrada"
                             >
-                              <Camera className="w-3.5 h-3.5 text-primary" />
-                              <span>Foto entrada</span>
+                              <Camera className="w-4 h-4 text-primary" />
                             </button>
                           )}
                           {checkOutPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                              onClick={() => setSelectedPhotoUrl(typeof getAttendanceImageUrl === 'function' ? getAttendanceImageUrl(checkOutPhoto) : formatAvatarUrl(checkOutPhoto))}
+                              className="w-8 h-8 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface flex items-center justify-center transition-colors cursor-pointer"
+                              title="Ver foto de salida"
+                              aria-label="Ver foto de salida"
                             >
-                              <Camera className="w-3.5 h-3.5 text-amber-500" />
-                              <span>Foto salida</span>
+                              <Camera className="w-4 h-4 text-amber-500" />
                             </button>
                           )}
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/50 bg-raised/50 text-xs text-text-4">
-                          <Camera className="w-3.5 h-3.5 opacity-40" />
-                          <span>Sin foto</span>
+                        <div
+                          className="w-8 h-8 rounded-xl border border-border/50 bg-raised/50 flex items-center justify-center text-text-4"
+                          title="Sin foto"
+                          aria-label="Sin foto"
+                        >
+                          <Camera className="w-4 h-4 text-muted-foreground/40" />
                         </div>
                       )}
 
