@@ -20,7 +20,7 @@ export function JustificacionesDesktopTable({
   isLoading = false,
 }: JustificacionesDesktopTableProps) {
   return (
-    <div className="hidden md:block overflow-x-auto border-t border-border/60">
+    <div className="hidden md:block overflow-x-auto border border-border/60 rounded-xl">
       <table className="w-full text-left text-xs">
         <thead className="bg-raised/60 border-b border-border/60 text-muted-foreground font-mono text-[10.5px] uppercase tracking-wider">
           <tr>
