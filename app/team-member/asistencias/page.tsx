@@ -741,16 +741,48 @@ export default function AttendanceHistoryPage() {
               )}
             </div>
 
-            {/* Pagination footer matching SVG */}
-            <div className="flex flex-row items-center justify-between gap-3 pt-4 border-t border-border/60">
+            {/* Pagination Controls */}
+            {/* Desktop/Tablet: Centered matching Image 1 */}
+            <div className="hidden sm:flex items-center justify-center gap-3 pt-4 border-t border-border/60">
+              <span className="text-xs text-text-3 font-medium whitespace-nowrap">
+                Página <strong className="text-foreground">{currentPage}</strong> de {Math.max(1, Math.ceil(totalCount / 5))}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  disabled={currentPage >= Math.ceil(totalCount / 5)}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+              <span className="text-xs text-text-4 font-mono whitespace-nowrap">
+                {totalCount} {totalCount === 1 ? "registro total" : "registros totales"}
+              </span>
+            </div>
+
+            {/* Mobile: Single row matching Image 3 */}
+            <div className="flex sm:hidden items-center justify-between w-full pt-4 border-t border-border/60">
               <span className="text-xs text-text-4 font-mono">
                 {totalCount} {totalCount === 1 ? "registro total" : "registros totales"}
               </span>
-              <div className="flex items-center gap-2 sm:gap-2.5">
+              <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   disabled={currentPage <= 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   aria-label="Página anterior"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -759,9 +791,10 @@ export default function AttendanceHistoryPage() {
                   Página <strong className="text-foreground">{currentPage}</strong> de {Math.max(1, Math.ceil(totalCount / 5))}
                 </span>
                 <button
+                  type="button"
                   disabled={currentPage >= Math.ceil(totalCount / 5)}
                   onClick={() => setCurrentPage((p) => p + 1)}
-                  className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                   aria-label="Página siguiente"
                 >
                   <ChevronRight className="w-4 h-4" />

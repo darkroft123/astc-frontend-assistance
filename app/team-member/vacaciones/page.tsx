@@ -569,33 +569,64 @@ export default function VacationsPage() {
               </>
             )}
 
-            {/* Pagination footer */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <p className="text-xs text-text-4 font-mono">
+            {/* Pagination Controls */}
+            {/* Desktop/Tablet: Centered matching Image 1 */}
+            <div className="hidden sm:flex items-center justify-center gap-3 pt-4 border-t border-border/60">
+              <span className="text-xs text-text-3 font-medium whitespace-nowrap">
+                Página <strong className="text-foreground">{page}</strong> de {totalPages}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+              <span className="text-xs text-text-4 font-mono whitespace-nowrap">
                 {filtered.length} {filtered.length === 1 ? "registro total" : "registros totales"}
-              </p>
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-text-3 font-medium">
+              </span>
+            </div>
+
+            {/* Mobile: Single row matching Image 3 */}
+            <div className="flex sm:hidden items-center justify-between w-full pt-4 border-t border-border/60">
+              <span className="text-xs text-text-4 font-mono">
+                {filtered.length} {filtered.length === 1 ? "registro total" : "registros totales"}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-xs text-text-3 font-medium whitespace-nowrap">
                   Página <strong className="text-foreground">{page}</strong> de {totalPages}
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="w-8 h-8 rounded-xl border border-border/80 bg-card flex items-center justify-center text-muted-foreground disabled:opacity-30 cursor-pointer hover:bg-muted/50 transition-colors shadow-2xs"
-                    title="Página anterior"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="w-8 h-8 rounded-xl border border-border/80 bg-card flex items-center justify-center text-muted-foreground disabled:opacity-30 cursor-pointer hover:bg-muted/50 transition-colors shadow-2xs"
-                    title="Página siguiente"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                  aria-label="Página siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>

@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Eye,
+  Pencil,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
@@ -566,18 +568,24 @@ export default function TMJustificacionesPage() {
                         </td>
                         <td className="py-3.5 px-4 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center gap-2">
-                            <Link
-                              href={`/team-member/justificaciones/${row.id}`}
-                              className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-brand-gradient hover:opacity-95 text-white shadow-sm inline-flex items-center justify-center transition-all cursor-pointer"
-                            >
-                              Ver detalle
+                            <Link href={`/team-member/justificaciones/${row.id}`}>
+                              <button
+                                type="button"
+                                title="Ver detalle"
+                                className="w-8 h-8 rounded-xl border border-border/80 bg-white dark:bg-card hover:bg-gray-100 dark:hover:bg-raised text-text-3 hover:text-foreground flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
                             </Link>
                             {isObservation && (
-                              <Link
-                                href={`/team-member/justificaciones/${row.id}`}
-                                className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center transition-all cursor-pointer"
-                              >
-                                Subsanar
+                              <Link href={`/team-member/justificar?justificationId=${row.id}`}>
+                                <button
+                                  type="button"
+                                  title="Subsanar"
+                                  className="w-8 h-8 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 flex items-center justify-center transition-colors cursor-pointer"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
                               </Link>
                             )}
                           </div>
@@ -661,18 +669,24 @@ export default function TMJustificacionesPage() {
                       )}
 
                       <div className="flex items-center gap-2">
-                        <Link
-                          href={`/team-member/justificaciones/${row.id}`}
-                          className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-brand-gradient hover:opacity-95 text-white shadow-sm inline-flex items-center justify-center transition-all cursor-pointer"
-                        >
-                          Ver detalle
+                        <Link href={`/team-member/justificaciones/${row.id}`}>
+                          <button
+                            type="button"
+                            title="Ver detalle"
+                            className="w-8 h-8 rounded-xl border border-border/80 bg-white dark:bg-card hover:bg-gray-100 dark:hover:bg-raised text-text-3 hover:text-foreground flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
                         </Link>
                         {isObservation && (
-                          <Link
-                            href={`/team-member/justificaciones/${row.id}`}
-                            className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center transition-all cursor-pointer"
-                          >
-                            Subsanar
+                          <Link href={`/team-member/justificar?justificationId=${row.id}`}>
+                            <button
+                              type="button"
+                              title="Subsanar"
+                              className="w-8 h-8 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 flex items-center justify-center transition-colors cursor-pointer"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
                           </Link>
                         )}
                       </div>
@@ -683,17 +697,48 @@ export default function TMJustificacionesPage() {
             )}
           </div>
 
-          {/* Standard Pagination Controls (Identical to asistencias & faltas) */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          {/* Pagination Controls */}
+          {/* Desktop/Tablet: Centered matching Image 1 */}
+          <div className="hidden sm:flex items-center justify-center gap-3 pt-3 border-t border-border/60">
+            <span className="text-xs text-text-3 font-medium whitespace-nowrap">
+              Página <strong className="text-foreground">{currentPage}</strong> de {totalPages}
+            </span>
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                disabled={currentPage <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                aria-label="Página anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                aria-label="Página siguiente"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <span className="text-xs text-text-4 font-mono whitespace-nowrap">
+              {total} {total === 1 ? "registro total" : "registros totales"}
+            </span>
+          </div>
+
+          {/* Mobile: Single row matching Image 3 */}
+          <div className="flex sm:hidden items-center justify-between w-full pt-3 border-t border-border/60">
             <span className="text-xs text-text-4 font-mono">
               {total} {total === 1 ? "registro total" : "registros totales"}
             </span>
-
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 disabled={currentPage <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                 aria-label="Página anterior"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -702,9 +747,10 @@ export default function TMJustificacionesPage() {
                 Página <strong className="text-foreground">{currentPage}</strong> de {totalPages}
               </span>
               <button
+                type="button"
                 disabled={currentPage >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                className="w-8 h-8 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                 aria-label="Página siguiente"
               >
                 <ChevronRight className="w-4 h-4" />
