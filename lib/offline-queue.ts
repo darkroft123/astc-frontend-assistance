@@ -75,6 +75,19 @@ export function enqueueAttendance(
   return queued;
 }
 
+export function clearAllAttendanceCache(): void {
+  if (typeof window === "undefined") return;
+  try {
+    Object.keys(localStorage).forEach((k) => {
+      if (k.startsWith(TODAY_CACHE_KEY_PREFIX)) {
+        localStorage.removeItem(k);
+      }
+    });
+  } catch (e) {
+    console.error("[OfflineQueue] Error clearing attendance cache:", e);
+  }
+}
+
 export function cacheTodayAttendance(projectId: string | null | undefined, value: any): void {
   if (typeof window === "undefined") return;
   try {

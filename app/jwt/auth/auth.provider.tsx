@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState, ReactNode } fr
 import { jwtDecode } from "jwt-decode";
 import { tokenService } from "./token.service";
 import { getApiBaseUrl } from "@/lib/api-host";
+import { clearAllAttendanceCache } from "@/lib/offline-queue";
 
 type JwtPayload = {
   sub?: string;
@@ -121,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     tokenService.clear();
     setTokenState(null);
+    clearAllAttendanceCache();
     const currentTheme =
       (typeof localStorage !== "undefined" && localStorage.getItem("theme")) ||
       (typeof document !== "undefined" && document.documentElement.classList.contains("dark") ? "dark" : "light");
