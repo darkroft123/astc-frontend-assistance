@@ -195,8 +195,8 @@ export function NotificationBell({ iconOnly }: { iconOnly?: boolean } = {}) {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-inset border-b border-line">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-gradient rounded-[var(--radius-nav)] flex items-center justify-center shadow-sm">
-              <Bell className="w-4 h-4 text-primary-foreground" strokeWidth={2} />
+            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/25 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm">
+              <Bell className="w-4 h-4" strokeWidth={2} />
             </div>
             <div>
               <h3 className="font-semibold text-[15px] text-foreground">Notificaciones</h3>

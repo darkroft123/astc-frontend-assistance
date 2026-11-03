@@ -249,7 +249,7 @@ export default function JustificationDetailPage() {
       <div className="rounded-2xl border border-border dark:border-[#1E2335] bg-card dark:bg-[#101322] p-5 sm:p-6 shadow-sm space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
               <Clock className="w-5 h-5 stroke-[2]" />
             </div>
             <div>
@@ -287,14 +287,14 @@ export default function JustificationDetailPage() {
             <div className="space-y-3.5">
               {/* Proyecto */}
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl border border-purple-500/25 bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+                <div className="w-9 h-9 rounded-xl border border-purple-500/25 bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
                   <Folder className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
                     PROYECTO
                   </p>
-                  <span className="inline-block px-2.5 py-0.5 rounded-md bg-purple-950/40 text-purple-300 border border-purple-800/40 text-xs font-semibold mt-0.5">
+                  <span className="inline-block px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800/40 text-xs font-semibold mt-0.5">
                     {currentJustification.projectName || "Proyecto"}
                   </span>
                 </div>
@@ -302,7 +302,7 @@ export default function JustificationDetailPage() {
 
               {/* Fecha de Falta */}
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl border border-amber-500/25 bg-amber-500/10 flex items-center justify-center text-amber-400 shrink-0">
+                <div className="w-9 h-9 rounded-xl border border-amber-500/25 bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div>

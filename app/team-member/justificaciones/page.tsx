@@ -31,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NotificationBell } from "@/components/layout/notification-bell";
 
 type DateRange = { from: string; to: string };
 
@@ -337,10 +336,6 @@ export default function TMJustificacionesPage() {
           <p className="text-xs sm:text-sm text-text-4 mt-1">
             Gestión y seguimiento de tus solicitudes de justificación y documentos adjuntos.
           </p>
-        </div>
-
-        <div className="flex items-center">
-          <NotificationBell />
         </div>
       </div>
 
