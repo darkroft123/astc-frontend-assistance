@@ -89,7 +89,7 @@ export default function PeriodSelector({
 
   const getInitialRange = (p: Period): DateRange => {
     const today = new Date();
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+    const formatDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
     if (p === "today") {
       const d = formatDate(today);
@@ -185,7 +185,7 @@ export default function PeriodSelector({
 
   const handleQuickPreset = (daysOrType: number | "month") => {
     const today = new Date();
-    const formatIso = (d: Date) => d.toISOString().split("T")[0];
+    const formatIso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
     if (daysOrType === "month") {
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);

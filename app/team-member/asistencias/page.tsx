@@ -152,8 +152,8 @@ export default function AttendanceHistoryPage() {
 
   const [period, setPeriod] = useState<Period>("month");
   const [dateRange, setDateRange] = useState<DateRange>({
-    fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0],
-    toDate: new Date().toISOString().split("T")[0],
+    fromDate: (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-01`; })(),
+    toDate: (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; })(),
     label: "Este mes",
     period: "month",
   });
@@ -171,7 +171,7 @@ export default function AttendanceHistoryPage() {
     setPeriod(p);
     setCurrentPage(1);
     const today = new Date();
-    const formatDate = (d: Date) => d.toISOString().split("T")[0];
+    const formatDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
     if (p === "today") {
       const d = formatDate(today);
@@ -182,7 +182,7 @@ export default function AttendanceHistoryPage() {
       monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
       setDateRange({ fromDate: formatDate(monday), toDate: formatDate(today), label: "Esta semana", period: p });
     } else if (p === "month") {
-      setDateRange({ fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split("T")[0], toDate: new Date().toISOString().split("T")[0], label: "Este mes", period: p });
+      setDateRange({ fromDate: (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-01`; })(), toDate: (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`; })(), label: "Este mes", period: p });
     } else if (p === "3months") {
       const d = new Date(today);
       d.setMonth(d.getMonth() - 3);
@@ -469,8 +469,18 @@ export default function AttendanceHistoryPage() {
                     filteredRecords.map((rec, idx) => {
                       const isEven = idx % 2 === 0;
                       const photos = (rec.photoUrl || "").split(",").map((p) => p.trim()).filter(Boolean);
-                      const checkInPhoto = photos.find((p) => !p.toLowerCase().includes("_checkout") && !p.toLowerCase().includes("checkout")) || null;
-                      const checkOutPhoto = photos.find((p) => p.toLowerCase().includes("_checkout") || p.toLowerCase().includes("checkout")) || null;
+                      let checkInPhoto: string | null = null;
+                      let checkOutPhoto: string | null = null;
+                      if (photos.length >= 2) {
+                        checkInPhoto = photos[0];
+                        checkOutPhoto = photos[1];
+                      } else if (photos.length === 1) {
+                        if (photos[0].toLowerCase().includes("checkout")) {
+                          checkOutPhoto = photos[0];
+                        } else {
+                          checkInPhoto = photos[0];
+                        }
+                      }
 
                       return (
                         <tr
@@ -517,12 +527,12 @@ export default function AttendanceHistoryPage() {
                           </td>
                           <td className="py-3.5 px-4 text-center">
                             {checkInPhoto || checkOutPhoto ? (
-                              <div className="flex items-center justify-center gap-1.5">
+                              <div className="flex items-center justify-center gap-2">
                                 {checkInPhoto && (
                                   <button
                                     type="button"
                                     onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
-                                    className="w-8 h-8 rounded-lg overflow-hidden border border-primary/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                    className="relative group w-8 h-8 rounded-lg overflow-hidden border border-primary/50 inline-block hover:scale-105 transition-transform cursor-pointer"
                                     title="Foto de entrada"
                                   >
                                     <img
@@ -530,13 +540,16 @@ export default function AttendanceHistoryPage() {
                                       alt="Foto entrada"
                                       className="w-full h-full object-cover"
                                     />
+                                    <span className="absolute bottom-0 inset-x-0 bg-primary/90 text-[7px] text-white font-mono font-bold leading-none py-0.5 text-center">
+                                      IN
+                                    </span>
                                   </button>
                                 )}
                                 {checkOutPhoto && (
                                   <button
                                     type="button"
                                     onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
-                                    className="w-8 h-8 rounded-lg overflow-hidden border border-amber-500/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                    className="relative group w-8 h-8 rounded-lg overflow-hidden border border-amber-500/50 inline-block hover:scale-105 transition-transform cursor-pointer"
                                     title="Foto de salida"
                                   >
                                     <img
@@ -544,6 +557,9 @@ export default function AttendanceHistoryPage() {
                                       alt="Foto salida"
                                       className="w-full h-full object-cover"
                                     />
+                                    <span className="absolute bottom-0 inset-x-0 bg-amber-600/90 text-[7px] text-white font-mono font-bold leading-none py-0.5 text-center">
+                                      OUT
+                                    </span>
                                   </button>
                                 )}
                               </div>
@@ -580,8 +596,18 @@ export default function AttendanceHistoryPage() {
               ) : (
                 filteredRecords.map((rec, idx) => {
                   const photos = (rec.photoUrl || "").split(",").map((p) => p.trim()).filter(Boolean);
-                  const checkInPhoto = photos.find((p) => !p.toLowerCase().includes("_checkout") && !p.toLowerCase().includes("checkout")) || null;
-                  const checkOutPhoto = photos.find((p) => p.toLowerCase().includes("_checkout") || p.toLowerCase().includes("checkout")) || null;
+                  let checkInPhoto: string | null = null;
+                  let checkOutPhoto: string | null = null;
+                  if (photos.length >= 2) {
+                    checkInPhoto = photos[0];
+                    checkOutPhoto = photos[1];
+                  } else if (photos.length === 1) {
+                    if (photos[0].toLowerCase().includes("checkout")) {
+                      checkOutPhoto = photos[0];
+                    } else {
+                      checkInPhoto = photos[0];
+                    }
+                  }
 
                   return (
                   <div

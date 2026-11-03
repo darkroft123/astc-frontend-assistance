@@ -12,7 +12,16 @@ import { listJustifications, submitJustification, getMyProjects } from "@/app/se
 import { formatDateTime } from "@/lib/timezone";
 import { DateRangeModal } from "@/components/ui/date-range-modal";
 
-import { JustificacionesKPIs } from "./components/JustificacionesKPIs";
+import { SubMetricCard } from "@/components/dashboard/SubMetricCard";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Clock, CheckCircle2, TrendingUp, Search, RotateCcw } from "lucide-react";
 import { JustificacionesFilterBar } from "./components/JustificacionesFilterBar";
 import { JustificacionesMobileCards } from "./components/JustificacionesMobileCards";
 import { JustificacionesDesktopTable } from "./components/JustificacionesDesktopTable";
@@ -383,25 +392,98 @@ export default function TMJustificacionesPage() {
         }}
       />
 
-      {/* 2. 4 KPI CARDS (OUTSIDE TABLE, AS IN IMAGE 1) */}
-      <JustificacionesKPIs
-        total={total}
-        pendientes={pendientes}
-        aprobadas={aprobadas}
-        porcentaje={porcentaje}
-      />
+      {/* UNIFIED MAIN CONTAINER ("Un cuadro entero, no 3") */}
+      <div className="rounded-[22px] border border-border bg-card/60 dark:bg-[#0C0E18] p-4 sm:p-5 md:p-6 shadow-sm space-y-5 sm:space-y-6">
+        {/* ================= 4 KPI METRIC CARDS ================= */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <SubMetricCard
+            label="Total"
+            value={total}
+            icon={<FileText className="w-5 h-5 text-text-3" />}
+          />
+          <SubMetricCard
+            label="Pendientes"
+            value={pendientes}
+            color="amber"
+            icon={<Clock className="w-5 h-5" />}
+          />
+          <SubMetricCard
+            label="Aprobadas"
+            value={aprobadas}
+            color="green"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+          />
+          <SubMetricCard
+            label="% Aprobadas"
+            value={`${porcentaje}%`}
+            color="blue"
+            icon={<TrendingUp className="w-5 h-5" />}
+          />
+        </div>
 
-      {/* 3. UNIFIED CARD CONTAINER: FILTERS + TABLE + PAGINATION */}
-      <div className="rounded-2xl border border-border bg-card shadow-xs overflow-hidden">
-        {/* Filters */}
-        <JustificacionesFilterBar
-          search={search}
-          setSearch={setSearch}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          isLoading={isLoading}
-          onRefresh={fetchData}
-        />
+        {/* Divider Line */}
+        <div className="border-t border-border/60 -mx-4 sm:-mx-5 md:-mx-6" />
+
+        {/* Table & Filters Content */}
+        <div className="space-y-4 sm:space-y-5 pt-1">
+          {/* Filter controls row */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-end justify-between gap-3 sm:gap-4">
+            {/* Search motivo */}
+            <div className="flex-1 max-w-xl space-y-1.5">
+              <label className="text-xs font-semibold text-text-3 block">
+                Buscar motivo
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Ej: Médico, Personal..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Status filter & update button */}
+            <div className="flex items-end gap-2.5 min-w-[240px]">
+              <div className="flex-1 space-y-1.5">
+                <label className="text-xs font-semibold text-text-3 block">
+                  Filtrar estado
+                </label>
+                <Select
+                  value={statusFilter}
+                  onValueChange={(v) => {
+                    setStatusFilter(v);
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground w-full">
+                    <SelectValue placeholder="Todos los estados" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TODOS">Todos los estados</SelectItem>
+                    <SelectItem value="APPROVED">Aprobadas</SelectItem>
+                    <SelectItem value="SUBMITTED">Pendientes</SelectItem>
+                    <SelectItem value="OBSERVATION">Observadas</SelectItem>
+                    <SelectItem value="REJECTED">Rechazadas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <button
+                onClick={() => {
+                  fetchData();
+                  setPage(1);
+                  setSearch("");
+                  setStatusFilter("TODOS");
+                }}
+                className="w-11 h-11 rounded-xl border border-border/80 bg-white dark:bg-card hover:bg-gray-100 dark:hover:bg-raised text-text-3 hover:text-foreground flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                title="Restablecer filtros"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
         {/* Mobile View */}
         <JustificacionesMobileCards
@@ -429,6 +511,7 @@ export default function TMJustificacionesPage() {
           onPrevPage={() => setPage((p) => Math.max(1, p - 1))}
           onNextPage={() => setPage((p) => Math.min(totalPages, p + 1))}
         />
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import {
   Loader2,
   ChevronLeft,
+  ChevronRight,
   FileText,
   Send,
   Pencil,
@@ -66,6 +67,8 @@ export default function JustificationDetailPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
+  const [historyPage, setHistoryPage] = useState(1);
+  const HISTORY_PAGE_SIZE = 2;
   const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
@@ -126,6 +129,26 @@ export default function JustificationDetailPage() {
   const isRejected = st === "REJECTED";
   const isObservation = st === "OBSERVATION";
   const isPending = st === "PENDING" || st === "SUBMITTED";
+
+  const historyList = useMemo(() => {
+    if (currentJustification?.history && currentJustification.history.length > 0) {
+      return currentJustification.history;
+    }
+    return [
+      {
+        id: "hist-1",
+        newStatus: currentJustification?.status || "SUBMITTED",
+        changedAt: currentJustification?.submittedAt || "2026-09-02T09:15:00Z",
+        comment: "Solicitud enviada para revisión del Jefe de Proyecto.",
+      },
+    ];
+  }, [currentJustification]);
+
+  const totalHistoryPages = Math.max(1, Math.ceil(historyList.length / HISTORY_PAGE_SIZE));
+  const paginatedHistory = useMemo(() => {
+    const start = (historyPage - 1) * HISTORY_PAGE_SIZE;
+    return historyList.slice(start, start + HISTORY_PAGE_SIZE);
+  }, [historyList, historyPage]);
 
   const statusBadge = useMemo(() => {
     if (isApproved) {

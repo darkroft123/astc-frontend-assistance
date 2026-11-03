@@ -38,6 +38,15 @@ import {
   PlaneTakeoff, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SubMetricCard } from "@/components/dashboard/SubMetricCard";
+import { Search, RotateCcw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { jwtDecode } from "jwt-decode";
 
 import { StatusBadge } from "@/components/atoms/status-badge";
@@ -60,6 +69,7 @@ export default function VacationsPage() {
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
