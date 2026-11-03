@@ -150,13 +150,21 @@ export default function DashboardPage() {
           }).catch(() => null),
         ]);
         if (cancelled) return;
+        const items = Array.isArray(attRes?.items) ? attRes.items : [];
+        const validAttendedCount = items.filter((item: any) => {
+          const s = String(item.status || "").toUpperCase();
+          return !s.includes("ABSENT") && !s.includes("FALTA");
+        }).length;
+        const totalAttendances =
+          (data?.totalAttendances ?? 0) > 0
+            ? data.totalAttendances
+            : validAttendedCount;
+
         setMetrics({
-          totalAttendances: data?.totalAttendances ?? 0,
+          totalAttendances,
           totalAbsences: data?.totalAbsences ?? 0,
           pendingJustifications: data?.pendingJustifications ?? 0,
         });
-
-        const items = Array.isArray(attRes?.items) ? attRes.items : [];
         let totalMins = 0;
         for (const item of items) {
           const inM = parseMinutes(item.checkIn);
