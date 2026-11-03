@@ -5,6 +5,14 @@ import Link from "next/link";
 import {
   FileText,
   Calendar as CalendarIcon,
+  Clock,
+  CheckCircle2,
+  TrendingUp,
+  Search,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { useAuthGuard } from "@/app/jwt/auth/useAuthGuard";
 import { useUserProject } from "@/features/attendance/hooks/useUserProject";
@@ -21,11 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Clock, CheckCircle2, TrendingUp, Search, RotateCcw } from "lucide-react";
-import { JustificacionesFilterBar } from "./components/JustificacionesFilterBar";
-import { JustificacionesMobileCards } from "./components/JustificacionesMobileCards";
-import { JustificacionesDesktopTable } from "./components/JustificacionesDesktopTable";
-import { JustificacionesPagination } from "./components/JustificacionesPagination";
 import { NotificationBell } from "@/components/layout/notification-bell";
 
 type DateRange = { from: string; to: string };
@@ -485,32 +488,229 @@ export default function TMJustificacionesPage() {
             </div>
           </div>
 
-        {/* Mobile View */}
-        <JustificacionesMobileCards
-          items={paginatedItems}
-          getStatusBadge={getStatusBadge}
-          onSubmit={handleSubmit}
-          submittingId={submittingId}
-          isLoading={isLoading}
-        />
+          {/* Desktop Table (Identical to asistencias & faltas) */}
+          <div className="hidden md:block overflow-x-auto border border-border/60 rounded-xl">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-raised/60 border-b border-border/60 text-muted-foreground font-mono text-[10.5px] uppercase tracking-wider">
+                <tr>
+                  <th className="py-3 px-4 font-semibold">FECHA</th>
+                  <th className="py-3 px-4 font-semibold">MOTIVO</th>
+                  <th className="py-3 px-4 font-semibold">DOCUMENTO</th>
+                  <th className="py-3 px-4 font-semibold">OBSERVACIÓN</th>
+                  <th className="py-3 px-4 font-semibold">ESTADO</th>
+                  <th className="py-3 px-4 font-semibold text-center">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/60">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                        <span>Cargando justificaciones...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-muted-foreground">
+                      No se encontraron justificaciones en el periodo seleccionado
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedItems.map((row, idx) => {
+                    const isEven = idx % 2 === 0;
+                    const badge = getStatusBadge(row.estado);
+                    const isObservation = row.estado === "OBSERVATION";
+                    return (
+                      <tr
+                        key={row.id || idx}
+                        className={`hover:bg-raised/40 transition-colors ${
+                          isEven ? "bg-surface/30" : "bg-transparent"
+                        }`}
+                      >
+                        <td className="py-3.5 px-4 font-mono font-medium text-foreground whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon className="w-4 h-4 text-text-4" />
+                            <span>{row.fecha}</span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 font-medium text-foreground max-w-[200px] truncate" title={row.motivo}>
+                          {row.motivo}
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          {row.documentUrl ? (
+                            <a
+                              href={row.documentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/80 bg-surface hover:bg-raised text-[11px] font-medium text-primary hover:text-primary/90 transition-colors"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              <span>Ver adjunto</span>
+                            </a>
+                          ) : (
+                            <span className="text-text-4 text-xs font-mono">Sin documento</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 text-muted-foreground max-w-[180px] truncate" title={row.comment || "—"}>
+                          {row.comment || "—"}
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${badge.cls}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                            {badge.label}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-2">
+                            <Link
+                              href={`/team-member/justificaciones/${row.id}`}
+                              className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-brand-gradient hover:opacity-95 text-white shadow-sm inline-flex items-center justify-center transition-all cursor-pointer"
+                            >
+                              Ver detalle
+                            </Link>
+                            {isObservation && (
+                              <Link
+                                href={`/team-member/justificaciones/${row.id}`}
+                                className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center transition-all cursor-pointer"
+                              >
+                                Subsanar
+                              </Link>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Desktop View */}
-        <JustificacionesDesktopTable
-          items={paginatedItems}
-          getStatusBadge={getStatusBadge}
-          onSubmit={handleSubmit}
-          submittingId={submittingId}
-          isLoading={isLoading}
-        />
+          {/* Mobile Cards List (Identical to asistencias & faltas) */}
+          <div className="md:hidden space-y-3">
+            {isLoading ? (
+              <div className="py-12 text-center text-muted-foreground">
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <span>Cargando justificaciones...</span>
+                </div>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground text-xs">
+                No se encontraron justificaciones en el periodo seleccionado
+              </div>
+            ) : (
+              paginatedItems.map((row, idx) => {
+                const badge = getStatusBadge(row.estado);
+                const isObservation = row.estado === "OBSERVATION";
+                return (
+                  <div
+                    key={row.id || idx}
+                    className="rounded-2xl border border-border/70 bg-surface/50 p-4 space-y-3"
+                  >
+                    {/* Header row: Fecha & Estado badge */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 font-mono text-xs font-semibold text-foreground">
+                        <CalendarIcon className="w-4 h-4 text-text-4" />
+                        <span>{row.fecha}</span>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${badge.cls}`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
+                        {badge.label}
+                      </span>
+                    </div>
 
-        {/* Pagination Footer */}
-        <JustificacionesPagination
-          total={total}
-          page={currentPage}
-          totalPages={totalPages}
-          onPrevPage={() => setPage((p) => Math.max(1, p - 1))}
-          onNextPage={() => setPage((p) => Math.min(totalPages, p + 1))}
-        />
+                    {/* Motivo box */}
+                    <div className="bg-raised/70 border border-border/60 rounded-xl p-2.5 space-y-1">
+                      <span className="block font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground font-semibold">
+                        MOTIVO
+                      </span>
+                      <p className="text-xs font-medium text-foreground">{row.motivo}</p>
+                    </div>
+
+                    {/* Observación box if any */}
+                    {row.comment && (
+                      <div className="bg-raised/70 border border-border/60 rounded-xl p-2.5 space-y-1">
+                        <span className="block font-mono text-[9.5px] uppercase tracking-wider text-amber-400 font-semibold">
+                          OBSERVACIÓN
+                        </span>
+                        <p className="text-xs text-muted-foreground">{row.comment}</p>
+                      </div>
+                    )}
+
+                    {/* Actions row: Documento link & Details button */}
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
+                      {row.documentUrl ? (
+                        <a
+                          href={row.documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-border/80 bg-raised hover:bg-surface text-xs font-medium text-primary transition-colors"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>Ver adjunto</span>
+                        </a>
+                      ) : (
+                        <span className="text-xs text-text-4 font-mono">Sin adjunto</span>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/team-member/justificaciones/${row.id}`}
+                          className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-brand-gradient hover:opacity-95 text-white shadow-sm inline-flex items-center justify-center transition-all cursor-pointer"
+                        >
+                          Ver detalle
+                        </Link>
+                        {isObservation && (
+                          <Link
+                            href={`/team-member/justificaciones/${row.id}`}
+                            className="h-7 px-3.5 rounded-full font-bold text-[11px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40 inline-flex items-center justify-center transition-all cursor-pointer"
+                          >
+                            Subsanar
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Standard Pagination Controls (Identical to asistencias & faltas) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <span className="text-xs text-text-4 font-mono">
+              {total} {total === 1 ? "registro total" : "registros totales"}
+            </span>
+
+            <div className="flex items-center gap-2">
+              <button
+                disabled={currentPage <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                aria-label="Página anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-text-3 font-medium whitespace-nowrap">
+                Página <strong className="text-foreground">{currentPage}</strong> de {totalPages}
+              </span>
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="w-9 h-9 rounded-xl border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                aria-label="Página siguiente"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

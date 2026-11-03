@@ -71,6 +71,56 @@ type AttendanceRecord = {
 
 
 
+function getAttendanceImageUrl(url: string | null | undefined): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+    return url;
+  }
+  return formatAvatarUrl(url) || url;
+}
+
+function AttendanceThumbnail({
+  url,
+  title,
+  borderColor,
+  onClick,
+}: {
+  url: string;
+  title: string;
+  borderColor: string;
+  onClick: () => void;
+}) {
+  const [hasError, setHasError] = useState(false);
+  const src = getAttendanceImageUrl(url);
+
+  if (!src || hasError) {
+    return (
+      <div
+        className={`w-8 h-8 rounded-lg bg-raised border ${borderColor} inline-flex items-center justify-center text-text-4`}
+        title={`${title} (no disponible)`}
+      >
+        <Camera className="w-4 h-4 opacity-40" />
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative group w-8 h-8 rounded-lg overflow-hidden border ${borderColor} inline-block hover:scale-105 transition-transform cursor-pointer`}
+      title={title}
+    >
+      <img
+        src={src}
+        alt={title}
+        className="w-full h-full object-cover"
+        onError={() => setHasError(true)}
+      />
+    </button>
+  );
+}
+
 function formatTimeOnly(timeStr?: string | null, dateStr?: string | null): string {
   return formatAttendanceTime(timeStr, dateStr);
 }
@@ -498,7 +548,7 @@ export default function AttendanceHistoryPage() {
                               {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
                                 <button
                                   type="button"
-                                  onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                                  onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
                                   className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                                   title="Ver foto de entrada"
                                 >
@@ -513,7 +563,7 @@ export default function AttendanceHistoryPage() {
                               {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
                                 <button
                                   type="button"
-                                  onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                                  onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
                                   className="p-1 text-muted-foreground hover:text-amber-500 transition-colors cursor-pointer"
                                   title="Ver foto de salida"
                                 >
@@ -529,43 +579,25 @@ export default function AttendanceHistoryPage() {
                             {checkInPhoto || checkOutPhoto ? (
                               <div className="flex items-center justify-center gap-2">
                                 {checkInPhoto && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
-                                    className="relative group w-8 h-8 rounded-lg overflow-hidden border border-primary/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                  <AttendanceThumbnail
+                                    url={checkInPhoto}
                                     title="Foto de entrada"
-                                  >
-                                    <img
-                                      src={formatAvatarUrl(checkInPhoto) || checkInPhoto}
-                                      alt="Foto entrada"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <span className="absolute bottom-0 inset-x-0 bg-primary/90 text-[7px] text-white font-mono font-bold leading-none py-0.5 text-center">
-                                      IN
-                                    </span>
-                                  </button>
+                                    borderColor="border-primary/50"
+                                    onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
+                                  />
                                 )}
                                 {checkOutPhoto && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
-                                    className="relative group w-8 h-8 rounded-lg overflow-hidden border border-amber-500/50 inline-block hover:scale-105 transition-transform cursor-pointer"
+                                  <AttendanceThumbnail
+                                    url={checkOutPhoto}
                                     title="Foto de salida"
-                                  >
-                                    <img
-                                      src={formatAvatarUrl(checkOutPhoto) || checkOutPhoto}
-                                      alt="Foto salida"
-                                      className="w-full h-full object-cover"
-                                    />
-                                    <span className="absolute bottom-0 inset-x-0 bg-amber-600/90 text-[7px] text-white font-mono font-bold leading-none py-0.5 text-center">
-                                      OUT
-                                    </span>
-                                  </button>
+                                    borderColor="border-amber-500/50"
+                                    onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
+                                  />
                                 )}
                               </div>
                             ) : (
                               <div className="w-8 h-8 rounded-lg bg-raised border border-border/80 inline-flex items-center justify-center text-text-4">
-                                <Camera className="w-4 h-4" />
+                                <Camera className="w-4 h-4 opacity-40" />
                               </div>
                             )}
                           </td>
@@ -636,7 +668,7 @@ export default function AttendanceHistoryPage() {
                           {rec.checkIn && rec.checkIn !== "-" && checkInPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
                               className="p-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                               title="Ver foto de entrada"
                             >
@@ -656,7 +688,7 @@ export default function AttendanceHistoryPage() {
                           {rec.checkOut && rec.checkOut !== "-" && checkOutPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
                               className="p-1 text-muted-foreground hover:text-amber-500 transition-colors cursor-pointer"
                               title="Ver foto de salida"
                             >
@@ -674,7 +706,7 @@ export default function AttendanceHistoryPage() {
                           {checkInPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkInPhoto))}
+                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
                               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-primary/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
                             >
                               <Camera className="w-3.5 h-3.5 text-primary" />
@@ -684,7 +716,7 @@ export default function AttendanceHistoryPage() {
                           {checkOutPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(formatAvatarUrl(checkOutPhoto))}
+                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
                               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
                             >
                               <Camera className="w-3.5 h-3.5 text-amber-500" />
@@ -694,7 +726,7 @@ export default function AttendanceHistoryPage() {
                         </div>
                       ) : (
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/50 bg-raised/50 text-xs text-text-4">
-                          <Camera className="w-3.5 h-3.5" />
+                          <Camera className="w-3.5 h-3.5 opacity-40" />
                           <span>Sin foto</span>
                         </div>
                       )}
