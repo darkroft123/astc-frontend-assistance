@@ -112,6 +112,47 @@ export default function DashboardPage() {
   const startTime = project?.workStartTime?.slice(0, 5) || "08:00";
   const endTime = project?.workEndTime?.slice(0, 5) || "17:00";
 
+  // Dynamic rotating suggestions for dashboard header
+  const suggestions = useMemo(() => {
+    const list: string[] = [];
+    if (metrics.pendingJustifications > 0) {
+      list.push(
+        `Tienes ${metrics.pendingJustifications} ${
+          metrics.pendingJustifications === 1 ? "falta pendiente" : "faltas pendientes"
+        } de justificar. Puedes adjuntar tu constancia desde el panel.`
+      );
+    } else {
+      list.push("Estás al día con tus asistencias. ¡Excelente trabajo!");
+    }
+
+    if (startTime) {
+      const end = endTime ? ` a ${endTime}` : "";
+      list.push(`Tu turno de hoy es de ${startTime}${end}. Recuerda registrar tu asistencia.`);
+    }
+
+    list.push("Recuerda que puedes solicitar justificaciones y adjuntar documentos desde el módulo de justificaciones.");
+    list.push("Mantén tu puntualidad para asegurar un récord impecable este periodo.");
+    list.push("Revisa tus horas acumuladas y resumen semanal en los gráficos inferiores.");
+    list.push("Si necesitas ausentarte, tramita tu justificación o permiso con anticipación.");
+
+    return list;
+  }, [metrics.pendingJustifications, startTime, endTime]);
+
+  const [suggestionIdx, setSuggestionIdx] = useState(0);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    if (suggestions.length <= 1) return;
+    const timer = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setSuggestionIdx((prev) => (prev + 1) % suggestions.length);
+        setFade(true);
+      }, 300);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [suggestions.length]);
+
   const totalDays = metrics.totalAttendances + metrics.totalAbsences + metrics.pendingJustifications;
   const attendanceRate =
     totalDays > 0
@@ -331,9 +372,13 @@ export default function DashboardPage() {
               Hola, {displayName}
             </h1>
 
-            {/* Subtitle */}
-            <p className="text-xs sm:text-sm text-text-4 mt-1">
-              Tienes {metrics.pendingJustifications} día pendiente de justificar. Tu turno de hoy empieza a las {startTime}.
+            {/* Subtitle with dynamic rotation and smooth fade */}
+            <p
+              className={`text-xs sm:text-sm text-text-4 mt-1 transition-opacity duration-300 min-h-[20px] ${
+                fade ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {suggestions[suggestionIdx] || "Panel de gestión y seguimiento de tu jornada laboral."}
             </p>
           </div>
 
