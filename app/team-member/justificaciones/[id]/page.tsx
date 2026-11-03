@@ -46,16 +46,33 @@ function formatDate(value?: string | null) {
 }
 
 function eventLabel(e: any) {
-  if (!e.previousStatus && e.newStatus === "PENDING") return "Justificación creada";
-  if (!e.previousStatus && e.newStatus === "SUBMITTED") return "Enviada para revisión";
-  if (e.previousStatus === "PENDING" && e.newStatus === "SUBMITTED") return "Enviada para revisión";
-  if (e.previousStatus === "OBSERVATION" && e.newStatus === "PENDING") return "Reenviada tras corrección";
-  if (e.previousStatus === "OBSERVATION" && e.newStatus === "SUBMITTED") return "Reenviada";
-  if (e.newStatus === "SUBMITTED") return "Enviada para revisión";
-  if (e.newStatus === "OBSERVATION") return "El Jefe de Proyecto solicitó correcciones";
-  if (e.newStatus === "APPROVED") return "Aprobada por el Jefe de Proyecto";
-  if (e.newStatus === "REJECTED") return "Rechazada por el Jefe de Proyecto";
-  return e.newStatus || "Cambio de estado";
+  const prev = (e.previousStatus || "").toUpperCase();
+  const next = (e.newStatus || "").toUpperCase();
+
+  if (next === "UNDER_REVIEW" || next === "IN_REVIEW" || next === "EN_REVISION") {
+    return "En revisión";
+  }
+  if (next === "OBSERVED" || next === "OBSERVATION" || next === "OBSERVADA") {
+    return "Observada";
+  }
+  if (next === "APPROVED" || next === "APROBADA") {
+    return "Aprobada por el Jefe de Proyecto";
+  }
+  if (next === "REJECTED" || next === "RECHAZADA") {
+    return "Rechazada por el Jefe de Proyecto";
+  }
+  if (prev === "OBSERVED" || prev === "OBSERVATION" || prev === "OBSERVADA") {
+    if (next === "SUBMITTED" || next === "PENDING") {
+      return "Reenviada tras corrección";
+    }
+  }
+  if (next === "SUBMITTED" || next === "ENVIADA") {
+    return "Enviada para revisión";
+  }
+  if (next === "PENDING" || next === "PENDIENTE") {
+    return "Justificación creada";
+  }
+  return next ? next.replace(/_/g, " ").toLowerCase().replace(/^\w/, (c: string) => c.toUpperCase()) : "Cambio de estado";
 }
 
 export default function JustificationDetailPage() {
@@ -382,8 +399,8 @@ export default function JustificationDetailPage() {
               <span>Historial de cambios</span>
             </h2>
 
-            <div className="space-y-3">
-              {(currentJustification.history && currentJustification.history.length > 0
+            {(() => {
+              const historyList = (currentJustification.history && currentJustification.history.length > 0)
                 ? currentJustification.history
                 : [
                     {
@@ -392,26 +409,65 @@ export default function JustificationDetailPage() {
                       changedAt: currentJustification.submittedAt || "2026-09-02T09:15:00Z",
                       comment: "Solicitud enviada para revisión del Jefe de Proyecto.",
                     },
-                  ]
-              ).map((entry: any, idx: number) => (
-                <div key={entry.id || idx} className="flex items-start gap-3 text-xs">
-                  <div className="w-2.5 h-2.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
-                  <div className="flex-1 bg-background dark:bg-[#141829] border border-border dark:border-[#1E2335] rounded-xl p-3 space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-foreground">{eventLabel(entry)}</p>
-                      <p className="text-[10px] text-muted-foreground font-mono">
-                        {formatDate(entry.changedAt)}
-                      </p>
-                    </div>
-                    {entry.comment && (
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        {entry.comment}
-                      </p>
-                    )}
+                  ];
+              const totalHistoryPages = Math.max(1, Math.ceil(historyList.length / HISTORY_PAGE_SIZE));
+              const safePage = Math.min(Math.max(1, historyPage), totalHistoryPages);
+              const start = (safePage - 1) * HISTORY_PAGE_SIZE;
+              const paginatedHistory = historyList.slice(start, start + HISTORY_PAGE_SIZE);
+
+              return (
+                <div className="space-y-3">
+                  <div className="space-y-3">
+                    {paginatedHistory.map((entry: any, idx: number) => (
+                      <div key={entry.id || idx} className="flex items-start gap-3 text-xs">
+                        <div className="w-2.5 h-2.5 rounded-full bg-purple-400 mt-1.5 shrink-0" />
+                        <div className="flex-1 bg-background dark:bg-[#141829] border border-border dark:border-[#1E2335] rounded-xl p-3 space-y-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="font-semibold text-foreground">{eventLabel(entry)}</p>
+                            <p className="text-[10px] text-muted-foreground font-mono">
+                              {formatDate(entry.changedAt)}
+                            </p>
+                          </div>
+                          {entry.comment && (
+                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                              {entry.comment}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
+
+                  {totalHistoryPages > 1 && (
+                    <div className="flex items-center justify-between pt-3 border-t border-border/40 text-xs">
+                      <span className="text-muted-foreground font-mono text-[11px]">
+                        Página <strong className="text-foreground">{safePage}</strong> de {totalHistoryPages}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          disabled={safePage <= 1}
+                          onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                          className="w-8 h-8 rounded-lg border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                          aria-label="Página anterior"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={safePage >= totalHistoryPages}
+                          onClick={() => setHistoryPage((p) => Math.min(totalHistoryPages, p + 1))}
+                          className="w-8 h-8 rounded-lg border border-border/80 bg-surface hover:bg-raised flex items-center justify-center text-text-3 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
+                          aria-label="Página siguiente"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </div>
 
           {/* CARD 5: Estado de la Revisión y Acciones */}
