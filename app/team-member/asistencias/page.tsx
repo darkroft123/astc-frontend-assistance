@@ -356,23 +356,23 @@ export default function AttendanceHistoryPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto overflow-x-auto scrollbar-none pb-0.5">
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className={`h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 ${
+              className={`h-10 px-3.5 sm:px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 whitespace-nowrap ${
                 period === "custom"
                   ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
                   : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
               }`}
               title="Abrir selector de rango personalizado"
             >
-              <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
-              <span>Rango personalizado</span>
+              <CalendarIcon className="w-4 h-4 text-[#8B7BD8] shrink-0" />
+              <span className="whitespace-nowrap">Rango personalizado</span>
             </button>
 
-            <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+            <div className="shrink-0 px-3.5 sm:px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs whitespace-nowrap">
+              <span className="whitespace-nowrap">{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
             </div>
           </div>
         </div>
@@ -436,13 +436,23 @@ export default function AttendanceHistoryPage() {
                   Buscar fecha
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <CalendarIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
                   <Input
-                    placeholder="AAAA-MM-DD..."
+                    type="date"
                     value={searchDate}
                     onChange={(e) => setSearchDate(e.target.value)}
-                    className="pl-10 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground"
+                    className="pl-10 pr-9 h-11 text-xs rounded-xl border border-border/80 bg-white dark:bg-card text-foreground cursor-pointer"
                   />
+                  {searchDate && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchDate("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 cursor-pointer"
+                      title="Limpiar fecha"
+                    >
+                      <XIcon className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -706,28 +716,33 @@ export default function AttendanceHistoryPage() {
                           {checkInPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkInPhoto))}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-primary/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                              onClick={() => setSelectedPhotoUrl(typeof getAttendanceImageUrl === 'function' ? getAttendanceImageUrl(checkInPhoto) : formatAvatarUrl(checkInPhoto))}
+                              className="w-8 h-8 rounded-xl border border-primary/40 bg-raised hover:bg-surface flex items-center justify-center transition-colors cursor-pointer"
+                              title="Ver foto de entrada"
+                              aria-label="Ver foto de entrada"
                             >
-                              <Camera className="w-3.5 h-3.5 text-primary" />
-                              <span>Foto entrada</span>
+                              <Camera className="w-4 h-4 text-primary" />
                             </button>
                           )}
                           {checkOutPhoto && (
                             <button
                               type="button"
-                              onClick={() => setSelectedPhotoUrl(getAttendanceImageUrl(checkOutPhoto))}
-                              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface text-xs font-medium text-foreground transition-colors cursor-pointer"
+                              onClick={() => setSelectedPhotoUrl(typeof getAttendanceImageUrl === 'function' ? getAttendanceImageUrl(checkOutPhoto) : formatAvatarUrl(checkOutPhoto))}
+                              className="w-8 h-8 rounded-xl border border-amber-500/40 bg-raised hover:bg-surface flex items-center justify-center transition-colors cursor-pointer"
+                              title="Ver foto de salida"
+                              aria-label="Ver foto de salida"
                             >
-                              <Camera className="w-3.5 h-3.5 text-amber-500" />
-                              <span>Foto salida</span>
+                              <Camera className="w-4 h-4 text-amber-500" />
                             </button>
                           )}
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border/50 bg-raised/50 text-xs text-text-4">
-                          <Camera className="w-3.5 h-3.5 opacity-40" />
-                          <span>Sin foto</span>
+                        <div
+                          className="w-8 h-8 rounded-xl border border-border/50 bg-raised/50 flex items-center justify-center text-text-4"
+                          title="Sin foto"
+                          aria-label="Sin foto"
+                        >
+                          <Camera className="w-4 h-4 text-muted-foreground/40" />
                         </div>
                       )}
 

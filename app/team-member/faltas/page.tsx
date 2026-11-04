@@ -237,23 +237,23 @@ export default function AbsencesPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto overflow-x-auto scrollbar-none pb-0.5">
             <button
               type="button"
               onClick={() => setCustomModalOpen(true)}
-              className={`h-10 px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 ${
+              className={`h-10 px-3.5 sm:px-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-2 text-xs font-semibold shadow-xs shrink-0 whitespace-nowrap ${
                 period === "custom"
                   ? "bg-white dark:bg-[#242938] text-primary border-primary/40 font-bold"
                   : "bg-card dark:bg-[#12141F] border-border dark:border-white/10 text-muted-foreground hover:text-foreground hover:bg-muted/40"
               }`}
               title="Abrir selector de rango personalizado"
             >
-              <CalendarIcon className="w-4 h-4 text-[#8B7BD8]" />
-              <span>Rango personalizado</span>
+              <CalendarIcon className="w-4 h-4 text-[#8B7BD8] shrink-0" />
+              <span className="whitespace-nowrap">Rango personalizado</span>
             </button>
 
-            <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-              <span>{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
+            <div className="shrink-0 px-3.5 sm:px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs whitespace-nowrap">
+              <span className="whitespace-nowrap">{formatDateDisplay(dateRange.fromDate)} → {formatDateDisplay(dateRange.toDate)}</span>
             </div>
           </div>
         </div>

@@ -361,9 +361,9 @@ export default function TMJustificacionesPage() {
           })}
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto">
-          <div className="flex-1 sm:flex-initial px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs">
-            <span>{formatDateDisplay(dateRange.from)} → {formatDateDisplay(dateRange.to)}</span>
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto overflow-x-auto scrollbar-none pb-0.5">
+          <div className="shrink-0 px-3.5 sm:px-4 h-10 rounded-2xl border border-border dark:border-white/10 bg-card dark:bg-[#12141F] font-mono text-xs text-muted-foreground dark:text-slate-300 font-medium flex items-center justify-center shadow-xs whitespace-nowrap">
+            <span className="whitespace-nowrap">{formatDateDisplay(dateRange.from)} → {formatDateDisplay(dateRange.to)}</span>
           </div>
 
           <button
